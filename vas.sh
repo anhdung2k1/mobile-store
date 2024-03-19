@@ -162,13 +162,17 @@ build_repo() {
             $MAVEN_IMAGE mvn clean install -Dskiptest \
             || die "[ERROR]: Failed to compile"
 
+        popd
+
         rm -rf $API_DIR/src/main/resources/application.properties
         cp -f $API_DIR/target/*.jar $DOCKER_DIR/$__name/ \
             || die "Target file does not exists in $API_DIR/target/"
-        popd
-
-        docker rm -f $__name
-
+        
+        authen_container=$(docker ps -a --format "{{.Names}}" | grep -i $__name)
+        if [[ -n $authen_container ]]; then
+            docker rm -f $__name
+        fi
+        
         $vas build_image --name=$__name
         docker run -it -d --name $__name \
                 ${DOCKER_REGISTRY}/${image_name}:${version} \
