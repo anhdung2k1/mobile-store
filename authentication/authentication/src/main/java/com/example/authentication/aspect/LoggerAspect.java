@@ -17,7 +17,7 @@ import jakarta.validation.constraints.NotNull;
 @Configuration
 @Aspect
 public class LoggerAspect {
-    private Logger logger = LoggerFactory.getLogger(LoggerAspect.class);
+    private final Logger logger = LoggerFactory.getLogger(LoggerAspect.class);
     @Around("execution(* com.example.authentication.*.*(..))")
     public Object before(@NotNull ProceedingJoinPoint joinPoint) throws Throwable{
         logger.info(joinPoint.getSignature().toString() + "method start");
@@ -25,12 +25,12 @@ public class LoggerAspect {
         Object result = joinPoint.proceed(); // Snap the time when running
         Instant endTime = Instant.now();
         long timeProcess = Duration.between(startTime, endTime).toMillis();
-        logger.info("Time excecuted: " + joinPoint.getSignature().toString() + "running end "+ timeProcess);
+        logger.info("Time executed: " + joinPoint.getSignature().toString() + "running end "+ timeProcess);
         logger.info(joinPoint.getSignature().toString() + "end");
         return result;
     }
     @AfterThrowing(value = "execution(* com.example.authentication.*.*(..))", throwing = "e")
     public void logException(@NotNull JoinPoint joinPoint, @NotNull Exception e){
-        logger.error(joinPoint.getSignature().toString() + "An exception happend because of " + e.getMessage());
+        logger.error(joinPoint.getSignature().toString() + "An exception happened because of " + e.getMessage());
     }
 }

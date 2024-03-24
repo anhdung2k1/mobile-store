@@ -1,7 +1,6 @@
 package com.example.authentication.builder;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,9 +42,6 @@ public class AccountBuilder implements UserDetails{
     @Size(min = 6, message = "Password must be at least 6 characters")
     @JsonIgnore
     private String password;
-
-    @Column(name = "PHONE_NUM")
-    private Long phone_number;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_AT")

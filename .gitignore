@@ -10,7 +10,7 @@
 /docker/client-server/client-server/
 /docker/client-server/requirements.txt
 /docker/authentication/*.jar
-
+/authentication/.idea
 
 # Precompiled Headers
 *.gch

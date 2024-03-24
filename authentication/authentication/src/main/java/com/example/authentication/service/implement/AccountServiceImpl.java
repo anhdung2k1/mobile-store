@@ -51,7 +51,7 @@ public class AccountServiceImpl implements AccountService{
             return AuthenticationResponse.builder().token(jwtToken).build();
         }
         catch(NoSuchElementException e){
-            throw new AccountNotFoundException(String.format("Account is existed"));
+            throw new AccountNotFoundException(String.format("Account is existed %s", accounts.getUserName()));
         }
     }
 
@@ -120,9 +120,9 @@ public class AccountServiceImpl implements AccountService{
                 stream()
                 .map(acc -> new Accounts(
                         acc.getAcc_id(),
+                        acc.getRoles(),
                         acc.getUserName(),
                         acc.getPassword(),
-                        acc.getPhone_number(),
                         acc.getUsers(),
                         acc.getCreateAt(),
                         acc.getUpdateAt()
@@ -134,11 +134,12 @@ public class AccountServiceImpl implements AccountService{
         try {
             UserEntity userEntity = userRepository.findByUserName(userName).isPresent() ? userRepository.findByUserName(userName).get() : null;
             assert userEntity != null;
-            AccountEntity accountEntity = accountRepository.findByUserName(userName).get();
+            AccountEntity accountEntity = accountRepository.findByUserName(userName).isPresent() ? accountRepository.findByUserName(userName).get() : null;
+            assert accountEntity != null;
             return accountEntity.getAcc_id();
         }
         catch (NoSuchElementException e){
-            throw new UserNotFoundException("User is not found :%d");
+            throw new UserNotFoundException("User is not found");
         }
     }
 
