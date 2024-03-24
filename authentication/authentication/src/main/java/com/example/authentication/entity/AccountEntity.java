@@ -26,6 +26,11 @@ public class AccountEntity implements Serializable{
                     pkColumnValue = "ACCOUNT_SEQ_NEXT_VAL",
                     allocationSize = 1)
     private Long acc_id;
+
+    @ManyToOne
+    @JoinColumn(name = "ROLE_ID")
+    private RoleEntity roles;
+
     @Column(name = "USER_NAME", nullable = false, length = 255)
     @NotBlank(message = "Username must not be blank")
     @Size(min = 3, message = "Username must at least 3 characters")
@@ -36,9 +41,6 @@ public class AccountEntity implements Serializable{
     @Size(min = 6, message = "Password must be at least 6 characters")
     @JsonIgnore
     private String password;
-
-    @Column(name = "PHONE_NUM")
-    private Long phone_number;
 
     @OneToOne
     @JoinColumn(name = "USER_ID")

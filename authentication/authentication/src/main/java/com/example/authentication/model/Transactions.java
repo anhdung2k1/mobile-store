@@ -1,0 +1,20 @@
+package com.example.authentication.model;
+
+import com.example.authentication.entity.PaymentEntity;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Transactions {
+    private Long transactionId;
+    private String transactionName;
+    private String transactionType;
+    private PaymentEntity payments;
+    private LocalDateTime createAt;
+    private LocalDateTime updateAt;
+}

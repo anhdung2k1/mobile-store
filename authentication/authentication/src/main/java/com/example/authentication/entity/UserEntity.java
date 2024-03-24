@@ -6,14 +6,8 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +15,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "USERS")
+@Transactional(rollbackOn = Exception.class)
 public class UserEntity implements Serializable{
     //Default Constructor
     public UserEntity(){}
@@ -31,7 +26,13 @@ public class UserEntity implements Serializable{
     }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "USER_ID", nullable = false)
+    @Column(name = "USER_ID", nullable = false, unique = true)
+    @TableGenerator(name = "USER_GEN",
+            table = "SEQUENCER",
+            pkColumnName = "SEQ_NAME",
+            valueColumnName = "SEQ_COUNT",
+            pkColumnValue = "USER_SEQ_NEXT_VAL",
+            allocationSize = 1)
     private Long user_id;
 
     @Column(name = "USER_NAME", nullable = false)
