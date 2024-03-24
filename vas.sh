@@ -137,6 +137,7 @@ build_repo() {
             -e MYSQL_DATABASE=${COMMON_DB} \
             -e MYSQL_USER=${COMMON_DB} \
             -e MYSQL_PASSWORD=${COMMON_DB} \
+            -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
             -p 3306:3306 \
             mysql:latest \
         || die "[ERROR]: Failed to run mysql docker"
