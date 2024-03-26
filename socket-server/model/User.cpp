@@ -3,21 +3,21 @@
 #include"User.h"
 using std::string;
 
-User::User() {
-}
+User::User() : role(make_unique<Roles>("USER")) {}
 
-User::User(string name, string password) : name(name), password(password) {
-}
+User::User(string name, string password) : name(name), password(password) {}
 
-User::User(int id, string name) : id(id), name(name) {
-}
+User::User(int id, string name) : id(id), name(name) {}
 
 User::User(int id, string name, string password)
-: id(id), name(name), password(password) {
-}
+: id(id), name(name), password(password) {}
 
 int User::getId() {
     return id;
+}
+
+unique_ptr<Roles> User::getRole() {
+    return move(role);
 }
 
 string User::getName() {
@@ -42,6 +42,10 @@ string User::getAddress() {
 
 void User::setId(int id) {
     this->id = id;
+}
+
+void User::setRole(unique_ptr<Roles> role) {
+    this->role = move(role);
 }
 
 void User::setName(string name) {

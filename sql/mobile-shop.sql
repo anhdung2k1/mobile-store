@@ -1,4 +1,4 @@
-CREATE TABLE USERS(
+CREATE TABLE users(
     user_id BIGINT NOT NULL AUTO_INCREMENT, 
     address VARCHAR(255), 
     birth_day DATE, 
@@ -9,16 +9,16 @@ CREATE TABLE USERS(
     PRIMARY KEY (user_id)
 );
 
-CREATE TABLE ROLES(
+CREATE TABLE roles(
     role_id BIGINT NOT NULL AUTO_INCREMENT,
     role_name VARCHAR(255) NOT NULL,
-    role_description VARCHAR(255) NOT NULL,
+    role_description VARCHAR(255),
     create_at DATETIME(6), 
     update_at DATETIME(6), 
     PRIMARY KEY (role_id)
 );
 
-CREATE TABLE ACCOUNTS(
+CREATE TABLE accounts(
     acc_id BIGINT NOT NULL AUTO_INCREMENT,
     role_id BIGINT NOT NULL,
     user_name VARCHAR(255) NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE ACCOUNTS(
     FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
 
-CREATE TABLE PERMISSION(
+CREATE TABLE permission(
     per_id BIGINT NOT NULL AUTO_INCREMENT,
     role_id BIGINT NOT NULL,
     per_module VARCHAR(255) NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE PERMISSION(
     FOREIGN KEY (role_id) REFERENCES ROLES(role_id)
 );
 
-CREATE TABLE MOBILE(
+CREATE TABLE mobile(
     mob_id BIGINT NOT NULL AUTO_INCREMENT,
     mob_name VARCHAR(255) NOT NULL,
     mob_model VARCHAR(255) NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE MOBILE(
     PRIMARY KEY (mob_id)
 );
 
-CREATE TABLE CUSTOMERS(
+CREATE TABLE customers(
     cus_id BIGINT NOT NULL AUTO_INCREMENT,
     cus_name VARCHAR(255) NOT NULL,
     mob_id BIGINT,
@@ -67,7 +67,7 @@ CREATE TABLE CUSTOMERS(
     FOREIGN KEY (mob_id) REFERENCES MOBILE(mob_id)
 );
 
-CREATE TABLE PAYMENT(
+CREATE TABLE payment(
     pay_id BIGINT NOT NULL AUTO_INCREMENT,
     mob_id BIGINT NOT NULL,
     pay_date DATE,
@@ -79,7 +79,12 @@ CREATE TABLE PAYMENT(
     FOREIGN KEY (mob_id) REFERENCES MOBILE(mob_id)
 );
 
-CREATE TABLE TRANSACTIONS(
+CREATE TABLE customer_payment(
+    pay_id BIGINT NOT NULL,
+    cus_id BIGINT NOT NULL
+);
+
+CREATE TABLE transactions(
     trans_id BIGINT NOT NULL AUTO_INCREMENT,
     trans_name VARCHAR(255) NOT NULL,
     trans_type VARCHAR(255) NOT NULL,
