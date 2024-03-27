@@ -12,9 +12,24 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "USERS")
+@Table(name = "TRANSACTIONS")
 @Transactional(rollbackOn = Exception.class)
 public class TransactionEntity {
+    public TransactionEntity(){
+        this.transactionName = "";
+        this.transactionType = "";
+        this.payments = new PaymentEntity();
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
+
+    public TransactionEntity(String transactionName, String transactionType) {
+        this.transactionName = transactionName;
+        this.transactionType = transactionType;
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "TRANS_ID", nullable = false, unique = true)
@@ -26,11 +41,11 @@ public class TransactionEntity {
             allocationSize = 1)
     private Long transactionId;
 
-    @Column(name = "TRANS_NAME", nullable = false)
+    @Column(name = "TRANS_NAME", nullable = false, length = 100)
     @NotBlank(message = "Transaction Name must not be blank")
     private String transactionName;
 
-    @Column(name = "TRANS_TYPE", nullable = false)
+    @Column(name = "TRANS_TYPE", nullable = false, length = 10)
     @NotBlank(message = "Must specify the transaction type")
     private String transactionType;
 

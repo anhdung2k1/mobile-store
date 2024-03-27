@@ -17,6 +17,14 @@ import java.util.Set;
 @Table(name = "PAYMENT")
 @Transactional(rollbackOn = Exception.class)
 public class PaymentEntity {
+    public PaymentEntity() {
+        this.paymentMethod = "";
+        this.paymentDescription = "";
+        this.paymentDate = new Date();
+        this.mobiles = new MobileEntity();
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PAY_ID", nullable = false, unique = true)

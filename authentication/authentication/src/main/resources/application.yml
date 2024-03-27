@@ -1,4 +1,4 @@
-#Get the ENV from k8s env
+#Get the ENV from k8s, docker env
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

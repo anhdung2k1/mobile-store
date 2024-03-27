@@ -2,6 +2,7 @@ package com.example.authentication.builder;
 
 import java.time.LocalDateTime;
 
+import com.example.authentication.entity.RoleEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,7 +33,7 @@ public class AccountBuilder implements UserDetails{
                     pkColumnValue = "ACCOUNT_SEQ_NEXT_VAL",
                     allocationSize = 1)
     private Long acc_id;
-    @Column(name = "USER_NAME", nullable = false, length = 255)
+    @Column(name = "USER_NAME", nullable = false, length = 20)
     @NotBlank(message = "Username must not be blank")
     @Size(min = 3, message = "Username must at least 3 characters")
     private String userName;
@@ -42,6 +43,10 @@ public class AccountBuilder implements UserDetails{
     @Size(min = 6, message = "Password must be at least 6 characters")
     @JsonIgnore
     private String password;
+
+    @ManyToOne
+    @JoinColumn(name = "ROLE_ID")
+    private RoleEntity roles;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_AT")

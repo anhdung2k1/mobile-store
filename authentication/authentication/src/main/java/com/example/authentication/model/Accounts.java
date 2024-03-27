@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Accounts {
-    private Long acc_id;
+    private Long accountId;
     private RoleEntity roles;
     private String userName;
     private String password;

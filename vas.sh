@@ -116,6 +116,7 @@ build_repo() {
     test -n "$__name" || die "Module name required"
     COMMON_DB="mobile"
     image_name=mb-$__name
+    mysql_con="mysql_container"
     version=$(get_version)
 
     echo "##################################"
@@ -129,10 +130,10 @@ build_repo() {
         
         mysql_container=$(docker ps -a --format "{{.Names}}" | grep -i mysql_container)
         if [[ -n "$mysql_container" ]]; then
-            docker rm -f mysql_container
+            docker rm -f $mysql_con
         fi
         # Start docker mysql container
-        docker run -d --name mysql_container \
+        docker run -d --name $mysql_con \
             -e MYSQL_ROOT_PASSWORD=root \
             -e MYSQL_DATABASE=${COMMON_DB} \
             -e MYSQL_USER=${COMMON_DB} \
@@ -141,15 +142,9 @@ build_repo() {
             -p 3306:3306 \
             mysql:latest \
         || die "[ERROR]: Failed to run mysql docker"
-        mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mysql_container)
+        mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
         echo $mysql_IP
-        chmod +x $VAS_GIT/test/application.properties
-        cp -f $VAS_GIT/test/application.properties $API_DIR/src/main/resources/application.properties
 
-        sed -i -e "s/REPLACE_WITH_DB_IP/${mysql_IP}/g" $API_DIR/src/main/resources/application.properties
-        sed -i -e "s/REPLACE_WITH_DB_COMMON/${COMMON_DB}/g" $API_DIR/src/main/resources/application.properties
-
-        ## Move to API directory
         pushd .
         cd $API_DIR
 
@@ -176,6 +171,10 @@ build_repo() {
         
         $vas build_image --name=$__name
         docker run -it -d --name $__name \
+                -e DB_HOST=${mysql_IP} \
+                -e DB_USERNAME=${COMMON_DB} \
+                -e DB_NAME=${COMMON_DB} \
+                -e DB_PASSWORD=${COMMON_DB} \
                 ${DOCKER_REGISTRY}/${image_name}:${version} \
                 || die "[ERROR]: Failed to compile"
     ;;
@@ -193,7 +192,7 @@ build_repo() {
         docker rm -f $__name
         
         API_HOST=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' authentication)
-        mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mysql_container)
+        mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
         echo $API_HOST
         $vas build_image --name=$__name
         docker run -it -d --name $__name \

@@ -33,9 +33,16 @@ COPY socket-server/ /app/socket-server
 RUN g++ main.cpp -o server \ 
         controller/ServerController.cpp \ 
         services/ServerService.cpp \ 
-        model/User.cpp \ 
+        model/User.cpp \
+        model/Transaction.cpp \
+        model/Role.cpp \
+        model/Permission.cpp \
+        model/Payment.cpp \
+        model/Mobile.cpp \
+        model/Customer.cpp \
         repository/Repository.cpp \ 
         utils/CurlUtils.cpp \ 
+        utils/Date.cpp \
         -lcurl -lmysqlclient -lpthread
 
 EXPOSE 8000

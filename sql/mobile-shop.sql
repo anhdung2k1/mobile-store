@@ -27,8 +27,8 @@ CREATE TABLE accounts(
     update_at DATETIME(6),
     user_id BIGINT,
     PRIMARY KEY (acc_id),
-    FOREIGN KEY (role_id) REFERENCES ROLES(role_id),
-    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+    FOREIGN KEY (role_id) REFERENCES roles(role_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE permission(
@@ -39,7 +39,7 @@ CREATE TABLE permission(
     create_at DATETIME(6), 
     update_at DATETIME(6), 
     PRIMARY KEY (per_id),
-    FOREIGN KEY (role_id) REFERENCES ROLES(role_id)
+    FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 
 CREATE TABLE mobile(
@@ -64,7 +64,7 @@ CREATE TABLE customers(
     create_at DATETIME(6),
     update_at DATETIME(6),
     PRIMARY KEY (cus_id),
-    FOREIGN KEY (mob_id) REFERENCES MOBILE(mob_id)
+    FOREIGN KEY (mob_id) REFERENCES mobile(mob_id)
 );
 
 CREATE TABLE payment(
@@ -76,7 +76,7 @@ CREATE TABLE payment(
     create_at DATETIME(6), 
     update_at DATETIME(6), 
     PRIMARY KEY (pay_id),
-    FOREIGN KEY (mob_id) REFERENCES MOBILE(mob_id)
+    FOREIGN KEY (mob_id) REFERENCES mobile(mob_id)
 );
 
 CREATE TABLE customer_payment(
@@ -92,5 +92,5 @@ CREATE TABLE transactions(
     create_at DATETIME(6), 
     update_at DATETIME(6), 
     PRIMARY KEY (trans_id),
-    FOREIGN KEY (pay_id) REFERENCES PAYMENT(pay_id)
+    FOREIGN KEY (pay_id) REFERENCES payment(pay_id)
 );

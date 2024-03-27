@@ -34,9 +34,9 @@ MYSQL_RES* Repository::mysqlExecuteQuery(
 MYSQL* Repository::connectToDatabase(string address) {
     struct connectionDetails mySql;
     mySql.server = address.c_str();
-    mySql.user = string(getenv("DB_USERNAME")).c_str();
-    mySql.password = string(getenv("DB_PASSWORD")).c_str();
-    mySql.database = string(getenv("DB_NAME")).c_str();
+    mySql.user = getenv("DB_USERNAME");
+    mySql.password = getenv("DB_PASSWORD");
+    mySql.database = getenv("DB_NAME");
     return  mysqlConnectionSetup(mySql);
 }
 

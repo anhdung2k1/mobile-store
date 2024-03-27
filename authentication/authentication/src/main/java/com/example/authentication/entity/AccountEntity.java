@@ -1,21 +1,30 @@
 package com.example.authentication.entity;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
 @Table(name = "ACCOUNTS")
 @Transactional(rollbackOn = Exception.class)
 public class AccountEntity implements Serializable{
+    public AccountEntity() {
+        this.userName = "user";
+        this.password = "user";
+        this.users = new UserEntity("user");
+        this.roles = new RoleEntity("USER");
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ACC_ID", nullable = false, unique = true)
@@ -31,7 +40,7 @@ public class AccountEntity implements Serializable{
     @JoinColumn(name = "ROLE_ID")
     private RoleEntity roles;
 
-    @Column(name = "USER_NAME", nullable = false, length = 255)
+    @Column(name = "USER_NAME", nullable = false, length = 20)
     @NotBlank(message = "Username must not be blank")
     @Size(min = 3, message = "Username must at least 3 characters")
     private String userName;
