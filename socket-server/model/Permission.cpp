@@ -3,19 +3,18 @@
 #include "Permission.h"
 
 Permission::Permission() 
-            : role(make_unique<Roles>("USER")) {
+            : role(Roles("USER")) {
     this->permissionName = "READ"; // Default permission set to USER has READ permission only
     this->permissionModule = "INVENTORY;SALES;CUSTOMER"; // Default permission Module access to system to read
 }
 
 Permission::Permission(string permissionName) 
-            : role(make_unique<Roles>("USER")), permissionName(permissionName) {
+            : role(Roles("USER")), permissionName(permissionName) {
     this->permissionModule = "INVENTORY;SALES;CUSTOMER"; // Default permission Module access to system to
 }
 
-Permission::Permission(string permissionName, unique_ptr<Roles> role)
-            : role(move(role)), permissionName(permissionName) {
-    if (this->role->getRoleName() == "ADMIN") {
+Permission::Permission(string permissionName, Roles role) : role(role), permissionName(permissionName) {
+    if (this->role.getRoleName() == "ADMIN") {
         this->permissionModule = "INVENTORY;SALES;CUSTOMER;SETTINGS;MANAGE"; //ADMIN role
     } else {
         this->permissionModule = "INVENTORY;SALES;CUSTOMER"; // USER role
@@ -26,8 +25,8 @@ int Permission::getPermissionId() {
     return permissionId;
 }
 
-unique_ptr<Roles> Permission::getRole() {
-    return move(role);
+Roles Permission::getRole() {
+    return role;
 }
 
 string Permission::getPermissionName() {

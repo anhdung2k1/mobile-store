@@ -1,9 +1,9 @@
 #include "Payment.h"
 
-Payment::Payment() : mobile(move(mobile)), paymentDate(Date(1,1,2000)),
+Payment::Payment() : mobile(Mobile()), paymentDate(Date(1,1,2000)),
                     paymentMethod("Cash"), paymentDescription("Cash method") {}
 
-Payment::Payment(string paymentMethod, string paymentDescription) : mobile(move(mobile)), paymentDate(Date(1,1,2000)),
+Payment::Payment(string paymentMethod, string paymentDescription) : mobile(Mobile()), paymentDate(Date(1,1,2000)),
                     paymentMethod(paymentMethod), paymentDescription(paymentDescription) {}
 
 Date Payment::getPaymentDate() { 

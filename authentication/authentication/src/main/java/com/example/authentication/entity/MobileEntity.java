@@ -13,6 +13,14 @@ import java.time.LocalDateTime;
 @Table(name = "MOBILE")
 @Transactional(rollbackOn = Exception.class)
 public class MobileEntity {
+    public MobileEntity() {
+        this.mobileName = "";
+        this.mobileModel = "";
+        this.mobileType = "";
+        this.mobileDescription = "";
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MOB_ID", nullable = false, unique = true)
