@@ -16,6 +16,15 @@ import java.util.Set;
 @Table(name = "CUSTOMERS")
 @Transactional(rollbackOn = Exception.class)
 public class CustomerEntity {
+    public CustomerEntity() {
+        this.customerName = "";
+        this.customerAddress = "";
+        this.customerGender = "";
+        this.customerBirthDay = new Date();
+        this.mobile = new MobileEntity();
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CUS_ID", nullable = false, unique = true)

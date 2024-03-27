@@ -16,6 +16,13 @@ import java.time.LocalDateTime;
 @Table(name = "PERMISSION")
 @Transactional(rollbackOn = Exception.class)
 public class PermissionEntity implements Serializable {
+    public PermissionEntity() {
+        this.permissionName = "READ";
+        this.permissionModule = "INVENTORY;SALES;CUSTOMER";
+        this.roles = new RoleEntity("USER");
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PER_ID", nullable = false, unique = true)
@@ -27,7 +34,7 @@ public class PermissionEntity implements Serializable {
                     allocationSize = 1)
     private Long permissionId;
 
-    @Column(name = "PER_NAME", nullable = false)
+    @Column(name = "PER_NAME", nullable = false, length = 64)
     @NotBlank(message = "Permission Name must not be blank")
     private String permissionName;
 
@@ -35,7 +42,7 @@ public class PermissionEntity implements Serializable {
     @JoinColumn(name = "ROLE_ID")
     private RoleEntity roles;
 
-    @Column(name = "PER_MODULE", nullable = false)
+    @Column(name = "PER_MODULE", nullable = false, length = 128)
     @NotBlank(message = "Permission Module must at least specify one module")
     private String permissionModule;
 

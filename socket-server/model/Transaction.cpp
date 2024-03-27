@@ -1,10 +1,10 @@
 #include "Transaction.h"
 
-Transaction::Transaction() : transactionName(""), transactionType(""), payment(make_unique<Payment>()) {}
+Transaction::Transaction() : transactionName(""), transactionType("") {}
 
-Transaction::Transaction(string transactionName, string transactionType) : transactionName(transactionName), transactionType(transactionType), payment(make_unique<Payment>()) {}
+Transaction::Transaction(string transactionName, string transactionType) : transactionName(transactionName), transactionType(transactionType) {}
 
-Transaction::Transaction(string transactionName, string transactionType, unique_ptr<Payment> payment) : transactionName(transactionName), transactionType(transactionType), payment(move(payment)) {}
+Transaction::Transaction(string transactionName, string transactionType, Payment payment) : transactionName(transactionName), transactionType(transactionType), payment(payment) {}
 
 int Transaction::getTransactionId() {
     return transactionId;
@@ -18,8 +18,8 @@ string Transaction::getTransactionType() {
     return transactionType;
 }
 
-unique_ptr<Payment> Transaction::getPayment() {
-    return move(payment);
+Payment Transaction::getPayment() {
+    return payment;
 }
 
 void Transaction::setTransactionName(string transactionName) {
@@ -30,7 +30,7 @@ void Transaction::setTransactionType(string transactionType) {
     this->transactionType = transactionType;
 }
 
-void Transaction::setPayment(unique_ptr<Payment> payment) {
-    this->payment = move(payment);
+void Transaction::setPayment(Payment payment) {
+    this->payment = payment;
 }
 
