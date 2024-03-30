@@ -2,7 +2,6 @@
 #pragma once
 
 #include<string>
-#include<memory>
 #include "Roles.h"
 
 using namespace std;
@@ -10,7 +9,7 @@ using namespace std;
 class UserClient {
  private:
         int id;
-        unique_ptr<Roles> role;
+        Roles role;
         string name;
         string password;
         string gender;
@@ -22,14 +21,14 @@ class UserClient {
         UserClient(int id, string name);
         UserClient(int id, string name, string password);
         int getId();
-        unique_ptr<Roles> getRole();
+        Roles getRole();
         string getName();
         string getPassword();
         string getGender();
         string getBirthday();
         string getAddress();
         void setId(int id);
-        void setRole(unique_ptr<Roles> role);
+        void setRole(Roles role);
         void setName(string name);
         void setPassword(string password);
         void setGender(string gender);

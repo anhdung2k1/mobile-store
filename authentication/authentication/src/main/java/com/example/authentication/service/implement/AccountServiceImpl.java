@@ -108,10 +108,11 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public boolean deleteAccount(Long id) throws Exception {
         try{
-            AccountEntity accountEntity = accountRepository.findById(id).isPresent() ? accountRepository.findById(id).get() : null;
-            assert accountEntity != null;
-            accountRepository.delete(accountEntity);
-            return true;
+            if (accountRepository.findById(id).isPresent()) {
+                accountRepository.delete(accountRepository.findById(id).get());
+                return true;
+            }
+            return false;
         }catch(NoSuchElementException e){
             throw new Exception(String.format("Could not find any account within id: %s", id));
         }
@@ -146,8 +147,6 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public Long getAccIdByUserName (String userName) throws Exception {
         try {
-            UserEntity userEntity = userRepository.findByUserName(userName).isPresent() ? userRepository.findByUserName(userName).get() : null;
-            assert userEntity != null;
             AccountEntity accountEntity = accountRepository.findByUserName(userName).isPresent() ? accountRepository.findByUserName(userName).get() : null;
             assert accountEntity != null;
             return accountEntity.getAcc_id();
@@ -167,7 +166,6 @@ public class AccountServiceImpl implements AccountService{
             }
             else{
                 accountEntity.setPassword(passwordEncoder.encode(accounts.getPassword()));
-                accountEntity.setCreateAt(LocalDateTime.now());
                 accountEntity.setUpdateAt(LocalDateTime.now());
                 accountRepository.save(accountEntity);
                 return accounts;

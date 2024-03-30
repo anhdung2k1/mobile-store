@@ -123,27 +123,26 @@ build_repo() {
     echo "# Prepare the docker local build : #"
     echo "##################################"
 
+    mysql_container=$(docker ps -a --format "{{.Names}}" | grep -i mysql_container)
+    if [[ -n "$mysql_container" ]]; then
+        docker rm -f $mysql_con
+    fi
+    # Start docker mysql container
+    docker run -d --name $mysql_con \
+        -e MYSQL_ROOT_PASSWORD=root \
+        -e MYSQL_DATABASE=${COMMON_DB} \
+        -e MYSQL_USER=${COMMON_DB} \
+        -e MYSQL_PASSWORD=${COMMON_DB} \
+        -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
+        -p 3306:3306 \
+        mysql:latest \
+    || die "[ERROR]: Failed to run mysql docker"
+    mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
+    echo $mysql_IP
+
     case $__name in
     "authentication")
         echo "Start to build Spring boot compile"
-        # To compile the Spring boot, must start the mysql docker for temporaly -> remove after build
-        
-        mysql_container=$(docker ps -a --format "{{.Names}}" | grep -i mysql_container)
-        if [[ -n "$mysql_container" ]]; then
-            docker rm -f $mysql_con
-        fi
-        # Start docker mysql container
-        docker run -d --name $mysql_con \
-            -e MYSQL_ROOT_PASSWORD=root \
-            -e MYSQL_DATABASE=${COMMON_DB} \
-            -e MYSQL_USER=${COMMON_DB} \
-            -e MYSQL_PASSWORD=${COMMON_DB} \
-            -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
-            -p 3306:3306 \
-            mysql:latest \
-        || die "[ERROR]: Failed to run mysql docker"
-        mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
-        echo $mysql_IP
 
         pushd .
         cd $API_DIR
@@ -160,7 +159,6 @@ build_repo() {
 
         popd
 
-        rm -rf $API_DIR/src/main/resources/application.properties
         cp -f $API_DIR/target/*.jar $DOCKER_DIR/$__name/ \
             || die "Target file does not exists in $API_DIR/target/"
         
@@ -188,11 +186,13 @@ build_repo() {
         if [[ -n "${server_image}" ]]; then 
             docker rmi -f ${server_image}:$version
         fi
+        # Remove the docker container running
+        server_container=$(docker ps -a --format "{{.Names}}" | grep -i $__name)
+        if [[ -n $server_container ]]; then
+            docker rm -f $__name
+        fi
 
-        docker rm -f $__name
-        
         API_HOST=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' authentication)
-        mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
         echo $API_HOST
         $vas build_image --name=$__name
         docker run -it -d --name $__name \
@@ -204,6 +204,18 @@ build_repo() {
                 ${DOCKER_REGISTRY}/${image_name}:${version} \
                 || die "[ERROR]: Failed to compile"
     esac
+}
+
+wsl_test() {
+    test -n "$VAS_GIT" || die "Not set [VAS_GIT]"
+    COMMON_DB="mobile"
+    # This for test in Windows compiler -> expose the ip address of the WSL
+    wsl_ip=$(ip addr show eth0 | grep -oP 'inet \K[\d.]+')
+    chmod +x $VAS_GIT/test/application.properties
+    cp -f $VAS_GIT/test/application.properties $API_DIR/src/main/resources/application.properties
+
+    sed -i -e "s/REPLACE_WITH_DB_IP/${wsl_ip}/g" $API_DIR/src/main/resources/application.properties
+    sed -i -e "s/REPLACE_WITH_DB_COMMON/${COMMON_DB}/g" $API_DIR/src/main/resources/application.properties
 }
 
 ## Push image
