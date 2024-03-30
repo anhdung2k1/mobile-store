@@ -23,8 +23,6 @@ public class RoleServiceImpl implements RoleService {
     public Roles createRole(Roles role) throws Exception {
         try {
             RoleEntity roleEntity = new RoleEntity();
-            role.setCreateAt(LocalDateTime.now());
-            role.setUpdateAt(LocalDateTime.now());
             // Copy all the properties into role Entity and save to DB
             BeanUtils.copyProperties(role, roleEntity);
             roleRepository.save(roleEntity);
@@ -58,7 +56,7 @@ public class RoleServiceImpl implements RoleService {
                put("roleDescription", roleEntity.getRoleDescription());
             }};
         } catch (NoSuchElementException e) {
-            throw new Exception("Couldn't not get Role" + roleName + e.getMessage());
+            throw new Exception("Could not get Role" + roleName + e.getMessage());
         }
     }
 
@@ -69,6 +67,7 @@ public class RoleServiceImpl implements RoleService {
             assert roleEntity != null;
             roleEntity.setRoleName(role.getRoleName());
             roleEntity.setRoleDescription(role.getRoleDescription());
+            roleEntity.setUpdateAt(LocalDateTime.now());
             roleRepository.save(roleEntity);
             return role;
         } catch (NoSuchElementException e) {
@@ -81,8 +80,9 @@ public class RoleServiceImpl implements RoleService {
         try {
             if (roleRepository.findById(roleId).isPresent()) {
                 roleRepository.delete(roleRepository.findById(roleId).get());
+                return true;
             }
-            return true;
+            return false;
         } catch (NoSuchElementException e) {
             throw new Exception("Couldn't found role" + e.getMessage());
         }

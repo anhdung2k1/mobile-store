@@ -1,0 +1,135 @@
+package com.example.authentication.service.implement;
+
+import com.example.authentication.entity.CustomerEntity;
+import com.example.authentication.model.Customers;
+import com.example.authentication.repository.CustomerRepository;
+import com.example.authentication.service.interfaces.CustomerService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
+@Service
+@Transactional(rollbackOn = Exception.class)
+@RequiredArgsConstructor
+public class CustomerServiceImpl implements CustomerService {
+    private final CustomerRepository customerRepository;
+
+    @Override
+    public Customers createCustomer(Customers customers) throws Exception {
+        try {
+            CustomerEntity customerEntity = new CustomerEntity();
+            BeanUtils.copyProperties(customers, customerEntity);
+            customerRepository.save(customerEntity);
+            return customers;
+        } catch (Exception e) {
+            throw new Exception("Could not create new Customer" + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllCustomers() {
+        List<Map<String, Object>> customersMapList = new ArrayList<>();
+        List<CustomerEntity> customerEntities = customerRepository.findAll();
+        customerEntities.forEach((customerEntity -> customersMapList.add(new HashMap<>() {{
+            put("customerName", customerEntity.getCustomerName());
+            put("customerGender", customerEntity.getCustomerGender());
+            put("customerAddress", customerEntity.getCustomerAddress());
+            put("customerBirthday", customerEntity.getCustomerBirthDay());
+            put("customerMobile", customerEntity.getMobile());
+        }})));
+        return customersMapList;
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllCustomersWithMobileId(Long mobileId) throws Exception {
+        try {
+            List<Map<String, Object>> customersMapList = new ArrayList<>();
+            List<CustomerEntity> customerEntities = customerRepository.findAllCustomersByMobileId(mobileId).isPresent()
+                    ? customerRepository.findAllCustomersByMobileId(mobileId).get() : null;
+            assert customerEntities != null;
+            customerEntities.forEach((customerEntity -> customersMapList.add(new HashMap<>() {{
+                put("customerName", customerEntity.getCustomerName());
+                put("customerGender", customerEntity.getCustomerGender());
+                put("customerAddress", customerEntity.getCustomerAddress());
+                put("customerBirthday", customerEntity.getCustomerBirthDay());
+                put("customerMobile", customerEntity.getMobile());
+            }})));
+            return customersMapList;
+        } catch (NoSuchElementException e) {
+            throw new Exception("Could not retrieve all customers with mobile ID: " + mobileId + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllCustomersWithName(String customerName) throws Exception {
+        try {
+            List<Map<String, Object>> customersMapList = new ArrayList<>();
+            List<CustomerEntity> customerEntities = customerRepository.findAllCustomersByCustomerName(customerName).isPresent()
+                    ? customerRepository.findAllCustomersByCustomerName(customerName).get() : null;
+            assert customerEntities != null;
+            customerEntities.forEach((customerEntity -> customersMapList.add(new HashMap<>() {{
+                put("customerName", customerEntity.getCustomerName());
+                put("customerGender", customerEntity.getCustomerGender());
+                put("customerAddress", customerEntity.getCustomerAddress());
+                put("customerBirthday", customerEntity.getCustomerBirthDay());
+                put("customerMobile", customerEntity.getMobile());
+            }})));
+            return customersMapList;
+        } catch (NoSuchElementException e) {
+            throw new Exception("Could not retrieve all customers with customer Name: " + customerName + e.getMessage());
+        }
+    }
+
+    @Override
+    public Map<String, Object> getCustomerByCustomerId(Long customerId) throws Exception {
+        try {
+            CustomerEntity customerEntity = customerRepository.findById(customerId).isPresent()
+                    ? customerRepository.findById(customerId).get() : null;
+            assert customerEntity != null;
+            return new HashMap<>() {{
+                put("customerName", customerEntity.getCustomerName());
+                put("customerGender", customerEntity.getCustomerGender());
+                put("customerAddress", customerEntity.getCustomerAddress());
+                put("customerBirthday", customerEntity.getCustomerBirthDay());
+                put("customerMobile", customerEntity.getMobile());
+            }};
+        } catch (NoSuchElementException e) {
+            throw new Exception("Could not get Customer with customer ID: " + customerId + e.getMessage());
+        }
+    }
+
+    @Override
+    public Customers updateCustomerInformation(Long customerId, Customers customers) throws Exception {
+        try {
+            CustomerEntity customerEntity = customerRepository.findById(customerId).isPresent()
+                    ? customerRepository.findById(customerId).get() : null;
+            assert customerEntity != null;
+            customerEntity.setCustomerName(customers.getCustomerName());
+            customerEntity.setCustomerGender(customers.getCustomerGender());
+            customerEntity.setCustomerAddress(customers.getCustomerAddress());
+            customerEntity.setCustomerBirthDay(customers.getCustomerBirthDay());
+            customerEntity.setUpdateAt(LocalDateTime.now());
+            customerRepository.save(customerEntity);
+            return customers;
+        } catch (NoSuchElementException e) {
+            throw new Exception("Could not get Customer with customer ID: " + customerId + e.getMessage());
+        }
+    }
+
+    @Override
+    public Boolean deleteCustomer(Long customerId) throws Exception {
+        try {
+            if(customerRepository.findById(customerId).isPresent()) {
+                customerRepository.delete(customerRepository.findById(customerId).get());
+                return true;
+            }
+            return false;
+        } catch (NoSuchElementException e) {
+            throw new Exception("Could not found customer with customerId: " + customerId + e.getMessage());
+        }
+    }
+}

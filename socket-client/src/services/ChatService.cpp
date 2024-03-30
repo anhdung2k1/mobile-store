@@ -69,21 +69,6 @@ int ChatService::GetPort()
     return PORT;
 }
 
-int ChatService::GetPosMsg()
-{
-    return posMsg;
-}
-
-void ChatService::SetPosMsg(int newPos)
-{
-    posMsg = newPos;
-}
-
-void ChatService::setLatestId(int id)
-{
-    latestMsgId = id;
-}
-
 string ChatService::GetAddress()
 {
     return ADDRESS;

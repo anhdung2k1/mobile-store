@@ -21,15 +21,12 @@ public:
     {
         Login = 0,
         Main = 1,
-        CreateRoom = 2,
-        JoinRoom = 3,
-        FindUser = 4,
-        Update = 5,
-        Chatting = 6,
-        ChattingOption = 7,
-        OrtherUserProfile = 8,
-        LoginInput = 9,
-        RegisterInput = 10
+        FindUser = 2,
+        Update = 3,
+        Chatting = 4,
+        OrtherUserProfile = 5,
+        LoginInput = 6,
+        RegisterInput = 7
     };
     static void handleLogin(int sock, int selection);
     static void UserConsole(int sock);
