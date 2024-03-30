@@ -1654,7 +1654,7 @@ void ChatView::handleMenu(int sock, int selection)
          init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
          init_pair(6, COLOR_WHITE, COLOR_BLACK);
          noecho();
-         if(has_colors() == FALSE)
+         if (has_colors() == FALSE)
          {
             clear();
             endwin();

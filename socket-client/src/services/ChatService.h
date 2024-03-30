@@ -1,9 +1,15 @@
 // Copyright [2024] <Anh Dung>
 #pragma once
 #include "../model/UserClient.h"
+<<<<<<< HEAD
 #include "../model/Mobile.h"
 #include "../view/ChatView.h"
 #include "../view/StatusBar.h"
+=======
+#include "../view/ChatView.h"
+#include "../view/StatusBar.h"
+
+>>>>>>> b1415be (Adapt Socket Client to new model mobile store management (#7))
 #include <vector>
 #include <sys/socket.h>
 #include <arpa/inet.h>
