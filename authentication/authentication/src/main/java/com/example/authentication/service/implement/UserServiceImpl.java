@@ -37,10 +37,11 @@ public class UserServiceImpl implements UserService{
     @Override
     public boolean deleteUser(Long id) throws Exception {
        try{
-            UserEntity userEntity = userRepository.findById(id).isPresent() ? userRepository.findById(id).get() : null;
-            assert userEntity != null;
-            userRepository.delete(userEntity);
-            return true; 
+            if(userRepository.findById(id).isPresent()) {
+               userRepository.delete(userRepository.findById(id).get());
+               return true;
+            }
+            return false;
        }catch(NoSuchElementException e){
             throw new Exception("User is not found :" + id.toString());
        }

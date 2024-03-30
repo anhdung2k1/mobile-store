@@ -19,8 +19,8 @@ int UserClient::getId() {
     return id;
 }
 
-unique_ptr<Roles> UserClient::getRole() {
-    return move(role);
+Roles UserClient::getRole() {
+    return role;
 }
 
 
@@ -48,8 +48,8 @@ void UserClient::setId(int id) {
     this->id = id;
 }
 
-void UserClient::setRole(unique_ptr<Roles> role) {
-    this->role = move(role);
+void UserClient::setRole(Roles role) {
+    this->role = role;
 }
 
 void UserClient::setName(string name) {

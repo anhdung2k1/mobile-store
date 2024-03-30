@@ -33,12 +33,12 @@ public class RoleController {
     }
     //Update Role
     @PatchMapping(value = "/roles/{roleId}")
-    public ResponseEntity<Roles> updateRole(@PathVariable Long roleId, @RequestBody Roles role) throws Exception {
+    public ResponseEntity<Roles> updateRole(@PathVariable("roleId") Long roleId, @RequestBody Roles role) throws Exception {
         return ResponseEntity.ok(roleService.updateRole(roleId, role));
     }
     // Delete Role By Role Id
     @DeleteMapping(value = "/roles/{roleId}")
-    public ResponseEntity<Map<String,Boolean>> deleteRole(@PathVariable Long roleId) throws Exception {
+    public ResponseEntity<Map<String,Boolean>> deleteRole(@PathVariable("roleId") Long roleId) throws Exception {
         return ResponseEntity.ok(new HashMap<>() {{
             put("deleted",roleService.deleteRole(roleId));
         }});
