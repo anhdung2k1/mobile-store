@@ -1,73 +1,90 @@
 // Copyright [2024] <Anh Dung>
-#include<string>
-#include"UserClient.h"
+#include <string>
+#include "UserClient.h"
 
-UserClient::UserClient() {
+UserClient::UserClient()
+{
 }
 
-UserClient::UserClient(string name, string password) : name(name), password(password) {
+UserClient::UserClient(string name, string password) : name(name), password(password)
+{
 }
 
-UserClient::UserClient(int id, string name) : id(id), name(name) {
+UserClient::UserClient(int id, string name) : id(id), name(name)
+{
 }
 
 UserClient::UserClient(int id, string name, string password)
-: id(id), name(name), password(password) {
+    : id(id), name(name), password(password)
+{
 }
 
-int UserClient::getId() {
+int UserClient::getId()
+{
     return id;
 }
 
-Roles UserClient::getRole() {
+Roles UserClient::getRole()
+{
     return role;
 }
 
-
-string UserClient::getName() {
+string UserClient::getName()
+{
     return name;
 }
 
-string UserClient::getPassword() {
+string UserClient::getPassword()
+{
     return password;
 }
 
-string UserClient::getGender() {
+string UserClient::getGender()
+{
     return gender;
 }
 
-string UserClient::getBirthday() {
+string UserClient::getBirthday()
+{
     return birthday;
 }
 
-string UserClient::getAddress() {
+string UserClient::getAddress()
+{
     return address;
 }
 
-void UserClient::setId(int id) {
+void UserClient::setId(int id)
+{
     this->id = id;
 }
 
-void UserClient::setRole(Roles role) {
+void UserClient::setRole(Roles role)
+{
     this->role = role;
 }
 
-void UserClient::setName(string name) {
+void UserClient::setName(string name)
+{
     this->name = name;
 }
 
-void UserClient::setPassword(string password) {
+void UserClient::setPassword(string password)
+{
     this->password = password;
 }
 
-void UserClient::setGender(string gender) {
+void UserClient::setGender(string gender)
+{
     this->gender = gender;
 }
 
-void UserClient::setBirthday(string birthday) {
+void UserClient::setBirthday(string birthday)
+{
     this->birthday = birthday;
 }
 
-void UserClient::setAddress(string address) {
+void UserClient::setAddress(string address)
+{
     this->address = address;
 }

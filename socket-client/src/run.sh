@@ -7,6 +7,18 @@ if [[ $option == "-a" ]]; then
     sudo apt-get install nlohmann-json3-dev -y && \
     sudo apt-get install libncurses5-dev libncursesw5-dev -y
 else
-    g++ -o client main.cpp controller/ChatController.cpp services/ChatService.cpp view/ChatView.cpp model/MessageClient.cpp model/UserClient.cpp model/ChatClient.cpp view/StatusBar.cpp -pthread -lncurses
+    g++ -o client main.cpp controller/ChatController.cpp \
+           services/ChatService.cpp \
+           view/ChatView.cpp \
+           model/Customer.cpp \
+           model/Mobile.cpp \
+           model/Payment.cpp \
+           model/Permission.cpp \
+           model/Role.cpp \
+           model/Transaction.cpp \
+           model/UserClient.cpp \
+           view/StatusBar.cpp \
+           utils/Date.cpp \
+           -pthread -lncurses
     ./client
 fi
