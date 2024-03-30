@@ -62,6 +62,12 @@ public class AccountServiceImpl implements AccountService{
         if(accountRepository.findByUserName(accounts.getUserName()).isPresent()){
             throw new Exception("User exists");
         }
+        if(!roleRepository.findByRoleName(accountEntity.getRoles().getRoleName()).isPresent()) {
+           // Create default role if didn't exists
+           roleEntity = new RoleEntity(accountEntity.getRoles().getRoleName());
+           roleRepository.save(roleEntity);
+           accounts.setRoles(roleEntity);
+        }
 
         String encodedPassword = passwordEncoder.encode(accounts.getPassword());
         accounts.setPassword(encodedPassword);
@@ -73,13 +79,6 @@ public class AccountServiceImpl implements AccountService{
             } else {
                 // If the repository not have that role -> create one
                 roleEntity = new RoleEntity(accounts.getRoles().getRoleName());
-                roleRepository.save(roleEntity);
-                accounts.setRoles(roleEntity);
-            }
-        } else {
-            if(!roleRepository.findByRoleName(accountEntity.getRoles().getRoleName()).isPresent()) {
-                // Create default role if didn't exists
-                roleEntity = new RoleEntity(accountEntity.getRoles().getRoleName());
                 roleRepository.save(roleEntity);
                 accounts.setRoles(roleEntity);
             }
