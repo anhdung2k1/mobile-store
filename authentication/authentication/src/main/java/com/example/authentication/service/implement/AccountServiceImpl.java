@@ -36,6 +36,7 @@ public class AccountServiceImpl implements AccountService{
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
+
     @Override
     public AuthenticationResponse authenticate(Accounts accounts) throws Exception {
         try{
@@ -57,7 +58,7 @@ public class AccountServiceImpl implements AccountService{
     public AuthenticationResponse createAccount(Accounts accounts) throws Exception {
        try{
         AccountEntity accountEntity = new AccountEntity();
-        RoleEntity roleEntity;
+        RoleEntity roleEntity = new RoleEntity("USER");
 
         if(accountRepository.findByUserName(accounts.getUserName()).isPresent()){
             throw new Exception("User exists");
@@ -65,25 +66,20 @@ public class AccountServiceImpl implements AccountService{
 
         String encodedPassword = passwordEncoder.encode(accounts.getPassword());
         accounts.setPassword(encodedPassword);
-        // Default Account will set Role to USER role when create new one
         if (accounts.getRoles() != null && accounts.getRoles().getRoleName() != null) {
-            // If the repository already has Role -> use that role
             if (roleRepository.findByRoleName(accounts.getRoles().getRoleName()).isPresent()) {
-                accounts.setRoles(roleRepository.findByRoleName(accounts.getRoles().getRoleName()).get());
+                roleEntity = roleRepository.findByRoleName(accounts.getRoles().getRoleName()).get();
             } else {
-                // If the repository not have that role -> create one
                 roleEntity = new RoleEntity(accounts.getRoles().getRoleName());
                 roleRepository.save(roleEntity);
-                accounts.setRoles(roleEntity);
             }
+        } else if (roleRepository.findByRoleName(accountEntity.getRoles().getRoleName()).isPresent()) {
+            roleEntity = roleRepository.findByRoleName(accountEntity.getRoles().getRoleName()).get();
         } else {
-            if(!roleRepository.findByRoleName(accountEntity.getRoles().getRoleName()).isPresent()) {
-                // Create default role if didn't exists
-                roleEntity = new RoleEntity(accountEntity.getRoles().getRoleName());
-                roleRepository.save(roleEntity);
-                accounts.setRoles(roleEntity);
-            }
+            roleRepository.save(roleEntity);
         }
+        accounts.setRoles(roleEntity);
+
         //Create new User when adding new account into database
         UserEntity userEntity = new UserEntity(accounts.getUserName());
         userRepository.save(userEntity);
@@ -168,6 +164,7 @@ public class AccountServiceImpl implements AccountService{
                 accountEntity.setPassword(passwordEncoder.encode(accounts.getPassword()));
                 accountEntity.setUpdateAt(LocalDateTime.now());
                 accountRepository.save(accountEntity);
+                BeanUtils.copyProperties(accountEntity, accounts);
                 return accounts;
             }
        } catch(NoSuchElementException e){

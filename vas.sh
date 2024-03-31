@@ -143,7 +143,7 @@ build_repo() {
     case $__name in
     "authentication")
         echo "Start to build Spring boot compile"
-
+        rm -rf $API_DIR/src/main/resources/application.properties
         pushd .
         cd $API_DIR
 

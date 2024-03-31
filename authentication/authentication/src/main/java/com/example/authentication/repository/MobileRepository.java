@@ -10,9 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface MobileRepository extends JpaRepository<MobileEntity, Long> {
-    @Query(value = "select m.* from mobile m where m.mob_name =:mobileName", nativeQuery = true)
+    @Query(value = "SELECT m.* FROM mobile m " +
+            "WHERE m.mob_name =:mobileName", nativeQuery = true)
     Optional<List<MobileEntity>> findAllByMobileName(String mobileName);
 
-    @Query(value = "select m.* from mobile m where m.mob_type =:mobileType", nativeQuery = true)
+    @Query(value = "SELECT m.* FROM mobile m " +
+            "WHERE m.mob_type =:mobileType", nativeQuery = true)
     Optional<List<MobileEntity>> findAllByMobileType(String mobileType);
 }

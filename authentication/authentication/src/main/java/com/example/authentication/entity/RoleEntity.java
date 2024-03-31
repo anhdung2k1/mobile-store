@@ -24,6 +24,9 @@ public class RoleEntity implements Serializable {
     }
     public RoleEntity(String roleName) {
         this.roleName = roleName;
+        this.roleDescription = "User only view permission";
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
     }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -38,7 +38,7 @@ public class PermissionEntity implements Serializable {
     @NotBlank(message = "Permission Name must not be blank")
     private String permissionName;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "ROLE_ID")
     private RoleEntity roles;
 

@@ -18,6 +18,15 @@ import java.util.*;
 public class MobileServiceImpl implements MobileService {
 
     private final MobileRepository mobileRepository;
+
+    private HashMap<String, Object> mobileMap(MobileEntity mobileEntity) {
+        return new HashMap<>() {{
+            put("mobileName", mobileEntity.getMobileName());
+            put("mobileModel", mobileEntity.getMobileModel());
+            put("mobileType", mobileEntity.getMobileType());
+            put("mobileDescription", mobileEntity.getMobileDescription());
+        }};
+    }
     @Override
     public Mobile createMobile(Mobile mobile) throws Exception {
         try {
@@ -37,12 +46,8 @@ public class MobileServiceImpl implements MobileService {
         List<MobileEntity> mobileEntities = mobileRepository.findAllByMobileName(mobileName).isPresent()
                 ? mobileRepository.findAllByMobileName(mobileName).get() : null;
         assert mobileEntities != null;
-        mobileEntities.forEach((mobileEntity -> mobilesMapList.add(new HashMap<>() {{
-            put("mobileName", mobileEntity.getMobileName());
-            put("mobileModel", mobileEntity.getMobileModel());
-            put("mobileType", mobileEntity.getMobileType());
-            put("mobileDescription", mobileEntity.getMobileDescription());
-        }})));
+        mobileEntities.forEach((mobileEntity
+                -> mobilesMapList.add(mobileMap(mobileEntity))));
         return mobilesMapList;
     }
 
@@ -52,12 +57,8 @@ public class MobileServiceImpl implements MobileService {
         List<MobileEntity> mobileEntities = mobileRepository.findAllByMobileType(mobileType).isPresent()
                 ? mobileRepository.findAllByMobileType(mobileType).get() : null;
         assert mobileEntities != null;
-        mobileEntities.forEach((mobileEntity -> mobilesMapList.add(new HashMap<>() {{
-            put("mobileName", mobileEntity.getMobileName());
-            put("mobileModel", mobileEntity.getMobileModel());
-            put("mobileType", mobileEntity.getMobileType());
-            put("mobileDescription", mobileEntity.getMobileDescription());
-        }})));
+        mobileEntities.forEach((mobileEntity
+                -> mobilesMapList.add(mobileMap(mobileEntity))));
         return mobilesMapList;
     }
 
@@ -67,12 +68,7 @@ public class MobileServiceImpl implements MobileService {
             MobileEntity mobileEntity = mobileRepository.findById(mobileId).isPresent()
                     ? mobileRepository.findById(mobileId).get() : null;
             assert mobileEntity != null;
-            return new HashMap<>() {{
-                put("mobileName", mobileEntity.getMobileName());
-                put("mobileModel", mobileEntity.getMobileModel());
-                put("mobileType", mobileEntity.getMobileType());
-                put("mobileDescription", mobileEntity.getMobileDescription());
-            }};
+            return mobileMap(mobileEntity);
         } catch (NoSuchElementException e) {
             throw new Exception("Mobile is not found " + e.getMessage());
         }
@@ -90,6 +86,7 @@ public class MobileServiceImpl implements MobileService {
             mobileEntity.setMobileDescription(mobile.getMobileDescription());
             mobileEntity.setUpdateAt(LocalDateTime.now());
             mobileRepository.save(mobileEntity);
+            BeanUtils.copyProperties(mobileEntity, mobile);
             return mobile;
         } catch (NoSuchElementException e) {
             throw new Exception("Could not found Mobile Device " + e.getMessage());

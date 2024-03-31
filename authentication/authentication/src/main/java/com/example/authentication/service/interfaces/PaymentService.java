@@ -7,7 +7,10 @@ import java.util.Map;
 
 public interface PaymentService {
     Payment createPayment(Payment payment) throws Exception;
-    // Get The History payment
-    List<Map<String, Object>> getAllPaymentByUserId(Long userId) throws Exception;
-
+    //This show the history that user use to pay
+    List<Map<String, Object>> getAllPaymentByCustomerId(Long customerId) throws Exception;
+    List<Map<String, Object>> getAllPaymentByMobileId(Long mobileId) throws Exception;
+    Map<String, Object> getPaymentById(Long paymentId) throws Exception;
+    Payment updatePayment(Long paymentId, Payment payment) throws Exception;
+    Boolean deletePayment(Long paymentId) throws Exception;
 }

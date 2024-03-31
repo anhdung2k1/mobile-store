@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<PermissionEntity, Long> {
-    @Query(value = "select p.* from permission p where p.per_name =:permissionName", nativeQuery = true)
+    @Query(value = "SELECT p.* FROM permission p " +
+            "WHERE p.per_name =:permissionName", nativeQuery = true)
     Optional<PermissionEntity> findByPermissionName(String permissionName);
 }
