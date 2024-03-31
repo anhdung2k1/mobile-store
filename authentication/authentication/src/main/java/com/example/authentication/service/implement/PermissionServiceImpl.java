@@ -18,6 +18,14 @@ import java.util.*;
 public class PermissionServiceImpl implements PermissionService {
 
     private final PermissionRepository permissionRepository;
+
+    private HashMap<String, Object> permissionMap(PermissionEntity permissionEntity) {
+        return new HashMap<>() {{
+            put("permissionName", permissionEntity.getPermissionName());
+            put("permissionModule", permissionEntity.getPermissionModule());
+            put("role", permissionEntity.getRoles());
+        }};
+    }
     @Override
     public Permission createPermission(Permission permission) throws Exception {
         try {
@@ -35,13 +43,8 @@ public class PermissionServiceImpl implements PermissionService {
     public List<Map<String, Object>> getAllPermission() {
         List<PermissionEntity> permissionEntities = permissionRepository.findAll();
         List<Map<String, Object>> perMapList = new ArrayList<>();
-        for(PermissionEntity permissionEntity : permissionEntities) {
-            perMapList.add(new HashMap<>() {{
-                put("permissionName", permissionEntity.getPermissionName());
-                put("permissionModule", permissionEntity.getPermissionModule());
-                put("role", permissionEntity.getRoles());
-            }});
-        }
+        permissionEntities.forEach((permissionEntity
+                -> perMapList.add(permissionMap(permissionEntity))));
         return perMapList;
     }
 
@@ -51,11 +54,7 @@ public class PermissionServiceImpl implements PermissionService {
             PermissionEntity permissionEntity = permissionRepository.findByPermissionName(permissionName).isPresent()
                     ? permissionRepository.findByPermissionName(permissionName).get() : null;
             assert permissionEntity != null;
-            return new HashMap<>() {{
-                put("permissionName", permissionEntity.getPermissionName());
-                put("permissionModule", permissionEntity.getPermissionModule());
-                put("role", permissionEntity.getRoles());
-            }};
+            return permissionMap(permissionEntity);
         } catch (NoSuchElementException e) {
             throw new Exception("Could not get Permission" + permissionName + e.getMessage());
         }
@@ -71,6 +70,7 @@ public class PermissionServiceImpl implements PermissionService {
             permissionEntity.setPermissionModule(permission.getPermissionModule());
             permissionEntity.setUpdateAt(LocalDateTime.now());
             permissionRepository.save(permissionEntity);
+            BeanUtils.copyProperties(permissionEntity, permission);
             return permission;
         } catch (NoSuchElementException e) {
             throw new Exception("Role is not found" + e.getMessage());

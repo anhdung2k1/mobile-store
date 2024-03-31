@@ -18,6 +18,15 @@ import java.util.*;
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
 
+    private Map<String, Object> customerMap(CustomerEntity customerEntity) {
+        return new HashMap<>() {{
+            put("customerName", customerEntity.getCustomerName());
+            put("customerGender", customerEntity.getCustomerGender());
+            put("customerAddress", customerEntity.getCustomerAddress());
+            put("customerBirthday", customerEntity.getCustomerBirthDay());
+            put("customerMobile", customerEntity.getMobile());
+        }};
+    }
     @Override
     public Customers createCustomer(Customers customers) throws Exception {
         try {
@@ -34,13 +43,8 @@ public class CustomerServiceImpl implements CustomerService {
     public List<Map<String, Object>> getAllCustomers() {
         List<Map<String, Object>> customersMapList = new ArrayList<>();
         List<CustomerEntity> customerEntities = customerRepository.findAll();
-        customerEntities.forEach((customerEntity -> customersMapList.add(new HashMap<>() {{
-            put("customerName", customerEntity.getCustomerName());
-            put("customerGender", customerEntity.getCustomerGender());
-            put("customerAddress", customerEntity.getCustomerAddress());
-            put("customerBirthday", customerEntity.getCustomerBirthDay());
-            put("customerMobile", customerEntity.getMobile());
-        }})));
+        customerEntities.forEach((customerEntity
+                -> customersMapList.add(customerMap(customerEntity))));
         return customersMapList;
     }
 
@@ -51,13 +55,8 @@ public class CustomerServiceImpl implements CustomerService {
             List<CustomerEntity> customerEntities = customerRepository.findAllCustomersByMobileId(mobileId).isPresent()
                     ? customerRepository.findAllCustomersByMobileId(mobileId).get() : null;
             assert customerEntities != null;
-            customerEntities.forEach((customerEntity -> customersMapList.add(new HashMap<>() {{
-                put("customerName", customerEntity.getCustomerName());
-                put("customerGender", customerEntity.getCustomerGender());
-                put("customerAddress", customerEntity.getCustomerAddress());
-                put("customerBirthday", customerEntity.getCustomerBirthDay());
-                put("customerMobile", customerEntity.getMobile());
-            }})));
+            customerEntities.forEach((customerEntity
+                    -> customersMapList.add(customerMap(customerEntity))));
             return customersMapList;
         } catch (NoSuchElementException e) {
             throw new Exception("Could not retrieve all customers with mobile ID: " + mobileId + e.getMessage());
@@ -71,13 +70,8 @@ public class CustomerServiceImpl implements CustomerService {
             List<CustomerEntity> customerEntities = customerRepository.findAllCustomersByCustomerName(customerName).isPresent()
                     ? customerRepository.findAllCustomersByCustomerName(customerName).get() : null;
             assert customerEntities != null;
-            customerEntities.forEach((customerEntity -> customersMapList.add(new HashMap<>() {{
-                put("customerName", customerEntity.getCustomerName());
-                put("customerGender", customerEntity.getCustomerGender());
-                put("customerAddress", customerEntity.getCustomerAddress());
-                put("customerBirthday", customerEntity.getCustomerBirthDay());
-                put("customerMobile", customerEntity.getMobile());
-            }})));
+            customerEntities.forEach((customerEntity
+                    -> customersMapList.add(customerMap(customerEntity))));
             return customersMapList;
         } catch (NoSuchElementException e) {
             throw new Exception("Could not retrieve all customers with customer Name: " + customerName + e.getMessage());
@@ -90,13 +84,7 @@ public class CustomerServiceImpl implements CustomerService {
             CustomerEntity customerEntity = customerRepository.findById(customerId).isPresent()
                     ? customerRepository.findById(customerId).get() : null;
             assert customerEntity != null;
-            return new HashMap<>() {{
-                put("customerName", customerEntity.getCustomerName());
-                put("customerGender", customerEntity.getCustomerGender());
-                put("customerAddress", customerEntity.getCustomerAddress());
-                put("customerBirthday", customerEntity.getCustomerBirthDay());
-                put("customerMobile", customerEntity.getMobile());
-            }};
+            return customerMap(customerEntity);
         } catch (NoSuchElementException e) {
             throw new Exception("Could not get Customer with customer ID: " + customerId + e.getMessage());
         }
@@ -114,6 +102,7 @@ public class CustomerServiceImpl implements CustomerService {
             customerEntity.setCustomerBirthDay(customers.getCustomerBirthDay());
             customerEntity.setUpdateAt(LocalDateTime.now());
             customerRepository.save(customerEntity);
+            BeanUtils.copyProperties(customerEntity, customers);
             return customers;
         } catch (NoSuchElementException e) {
             throw new Exception("Could not get Customer with customer ID: " + customerId + e.getMessage());

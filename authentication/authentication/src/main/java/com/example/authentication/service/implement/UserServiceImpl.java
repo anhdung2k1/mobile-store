@@ -119,6 +119,7 @@ public class UserServiceImpl implements UserService{
             userEntity.setGender(user.getGender());
             userEntity.setUpdateAt(LocalDateTime.now());
             userRepository.save(userEntity);
+            BeanUtils.copyProperties(userEntity, user);
             return user;
         }
         catch (NoSuchElementException e){

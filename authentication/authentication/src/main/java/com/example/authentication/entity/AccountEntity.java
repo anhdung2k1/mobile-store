@@ -19,7 +19,7 @@ public class AccountEntity implements Serializable{
     public AccountEntity() {
         this.userName = "user";
         this.password = "user";
-        this.users = new UserEntity("user");
+        this.users = new UserEntity(this.userName);
         this.roles = new RoleEntity("USER");
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();

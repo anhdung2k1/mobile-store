@@ -12,7 +12,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, Long>{
     List<UserEntity> findByUserNameContains(String userName);
     
-    @Query(value = "select u.* from users u where u.user_name =:userName",nativeQuery=true)
+    @Query(value = "SELECT u.* FROM users u " +
+            "WHERE u.user_name =:userName",nativeQuery=true)
     Optional<UserEntity> findByUserName(String userName);
 }
 

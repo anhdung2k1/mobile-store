@@ -19,6 +19,12 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
 
+    private HashMap<String, String> roleMap(RoleEntity roleEntity) {
+        return new HashMap<>() {{
+            put("roleName", roleEntity.getRoleName());
+            put("roleDescription", roleEntity.getRoleDescription());
+        }};
+    }
     @Override
     public Roles createRole(Roles role) throws Exception {
         try {
@@ -36,25 +42,18 @@ public class RoleServiceImpl implements RoleService {
     public List<Map<String, String>> getAllRoles() {
         List<RoleEntity> roleEntities = roleRepository.findAll();
         List<Map<String, String>> roleMapList = new ArrayList<>();
-        for(RoleEntity roleEntity : roleEntities) {
-            Map<String, String> role = new HashMap<>() {{
-                put("roleName", roleEntity.getRoleName());
-                put("roleDescription", roleEntity.getRoleDescription());
-            }};
-            roleMapList.add(role);
-        }
+        roleEntities.forEach((roleEntity
+                -> roleMapList.add(roleMap(roleEntity))));
         return roleMapList;
     }
 
     @Override
     public Map<String, String> getRoleByName(String roleName) throws Exception {
         try {
-            RoleEntity roleEntity = roleRepository.findByRoleName(roleName).isPresent() ? roleRepository.findByRoleName(roleName).get() : null;
+            RoleEntity roleEntity = roleRepository.findByRoleName(roleName).isPresent()
+                    ? roleRepository.findByRoleName(roleName).get() : null;
             assert roleEntity != null;
-            return new HashMap<>(){{
-               put("roleName", roleEntity.getRoleName());
-               put("roleDescription", roleEntity.getRoleDescription());
-            }};
+            return roleMap(roleEntity);
         } catch (NoSuchElementException e) {
             throw new Exception("Could not get Role" + roleName + e.getMessage());
         }
@@ -69,6 +68,7 @@ public class RoleServiceImpl implements RoleService {
             roleEntity.setRoleDescription(role.getRoleDescription());
             roleEntity.setUpdateAt(LocalDateTime.now());
             roleRepository.save(roleEntity);
+            BeanUtils.copyProperties(roleEntity, role);
             return role;
         } catch (NoSuchElementException e) {
             throw new Exception("Role is not found" + e.getMessage());
