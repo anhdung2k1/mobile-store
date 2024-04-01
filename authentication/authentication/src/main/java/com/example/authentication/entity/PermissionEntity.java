@@ -19,7 +19,12 @@ public class PermissionEntity implements Serializable {
     public PermissionEntity() {
         this.permissionName = "READ";
         this.permissionModule = "INVENTORY;SALES;CUSTOMER";
-        this.roles = new RoleEntity("USER");
+        this.createAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
+    public PermissionEntity(String permissionName, String permissionModule) {
+        this.permissionName = permissionName;
+        this.permissionModule = permissionModule;
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
     }
@@ -37,10 +42,6 @@ public class PermissionEntity implements Serializable {
     @Column(name = "PER_NAME", nullable = false, length = 64)
     @NotBlank(message = "Permission Name must not be blank")
     private String permissionName;
-
-    @OneToOne
-    @JoinColumn(name = "ROLE_ID")
-    private RoleEntity roles;
 
     @Column(name = "PER_MODULE", nullable = false, length = 128)
     @NotBlank(message = "Permission Module must at least specify one module")

@@ -23,7 +23,6 @@ public class PermissionServiceImpl implements PermissionService {
         return new HashMap<>() {{
             put("permissionName", permissionEntity.getPermissionName());
             put("permissionModule", permissionEntity.getPermissionModule());
-            put("role", permissionEntity.getRoles());
         }};
     }
     @Override

@@ -7,10 +7,7 @@ import com.example.authentication.entity.AccountEntity;
 import com.example.authentication.entity.RoleEntity;
 import com.example.authentication.entity.UserEntity;
 import com.example.authentication.model.Accounts;
-import com.example.authentication.repository.AccountBuilderRepository;
-import com.example.authentication.repository.AccountRepository;
-import com.example.authentication.repository.RoleRepository;
-import com.example.authentication.repository.UserRepository;
+import com.example.authentication.repository.*;
 import com.example.authentication.service.interfaces.AccountService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +32,7 @@ public class AccountServiceImpl implements AccountService{
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
     private final AuthenticationManager authenticationManager;
 
     @Override
@@ -72,17 +70,26 @@ public class AccountServiceImpl implements AccountService{
             } else {
                 roleEntity = new RoleEntity(accounts.getRoles().getRoleName());
                 roleRepository.save(roleEntity);
+                permissionRepository.saveAll(roleEntity.getPermissions());
             }
         } else if (roleRepository.findByRoleName(accountEntity.getRoles().getRoleName()).isPresent()) {
             roleEntity = roleRepository.findByRoleName(accountEntity.getRoles().getRoleName()).get();
         } else {
             roleRepository.save(roleEntity);
+            permissionRepository.saveAll(roleEntity.getPermissions());
         }
         accounts.setRoles(roleEntity);
 
         //Create new User when adding new account into database
-        UserEntity userEntity = new UserEntity(accounts.getUserName());
-        userRepository.save(userEntity);
+        UserEntity userEntity;
+        if  (userRepository.findByUserName(accounts.getUserName()).isPresent()) {
+            userEntity = userRepository.findByUserName(accounts.getUserName()).get();
+        } else {
+            userEntity = new UserEntity(accounts.getUserName());
+            userRepository.save(userEntity);
+        }
+        accounts.setCreateAt(LocalDateTime.now());
+        accounts.setUpdateAt(LocalDateTime.now());
         accounts.setUsers(userEntity);
         BeanUtils.copyProperties(accounts, accountEntity);
         accountRepository.save(accountEntity);

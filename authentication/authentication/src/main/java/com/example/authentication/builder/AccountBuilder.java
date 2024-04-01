@@ -1,19 +1,21 @@
 package com.example.authentication.builder;
 
-import java.time.LocalDateTime;
-
 import com.example.authentication.entity.RoleEntity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.*;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.*;
-import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Entity
 @Builder
@@ -56,7 +58,7 @@ public class AccountBuilder implements UserDetails{
     private LocalDateTime updateAt;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("USER"));
+        return roles.getAuthorities();
     }
     @Override
     public String getPassword() {

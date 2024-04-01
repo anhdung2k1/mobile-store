@@ -33,13 +33,17 @@ CREATE TABLE accounts(
 
 CREATE TABLE permission(
     per_id BIGINT NOT NULL AUTO_INCREMENT,
-    role_id BIGINT NOT NULL,
     per_module VARCHAR(255) NOT NULL,
     per_name VARCHAR(255) NOT NULL,
     create_at DATETIME(6), 
     update_at DATETIME(6), 
-    PRIMARY KEY (per_id),
-    FOREIGN KEY (role_id) REFERENCES roles(role_id)
+    PRIMARY KEY (per_id)
+);
+
+CREATE TABLE roles_permissions(
+    role_id BIGINT NOT NULL,
+    per_id BIGINT NOT NULL,
+    PRIMARY KEY (role_id, per_id)
 );
 
 CREATE TABLE mobile(
@@ -81,7 +85,8 @@ CREATE TABLE payment(
 
 CREATE TABLE customer_payment(
     pay_id BIGINT NOT NULL,
-    cus_id BIGINT NOT NULL
+    cus_id BIGINT NOT NULL,
+    PRIMARY KEY (pay_id, cus_id)
 );
 
 CREATE TABLE transactions(

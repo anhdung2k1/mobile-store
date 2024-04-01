@@ -19,10 +19,11 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
 
-    private HashMap<String, String> roleMap(RoleEntity roleEntity) {
+    private HashMap<String, Object> roleMap(RoleEntity roleEntity) {
         return new HashMap<>() {{
             put("roleName", roleEntity.getRoleName());
             put("roleDescription", roleEntity.getRoleDescription());
+            put("permissions", roleEntity.getPermissions());
         }};
     }
     @Override
@@ -39,16 +40,16 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<Map<String, String>> getAllRoles() {
+    public List<Map<String, Object>> getAllRoles() {
         List<RoleEntity> roleEntities = roleRepository.findAll();
-        List<Map<String, String>> roleMapList = new ArrayList<>();
+        List<Map<String, Object>> roleMapList = new ArrayList<>();
         roleEntities.forEach((roleEntity
                 -> roleMapList.add(roleMap(roleEntity))));
         return roleMapList;
     }
 
     @Override
-    public Map<String, String> getRoleByName(String roleName) throws Exception {
+    public Map<String, Object> getRoleByName(String roleName) throws Exception {
         try {
             RoleEntity roleEntity = roleRepository.findByRoleName(roleName).isPresent()
                     ? roleRepository.findByRoleName(roleName).get() : null;

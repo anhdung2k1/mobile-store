@@ -7,8 +7,8 @@ import java.util.Map;
 
 public interface RoleService {
     Roles createRole(Roles role) throws Exception;
-    List<Map<String, String>> getAllRoles();
-    Map<String, String> getRoleByName(String roleName) throws Exception;
+    List<Map<String, Object>> getAllRoles();
+    Map<String, Object> getRoleByName(String roleName) throws Exception;
     Roles updateRole(Long roleId, Roles role) throws Exception;
     Boolean deleteRole(Long roleId) throws Exception;
 }

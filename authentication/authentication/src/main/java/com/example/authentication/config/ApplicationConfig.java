@@ -1,5 +1,7 @@
 package com.example.authentication.config;
 
+import com.example.authentication.entity.AccountEntity;
+import com.example.authentication.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,16 +10,12 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
-
-import com.example.authentication.entity.AccountEntity;
-import com.example.authentication.repository.AccountRepository;
 
 @Configuration
 @RequiredArgsConstructor
@@ -26,15 +24,12 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new UserDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException{
-                AccountEntity account = accountRepository.findByUserName(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("User is not found"));
-                if(account == null)
-                    throw new UsernameNotFoundException(userName);
-                return new User(account.getUserName(), account.getPassword(), Collections.emptyList());
-            }
+        return userName -> {
+            AccountEntity account = accountRepository.findByUserName(userName)
+            .orElseThrow(() -> new UsernameNotFoundException("User is not found"));
+            if(account == null)
+                throw new UsernameNotFoundException(userName);
+            return new User(account.getUserName(), account.getPassword(), Collections.emptyList());
         };
     }
 
