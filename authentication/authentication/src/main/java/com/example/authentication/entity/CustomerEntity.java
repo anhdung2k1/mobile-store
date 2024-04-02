@@ -21,7 +21,6 @@ public class CustomerEntity {
         this.customerAddress = "";
         this.customerGender = "";
         this.customerBirthDay = new Date();
-        this.mobile = new MobileEntity();
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
     }
@@ -40,10 +39,6 @@ public class CustomerEntity {
     @NotBlank(message = "Customer Name must not be blank")
     @Size(min = 3, message = "Customer Name at least 3 characters")
     private String customerName;
-
-    @ManyToOne
-    @JoinColumn(name = "MOB_ID")
-    private MobileEntity mobile;
 
     @ManyToMany(mappedBy = "payedCustomers")
     Set<PaymentEntity> pays;

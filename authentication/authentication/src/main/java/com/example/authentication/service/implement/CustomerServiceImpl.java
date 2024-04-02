@@ -24,7 +24,6 @@ public class CustomerServiceImpl implements CustomerService {
             put("customerGender", customerEntity.getCustomerGender());
             put("customerAddress", customerEntity.getCustomerAddress());
             put("customerBirthday", customerEntity.getCustomerBirthDay());
-            put("customerMobile", customerEntity.getMobile());
         }};
     }
     @Override
@@ -46,21 +45,6 @@ public class CustomerServiceImpl implements CustomerService {
         customerEntities.forEach((customerEntity
                 -> customersMapList.add(customerMap(customerEntity))));
         return customersMapList;
-    }
-
-    @Override
-    public List<Map<String, Object>> getAllCustomersWithMobileId(Long mobileId) throws Exception {
-        try {
-            List<Map<String, Object>> customersMapList = new ArrayList<>();
-            List<CustomerEntity> customerEntities = customerRepository.findAllCustomersByMobileId(mobileId).isPresent()
-                    ? customerRepository.findAllCustomersByMobileId(mobileId).get() : null;
-            assert customerEntities != null;
-            customerEntities.forEach((customerEntity
-                    -> customersMapList.add(customerMap(customerEntity))));
-            return customersMapList;
-        } catch (NoSuchElementException e) {
-            throw new Exception("Could not retrieve all customers with mobile ID: " + mobileId + e.getMessage());
-        }
     }
 
     @Override

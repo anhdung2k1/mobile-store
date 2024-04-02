@@ -2,19 +2,15 @@
 #include "Customer.h"
 
 Customer::Customer() 
-    :mobile(Mobile()), customerName(""), customerEmail(""),
+    : customerName(""), customerEmail(""),
     customerAddress(""), customerGender(""), customerBirthday(Date(1,1,2000)) {}
 
 Customer::Customer(string customerName)
-    :mobile(Mobile()), customerName(customerName), customerEmail(""), 
+    :customerName(customerName), customerEmail(""), 
     customerAddress(""), customerGender(""), customerBirthday(Date(1,1,2000)) {}
 
 int Customer::getCustomerId() {
     return customerId;
-}
-
-Mobile Customer::getMobile() {
-    return mobile;
 }
 
 string Customer::getCustomerName() {
@@ -36,11 +32,6 @@ string Customer::getCustomerGender() {
 Date Customer::getCustomerBirthday() {
     return customerBirthday;
 }
-
-void Customer::setMobile(Mobile mobile) {
-    this->mobile = mobile;
-}
-
 void Customer::setCustomerName(string customerName) {
     this->customerName = customerName;
 }

@@ -9,11 +9,6 @@ import java.util.Optional;
 
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
     @Query(value = "SELECT cus.* FROM customers cus " +
-            "WHERE cus.mob_id =:mobileId",
-            nativeQuery = true)
-    Optional<List<CustomerEntity>> findAllCustomersByMobileId(Long mobileId);
-
-    @Query(value = "SELECT cus.* FROM customers cus " +
             "WHERE cus.cus_name =:customerName", nativeQuery = true)
     Optional<List<CustomerEntity>> findAllCustomersByCustomerName(String customerName);
 }

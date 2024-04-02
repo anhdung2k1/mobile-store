@@ -25,6 +25,8 @@ public class MobileServiceImpl implements MobileService {
             put("mobileName", mobileEntity.getMobileName());
             put("mobileModel", mobileEntity.getMobileModel());
             put("mobileType", mobileEntity.getMobileType());
+            put("mobileQuantity", mobileEntity.getMobileQuantity());
+            put("mobilePrice", mobileEntity.getMobilePrice());
             put("mobileDescription", mobileEntity.getMobileDescription());
         }};
     }
@@ -84,6 +86,8 @@ public class MobileServiceImpl implements MobileService {
             mobileEntity.setMobileName(mobile.getMobileName());
             mobileEntity.setMobileModel(mobile.getMobileModel());
             mobileEntity.setMobileType(mobile.getMobileType());
+            mobileEntity.setMobileQuantity(mobile.getMobileQuantity());
+            mobileEntity.setMobilePrice(mobile.getMobilePrice());
             mobileEntity.setMobileDescription(mobile.getMobileDescription());
             mobileEntity.setUpdateAt(LocalDateTime.now());
             mobileRepository.save(mobileEntity);
