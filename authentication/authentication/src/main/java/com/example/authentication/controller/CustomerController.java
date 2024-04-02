@@ -26,11 +26,6 @@ public class CustomerController {
     public ResponseEntity<List<Map<String, Object>>> getAllCustomers() {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
-    // Get all customers attached with mobile
-    @GetMapping(value = "/customers/mobile/{mobileId}")
-    public ResponseEntity<List<Map<String, Object>>> getAllCustomersWithMobile(@PathVariable("mobileId") Long mobileId) throws Exception{
-        return ResponseEntity.ok(customerService.getAllCustomersWithMobileId(mobileId));
-    }
     // Get all customers with customer Name
     @GetMapping(value = "/customers/query")
     public ResponseEntity<List<Map<String, Object>>> getAllCustomersWithName(@RequestParam("query") String customerName) throws Exception {

@@ -24,6 +24,14 @@ string Mobile::getMobileType() {
     return mobileType;
 }
 
+int Mobile::getMobileQuantity() {
+    return mobileQuantity;
+}
+
+string Mobile::getMobilePrice() {
+    return mobilePrice;
+}
+
 string Mobile::getMobileDescription() {
     return mobileDescription;
 }
@@ -38,6 +46,14 @@ void Mobile::setMobileModel(string mobileModel) {
 
 void Mobile::setMobileType(string mobileType) {
     this->mobileType = mobileType;
+}
+
+void Mobile::setMobileQuantity(int mobileQuantity) {
+    this->mobileQuantity = mobileQuantity;
+}
+
+void Mobile::setMobilePrice(string mobilePrice) {
+    this->mobilePrice = mobilePrice;
 }
 
 void Mobile::setMobileDescription(string mobileDescription) {

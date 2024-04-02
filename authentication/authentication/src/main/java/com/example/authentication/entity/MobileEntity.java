@@ -44,8 +44,17 @@ public class MobileEntity {
     @NotBlank(message = "Mobile Type must not be blank")
     private String mobileType;
 
+    @Column(name = "MOB_QUANT", nullable = false) // Quantity of the mobile
+    @NotBlank(message = "Must specify quantity")
+    private Integer mobileQuantity;
+
+    @Column(name = "MOB_PRICE", nullable = false) // Price of the mobile
+    @NotBlank(message = "Must specify price")
+    private String mobilePrice;
+
     @Column(name = "MOB_DESC")
     private String mobileDescription; // The description for individual mobile
+
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_AT")

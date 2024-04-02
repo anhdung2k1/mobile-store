@@ -8,7 +8,6 @@ using namespace std;
 class Customer {
     private:
         int customerId;
-        Mobile mobile;
         string customerName;
         string customerEmail;
         string customerAddress;
@@ -18,13 +17,11 @@ class Customer {
         Customer();
         Customer(string customerName);
         int getCustomerId();
-        Mobile getMobile();
         string getCustomerName();
         string getCustomerEmail();
         string getCustomerAddress();
         string getCustomerGender();
         Date getCustomerBirthday();
-        void setMobile(Mobile mobile);
         void setCustomerName(string customerName);
         void setCustomerEmail(string customerEmail);
         void setCustomerAddress(string customerAdress);

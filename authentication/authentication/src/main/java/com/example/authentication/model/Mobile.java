@@ -15,6 +15,8 @@ public class Mobile {
     private String mobileModel;
     private String mobileType;
     private String mobileDescription;
+    private Integer mobileQuantity;
+    private String mobilePrice;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
 }

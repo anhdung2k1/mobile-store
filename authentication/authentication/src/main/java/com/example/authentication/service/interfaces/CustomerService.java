@@ -8,7 +8,6 @@ import java.util.Map;
 public interface CustomerService {
     Customers createCustomer(Customers customers) throws Exception;
     List<Map<String,Object>> getAllCustomers();
-    List<Map<String, Object>> getAllCustomersWithMobileId(Long mobileId) throws Exception;
     List<Map<String, Object>> getAllCustomersWithName(String customerName) throws Exception;
     Map<String, Object> getCustomerByCustomerId(Long customerId) throws Exception;
     Customers updateCustomerInformation(Long customerId, Customers customers) throws Exception;

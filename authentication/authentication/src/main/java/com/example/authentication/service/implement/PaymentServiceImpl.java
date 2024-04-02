@@ -21,7 +21,6 @@ public class PaymentServiceImpl implements PaymentService {
     private HashMap<String, Object> paymentMap(PaymentEntity paymentEntity) {
         return new HashMap<>() {{
             put("paymentMethod", paymentEntity.getPaymentMethod());
-            put("paymentDate", paymentEntity.getPaymentDate());
             put("paymentDescription", paymentEntity.getPaymentDescription());
         }};
     }
@@ -82,7 +81,6 @@ public class PaymentServiceImpl implements PaymentService {
                     ? paymentRepository.findById(paymentId).get() : null;
             assert paymentEntity != null;
             paymentEntity.setPaymentMethod(payment.getPaymentMethod());
-            paymentEntity.setPaymentDate(payment.getPaymentDate());
             paymentEntity.setPaymentDescription(payment.getPaymentDescription());
             paymentEntity.setUpdateAt(LocalDateTime.now());
             paymentRepository.save(paymentEntity);

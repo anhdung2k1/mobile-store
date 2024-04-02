@@ -25,7 +25,7 @@ CREATE TABLE accounts(
     hash_pass VARCHAR(255) NOT NULL,
     create_at DATETIME(6),
     update_at DATETIME(6),
-    user_id BIGINT,
+    user_id BIGINT NOT NULL,
     PRIMARY KEY (acc_id),
     FOREIGN KEY (role_id) REFERENCES roles(role_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -51,6 +51,8 @@ CREATE TABLE mobile(
     mob_name VARCHAR(255) NOT NULL,
     mob_model VARCHAR(255) NOT NULL,
     mob_type VARCHAR(255) NOT NULL,
+    mob_quant INT NOT NULL,
+    mob_price VARCHAR(255) NOT NULL,
     mob_desc VARCHAR(255),
     create_at DATETIME(6), 
     update_at DATETIME(6), 
@@ -60,15 +62,13 @@ CREATE TABLE mobile(
 CREATE TABLE customers(
     cus_id BIGINT NOT NULL AUTO_INCREMENT,
     cus_name VARCHAR(255) NOT NULL,
-    mob_id BIGINT,
     cus_email VARCHAR(255),
     cus_address VARCHAR(255),
     cus_gender VARCHAR(255),
     cus_birth_day DATE,
     create_at DATETIME(6),
     update_at DATETIME(6),
-    PRIMARY KEY (cus_id),
-    FOREIGN KEY (mob_id) REFERENCES mobile(mob_id)
+    PRIMARY KEY (cus_id)
 );
 
 CREATE TABLE payment(
@@ -77,8 +77,7 @@ CREATE TABLE payment(
     pay_method VARCHAR(255) NOT NULL,
     create_at DATETIME(6), 
     update_at DATETIME(6), 
-    PRIMARY KEY (pay_id),
-    FOREIGN KEY (mob_id) REFERENCES mobile(mob_id)
+    PRIMARY KEY (pay_id)
 );
 
 CREATE TABLE customer_payment(
