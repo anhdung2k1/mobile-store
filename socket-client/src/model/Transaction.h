@@ -13,7 +13,7 @@ class Transaction {
         Payment payment;
     public:
         Transaction();
-        Transaction(string transactionName, string transactionType);
+        Transaction(int transactionId, string transactionName, string transactionType);
         Transaction(string transactionName, string transactionType, Payment payment);
         int getTransactionId();
         string getTransactionName();

@@ -27,9 +27,9 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.getAllPaymentByCustomerId(customerId));
     }
     // Get all Payments by Mobile ID
-    @GetMapping(value = "/payments/mobiles/{mobileId}")
-    public ResponseEntity<List<Map<String, Object>>> getAllPaymentByMobileId(@PathVariable("mobileId") Long mobileId) throws Exception{
-        return ResponseEntity.ok(paymentService.getAllPaymentByMobileId(mobileId));
+    @GetMapping(value = "/payments")
+    public ResponseEntity<List<Map<String, Object>>> getAllPayments() throws Exception{
+        return ResponseEntity.ok(paymentService.getAllPayments());
     }
     // Get Payment By ID
     @GetMapping(value = "/payments/{paymentId}")

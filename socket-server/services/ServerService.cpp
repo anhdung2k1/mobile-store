@@ -44,6 +44,7 @@ struct ServerService::Client
     struct curl_slist *slist;
 };
 
+
 bool ServerService::ReadResponse(Client client, char *buffer, map<int, Client> clientMap)
 {
     int bytes_received = recv(client.sock, buffer, 1024, 0);
@@ -191,6 +192,23 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         string accountId = curlUtils.getUtil(client.curl, client.res, apiIp + "/accounts/find?userName=" + client.user.getName(), flag);
         string url = apiIp + "/accounts/" + accountId;
         string response = curlUtils.putUtil(client.curl, client.res, url, formData.str(), flag);
+    }
+    else if (pattern == "FIND_INVENTORY_NAME") {
+        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/products/query?query=" + value, flag);
+        SendResponse(client.sock, "FIND_INVENTORY_NAME|" + response);
+    }
+    else if (pattern == "FIND_INVENTORY_TYPE") {
+        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/types/query?query=" + value, flag);
+        SendResponse(client.sock, "FIND_INVENTORY_TYPE|" + response);
+    }
+    else if (pattern == "GET_TRANSACTION_HISTORY")
+    {
+        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/transactions", flag);
+        SendResponse(client.sock, "GET_TRANSACTION_HISTORY|" + response);
+    }
+    else if (pattern == "GET_PAYMENT_METHOD") {
+        string reponse = curlUtils.getUtil(client.curl, client.res, apiIp + "/payments", flag);
+        SendResponse(client.sock, "GET_PAYMENT_METHOD|" + reponse);
     }
     else if (pattern == "USER_EXIT_APP")
     {

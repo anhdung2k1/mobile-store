@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <sstream>
 #include"../model/User.h"
+#include "../model/Mobile.h"
 #include"../repository/Repository.h"
 #include"../utils/CurlUtils.h"
 #include <poll.h>

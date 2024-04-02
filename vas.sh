@@ -128,15 +128,15 @@ build_repo() {
         docker rm -f $mysql_con
     fi
     # Start docker mysql container
-    docker run -d --name $mysql_con \
-        -e MYSQL_ROOT_PASSWORD=root \
-        -e MYSQL_DATABASE=${COMMON_DB} \
-        -e MYSQL_USER=${COMMON_DB} \
-        -e MYSQL_PASSWORD=${COMMON_DB} \
-        -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
-        -p 3306:3306 \
-        mysql:latest \
-    || die "[ERROR]: Failed to run mysql docker"
+    # docker run -d --name $mysql_con \
+    #     -e MYSQL_ROOT_PASSWORD=root \
+    #     -e MYSQL_DATABASE=${COMMON_DB} \
+    #     -e MYSQL_USER=${COMMON_DB} \
+    #     -e MYSQL_PASSWORD=${COMMON_DB} \
+    #     -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
+    #     -p 3306:3306 \
+    #     mysql:latest \
+    # || die "[ERROR]: Failed to run mysql docker"
     mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
     echo $mysql_IP
 

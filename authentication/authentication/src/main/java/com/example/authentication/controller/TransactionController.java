@@ -23,9 +23,9 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.createTransaction(transactions));
     }
     // Get all Transactions by PayID
-    @GetMapping(value = "/transactions/pays/{payId}")
-    public ResponseEntity<List<Map<String, Object>>> getAllTransactionsByPayId(@PathVariable("payId") Long payId) throws Exception {
-        return ResponseEntity.ok(transactionService.getAllTransactionByPaymentId(payId));
+    @GetMapping(value = "/transactions")
+    public ResponseEntity<List<Map<String, Object>>> getAllTransactions() throws Exception {
+        return ResponseEntity.ok(transactionService.getAllTransactions());
     }
     // Get all Transactions by CustomerID
     @GetMapping(value = "/transactions/customers/{customerId}")

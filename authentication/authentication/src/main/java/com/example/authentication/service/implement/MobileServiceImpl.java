@@ -21,6 +21,7 @@ public class MobileServiceImpl implements MobileService {
 
     private HashMap<String, Object> mobileMap(MobileEntity mobileEntity) {
         return new HashMap<>() {{
+            put("mobileID", mobileEntity.getMobileId());
             put("mobileName", mobileEntity.getMobileName());
             put("mobileModel", mobileEntity.getMobileModel());
             put("mobileType", mobileEntity.getMobileType());
@@ -43,8 +44,8 @@ public class MobileServiceImpl implements MobileService {
     @Override
     public List<Map<String, Object>> getAllMobilesByName(String mobileName) {
         List<Map<String, Object>> mobilesMapList = new ArrayList<>();
-        List<MobileEntity> mobileEntities = mobileRepository.findAllByMobileName(mobileName).isPresent()
-                ? mobileRepository.findAllByMobileName(mobileName).get() : null;
+        List<MobileEntity> mobileEntities = mobileRepository.findAllByMobileNameContains(mobileName).isPresent()
+                ? mobileRepository.findAllByMobileNameContains(mobileName).get() : null;
         assert mobileEntities != null;
         mobileEntities.forEach((mobileEntity
                 -> mobilesMapList.add(mobileMap(mobileEntity))));
@@ -54,8 +55,8 @@ public class MobileServiceImpl implements MobileService {
     @Override
     public List<Map<String, Object>> getAllMobilesByType(String mobileType) {
         List<Map<String, Object>> mobilesMapList = new ArrayList<>();
-        List<MobileEntity> mobileEntities = mobileRepository.findAllByMobileType(mobileType).isPresent()
-                ? mobileRepository.findAllByMobileType(mobileType).get() : null;
+        List<MobileEntity> mobileEntities = mobileRepository.findAllByMobileTypeContains(mobileType).isPresent()
+                ? mobileRepository.findAllByMobileTypeContains(mobileType).get() : null;
         assert mobileEntities != null;
         mobileEntities.forEach((mobileEntity
                 -> mobilesMapList.add(mobileMap(mobileEntity))));

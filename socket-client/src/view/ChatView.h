@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "../model/UserClient.h"
+#include "../model/Mobile.h"
 #include "../view/StatusBar.h"
 #include <thread>
 #include <cstdlib>
@@ -26,7 +27,8 @@ public:
         Chatting = 4,
         OrtherUserProfile = 5,
         LoginInput = 6,
-        RegisterInput = 7
+        RegisterInput = 7,
+        MobileInventory = 8
     };
     static void handleLogin(int sock, int selection);
     static void UserConsole(int sock);

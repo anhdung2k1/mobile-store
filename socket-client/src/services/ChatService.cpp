@@ -91,6 +91,12 @@ void ChatService::processPattern(char *buffer, string &pattern, string &value)
     value = convertedBuffer.substr(pos + 1);
 }
 
+string ChatService::processString(string msg)
+{
+    msg.erase(remove_if(msg.begin(), msg.end(), [](char c) { return c == '"'; }), msg.end());
+    return msg;
+}
+
 bool ChatService::HandlePattern(char *buffer, int sock)
 {
     string pattern, value;
@@ -126,21 +132,6 @@ string ChatService::GetValueFromServer(int sock, string pattern)
         {
             if (response.pattern == pattern)
             {
-                if (pattern == "CREATE_ROOM")
-                {
-                    if (response.value.length() != 0)
-                    {
-                        return "You has created a room\n";
-                    }
-                    else
-                    {
-                        return "Create room failed\n";
-                    }
-                }
-                else if (pattern == "LOAD_HISTORY")
-                {
-                    sleep(1);
-                }
                 response.pattern = "";
                 string res = response.value;
                 response.value = "";
@@ -365,6 +356,32 @@ void ChatService::GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserP
     wrefresh(OrtherUserProfileWin);
 }
 
+void ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string input)
+{
+    ChatService::RequestSend("FIND_INVENTORY_NAME|" + input, sock);
+    string response = ChatService::GetValueFromServer(sock, "FIND_INVENTORY_NAME");
+    if (response.length() > 0) {
+        nlohmann::json j = nlohmann::json::parse(response);
+        mvprintw(5, 20, "%s", "Mobile Name");
+        mvprintw(5, 40, "%s", "Mobile Type");
+        mvprintw(5, 60, "%s", "Mobile Model");
+        mvprintw(5, 80, "%s", "Mobile Description");
+
+        for (auto it : j) {
+            Mobile mb(
+                it.at("mobileID").get<int>(),
+                it.at("mobileName").get<string>(),
+                it.at("mobileType").get<string>(),
+                it.at("mobileModel").get<string>(),
+                it.at("mobileDescription").get<string>()
+            );
+            mobile.push_back(mb);
+        }
+    } else {
+        mvprintw(5, 20, "%s", "Could not found any mobile device!!");
+    }
+}
+
 bool ChatService::HandleName(string username)
 {
     if (username.length() < 2)
@@ -420,3 +437,4 @@ bool ChatService::HandlePassword(string password)
     }
     return false;
 }
+

@@ -2,7 +2,8 @@
 
 Transaction::Transaction() : transactionName(""), transactionType("") {}
 
-Transaction::Transaction(string transactionName, string transactionType) : transactionName(transactionName), transactionType(transactionType) {}
+Transaction::Transaction(int transactionId, string transactionName, string transactionType) 
+    : transactionId(transactionId) ,transactionName(transactionName), transactionType(transactionType) {}
 
 Transaction::Transaction(string transactionName, string transactionType, Payment payment) : transactionName(transactionName), transactionType(transactionType), payment(payment) {}
 
