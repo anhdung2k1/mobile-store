@@ -36,7 +36,7 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getAllAccounts());
     }
     //Get Account by ID
-    @GetMapping(value = "/accounts/{id}")
+    @GetMapping(value = "/accounts/{accountId}")
     public ResponseEntity<Accounts> getAccountById(@PathVariable Long accountId) throws Exception {
         return ResponseEntity.ok(accountService.getAccountsById(accountId));
     }

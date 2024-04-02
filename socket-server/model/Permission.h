@@ -10,13 +10,10 @@ class Permission {
         int permissionId;
         string permissionName;
         string permissionModule;
-        Roles role;
     public:
         Permission();
-        Permission(string permissionName);
-        Permission(string permissionName, Roles role);
+        Permission(string permissionName, string permissionModule);
         int getPermissionId();
-        Roles getRole();
         string getPermissionName();
         string getPermissionModule();
         void setPermissionName(string permissionName);

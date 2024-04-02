@@ -23,12 +23,12 @@ public class RoleController {
     }
     // Get all roles
     @GetMapping(value = "/roles")
-    public ResponseEntity<List<Map<String, String>>> getAllRoles() {
+    public ResponseEntity<List<Map<String, Object>>> getAllRoles() {
         return ResponseEntity.ok(roleService.getAllRoles());
     }
     // Get Role By Role Name
     @GetMapping(value = "/roles/query")
-    public ResponseEntity<Map<String, String>> getRoleByName(@RequestParam("query") String roleName) throws  Exception {
+    public ResponseEntity<Map<String, Object>> getRoleByName(@RequestParam("query") String roleName) throws  Exception {
         return ResponseEntity.ok(roleService.getRoleByName(roleName));
     }
     //Update Role
