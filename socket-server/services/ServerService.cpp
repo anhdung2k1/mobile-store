@@ -206,6 +206,10 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/transactions", flag);
         SendResponse(client.sock, "GET_TRANSACTION_HISTORY|" + response);
     }
+    else if (pattern == "GET_CUSTOMERS") {
+        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/customers", flag);
+        SendResponse(client.sock, "GET_CUSTOMERS|" + response);
+    }
     else if (pattern == "GET_PAYMENT_METHOD") {
         string reponse = curlUtils.getUtil(client.curl, client.res, apiIp + "/payments", flag);
         SendResponse(client.sock, "GET_PAYMENT_METHOD|" + reponse);

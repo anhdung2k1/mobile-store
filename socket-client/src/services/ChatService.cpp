@@ -365,7 +365,9 @@ void ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string inp
         mvprintw(5, 20, "%s", "Mobile Name");
         mvprintw(5, 40, "%s", "Mobile Type");
         mvprintw(5, 60, "%s", "Mobile Model");
-        mvprintw(5, 80, "%s", "Mobile Description");
+        mvprintw(5, 80, "%s", "Mobile Quantity");
+        mvprintw(5, 100, "%s", "Mobile Price");
+        mvprintw(5, 120, "%s", "Mobile Description");
 
         for (auto it : j) {
             Mobile mb(
@@ -373,6 +375,8 @@ void ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string inp
                 it.at("mobileName").get<string>(),
                 it.at("mobileType").get<string>(),
                 it.at("mobileModel").get<string>(),
+                it.at("mobileQuantity").get<int>(),
+                it.at("mobilePrice").get<string>(),
                 it.at("mobileDescription").get<string>()
             );
             mobile.push_back(mb);

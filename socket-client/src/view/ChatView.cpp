@@ -1451,7 +1451,9 @@ void ChatView::handleMenu(int sock, int selection)
                mvprintw(6+spacePos, 20, "%s", ChatService::processString(mb.getMobileName()).c_str());
                mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
                mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
-               mvprintw(6+spacePos, 80, "%s", ChatService::processString(mb.getMobileDescription()).c_str());
+               mvprintw(6+spacePos, 80, "%s", ChatService::processString(to_string(mb.getMobileQuantity())).c_str());
+               mvprintw(6+spacePos, 100, "%s", ChatService::processString(mb.getMobilePrice()).c_str());
+               mvprintw(6+spacePos, 120, "%s", ChatService::processString(mb.getMobileDescription()).c_str());
                spacePos += 1;
             }
 
@@ -1469,21 +1471,113 @@ void ChatView::handleMenu(int sock, int selection)
       }
       case 105: //I
       {
-         ChatService::RequestSend("GET_TRANSACTION_HISTORY|", sock);
-         string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY");
-         
-         mvprintw(5, 20, "%s", response.c_str());
-         int back = getch();
-         if (back == 27) {
+         clear();
+         refresh();
+         endwin();
+         currentView = Transaction;
+         system("clear");
+         string input;
+         // Start regigter window design
+         initscr();
+         keypad(stdscr, TRUE);
+         cbreak();
+         refresh();
+         start_color();
+         init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+         init_pair(2, COLOR_RED, COLOR_BLACK);
+         init_pair(3, COLOR_GREEN, COLOR_BLACK);
+         init_pair(4, COLOR_CYAN, COLOR_BLACK);
+         init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+         init_pair(6, COLOR_WHITE, COLOR_BLACK);
+         noecho();
+         if(has_colors() == FALSE)
+         {
             clear();
             endwin();
+            printf("Your terminal does not support color\n");
+            exit(1);
+         }
+         //echo();
+         WINDOW *transactionWin = newwin(5, 61, 0, 0);
+         currentWin = transactionWin;
+         wattron(currentWin, COLOR_PAIR(3));
+         int curs_x, curs_y;
+         getyx(currentWin, curs_y, curs_x);
+         wmove(currentWin, curs_y, curs_x);
+         // change int to char *
+         int n;
+         char c = char(n);
+         if (n == 27) {
             break;
+         }
+         else {
+            ChatService::RequestSend("GET_TRANSACTION_HISTORY|", sock);
+            string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY");
+            
+            mvprintw(2, 0, "%s", response.c_str());
+            int back = getch();
+            if (back == 27) {
+               clear();
+               endwin();
+               break;
+            }
          }
          break;
       }
       case 106: //J
       {
-         break;
+         clear();
+         refresh();
+         endwin();
+         currentView = Customer;
+         system("clear");
+         string input;
+         // Start regigter window design
+         initscr();
+         keypad(stdscr, TRUE);
+         cbreak();
+         refresh();
+         start_color();
+         init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+         init_pair(2, COLOR_RED, COLOR_BLACK);
+         init_pair(3, COLOR_GREEN, COLOR_BLACK);
+         init_pair(4, COLOR_CYAN, COLOR_BLACK);
+         init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+         init_pair(6, COLOR_WHITE, COLOR_BLACK);
+         noecho();
+         if(has_colors() == FALSE)
+         {
+            clear();
+            endwin();
+            printf("Your terminal does not support color\n");
+            exit(1);
+         }
+         //echo();
+         WINDOW *customerWin = newwin(5, 61, 0, 0);
+         currentWin = customerWin;
+         wattron(currentWin, COLOR_PAIR(3));
+         int curs_x, curs_y;
+         getyx(currentWin, curs_y, curs_x);
+         wmove(currentWin, curs_y, curs_x);
+         // change int to char *
+         int n;
+         char c = char(n);
+         if (n == 27) {
+            break;
+         }
+         else {
+            ChatService::RequestSend("GET_CUSTOMERS|", sock);
+            string response = ChatService::GetValueFromServer(sock, "GET_CUSTOMERS");
+            mvprintw(5, 20, "%s", response.c_str());
+
+            int back = getch();
+            if (back == 27) {
+               clear();
+               endwin();
+               break;
+            }
+            break;
+         }
       }
       case 102: // F
       {
