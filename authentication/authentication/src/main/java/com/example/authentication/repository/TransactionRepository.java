@@ -11,10 +11,6 @@ import java.util.Optional;
 @Repository
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
     @Query(value = "SELECT trans.* FROM transactions trans " +
-            "WHERE trans.pay_id =:paymentId", nativeQuery = true)
-    Optional<List<TransactionEntity>> findAllTransactionByPaymentId(Long paymentId);
-
-    @Query(value = "SELECT trans.* FROM transactions trans " +
             "WHERE trans.pay_id in (" +
             "SELECT pu.pay_id FROM customer_payment pu " +
             "WHERE pu.cus_id =:customerId)", nativeQuery = true)

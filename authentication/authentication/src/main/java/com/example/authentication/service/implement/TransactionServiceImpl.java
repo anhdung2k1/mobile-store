@@ -38,17 +38,16 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Map<String, Object>> getAllTransactionByPaymentId(Long paymentId) throws Exception {
+    public List<Map<String, Object>> getAllTransactions() throws Exception {
         try {
             List<Map<String, Object>> transactionMapList = new ArrayList<>();
-            List<TransactionEntity> transactionEntities = transactionRepository.findAllTransactionByPaymentId(paymentId).isPresent()
-                    ? transactionRepository.findAllTransactionByPaymentId(paymentId).get() : null;
-            assert transactionEntities != null;
+            List<TransactionEntity> transactionEntities = transactionRepository.findAll();
+
             transactionEntities.forEach((transactionEntity
                     -> transactionMapList.add(transactionMap(transactionEntity))));
             return transactionMapList;
         } catch (NoSuchElementException e) {
-            throw new Exception("Could not retrieve all the transaction by the payment ID: " + paymentId +  e.getMessage());
+            throw new Exception("Could not retrieve all the transaction history " +  e.getMessage());
         }
     }
 

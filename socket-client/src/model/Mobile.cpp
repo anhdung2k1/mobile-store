@@ -5,8 +5,8 @@
 Mobile::Mobile()
         : mobileName(""), mobileModel(""), mobileType(""), mobileDescription("") {}
 
-Mobile::Mobile(string mobileName, string mobileModel, string mobileType) 
-    : mobileName(mobileName), mobileModel(mobileModel), mobileType(mobileType), mobileDescription("") {}
+Mobile::Mobile(int mobileId, string mobileName, string mobileModel, string mobileType, string mobileDescription) 
+    : mobileId(mobileId) ,mobileName(mobileName), mobileModel(mobileModel), mobileType(mobileType), mobileDescription(mobileDescription) {}
 
 int Mobile::getMobileId() {
     return mobileId;

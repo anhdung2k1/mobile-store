@@ -23,7 +23,6 @@ public class PaymentServiceImpl implements PaymentService {
             put("paymentMethod", paymentEntity.getPaymentMethod());
             put("paymentDate", paymentEntity.getPaymentDate());
             put("paymentDescription", paymentEntity.getPaymentDescription());
-            put("mobile", paymentEntity.getMobiles());
         }};
     }
     @Override
@@ -53,16 +52,14 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<Map<String, Object>> getAllPaymentByMobileId(Long mobileId) throws Exception {
+    public List<Map<String, Object>> getAllPayments() throws Exception {
         try {
             List<Map<String, Object>> paymentMapList = new ArrayList<>();
-            List<PaymentEntity> paymentEntities = paymentRepository.findAllPaymentByMobileId(mobileId).isPresent()
-                    ? paymentRepository.findAllPaymentByMobileId(mobileId).get() : null;
-            assert paymentEntities != null;
+            List<PaymentEntity> paymentEntities = paymentRepository.findAll();
             paymentEntities.forEach((paymentEntity -> paymentMapList.add(paymentMap(paymentEntity))));
             return paymentMapList;
         } catch (NoSuchElementException e) {
-            throw new Exception("Could not get list of payments from " + mobileId + e.getMessage());
+            throw new Exception("Could not get list of payments " + e.getMessage());
         }
     }
 
@@ -87,7 +84,6 @@ public class PaymentServiceImpl implements PaymentService {
             paymentEntity.setPaymentMethod(payment.getPaymentMethod());
             paymentEntity.setPaymentDate(payment.getPaymentDate());
             paymentEntity.setPaymentDescription(payment.getPaymentDescription());
-            paymentEntity.setMobiles(payment.getMobiles());
             paymentEntity.setUpdateAt(LocalDateTime.now());
             paymentRepository.save(paymentEntity);
             BeanUtils.copyProperties(paymentEntity, payment);

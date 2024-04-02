@@ -198,13 +198,8 @@ void ChatView::handleLogin(int sock, int selection)
          // This do while loop will handle user name input
          do
          {
-            // printw("Y = %d, X = %d", registerWin->_cury, registerWin->_curx);
-            // refresh();
-            // Get the key
             curs_set(1);
             n = wgetch(nameWin);
-            // printw("Y = %d, X = %d", registerWin->_cury, registerWin->_curx);
-            // refresh();
             // if get Esc(27), it will turn back to login menu
             if (n == 27) // back to login menu
             {
@@ -933,7 +928,7 @@ void ChatView::Menu()
    noecho();
    curs_set(0);
    int height, width, start_X, start_Y;
-   height = 19;
+   height = 24;
    width = 70;
    start_X = start_Y = 0;
    WINDOW *userMenu = newwin(height, width, start_Y, start_X);
@@ -944,20 +939,22 @@ void ChatView::Menu()
    wattroff(userMenu, COLOR_PAIR(3));
    wattron(userMenu, COLOR_PAIR(4));
    mvwprintw(userMenu, 2, (userMenu->_maxx - 28) / 2, ">>>>> Chat Application <<<<<");
-   mvwprintw(userMenu, 6, 3, "Create new chat room");
-   mvwprintw(userMenu, 8, 3, "Join room");
-   mvwprintw(userMenu, 10, 3, "Find user(s)");
-   mvwprintw(userMenu, 12, 3, "Update profile");
-   mvwprintw(userMenu, 14, 3, "Log out");
+   mvwprintw(userMenu, 6, 3, "Mobile Inventory");
+   mvwprintw(userMenu, 8, 3, "Transaction History");
+   mvwprintw(userMenu, 10, 3, "List of Customers");
+   mvwprintw(userMenu, 12, 3, "Find user(s)");
+   mvwprintw(userMenu, 14, 3, "Update profile");
+   mvwprintw(userMenu, 16, 3, "Log out");
    mvwprintw(userMenu, 6, (userMenu->_maxx - 11), "(Press N)");
-   mvwprintw(userMenu, 8, (userMenu->_maxx - 11), "(Press J)");
-   mvwprintw(userMenu, 10, (userMenu->_maxx - 11), "(Press F)");
-   mvwprintw(userMenu, 12, (userMenu->_maxx - 11), "(Press U)");
-   mvwprintw(userMenu, 14, (userMenu->_maxx - 11), "(Press O)");
+   mvwprintw(userMenu, 8, (userMenu->_maxx - 11), "(Press I)");
+   mvwprintw(userMenu, 10, (userMenu->_maxx - 11), "(Press J)");
+   mvwprintw(userMenu, 12, (userMenu->_maxx - 11), "(Press F)");
+   mvwprintw(userMenu, 14, (userMenu->_maxx - 11), "(Press U)");
+   mvwprintw(userMenu, 16, (userMenu->_maxx - 11), "(Press O)");
    wattroff(userMenu, COLOR_PAIR(4));
    wattron(userMenu, COLOR_PAIR(2));
-   mvwprintw(userMenu, 16, 3, "Exit");
-   mvwprintw(userMenu, 16, (userMenu->_maxx - 13), "(Press Esc)");
+   mvwprintw(userMenu, 18, 3, "Exit");
+   mvwprintw(userMenu, 18, (userMenu->_maxx - 13), "(Press Esc)");
    wattroff(userMenu, COLOR_PAIR(2));
    wrefresh(userMenu);
 }
@@ -1355,7 +1352,140 @@ void ChatView::handleMenu(int sock, int selection)
       }
       switch (selection)
       {
-      case 102: // J
+      case 110: //N
+      {
+         clear();
+         refresh();
+         endwin();
+         currentView = MobileInventory;
+         system("clear");
+         string input;
+         // Start regigter window design
+         initscr();
+         keypad(stdscr, TRUE);
+         cbreak();
+         refresh();
+         start_color();
+         init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+         init_pair(2, COLOR_RED, COLOR_BLACK);
+         init_pair(3, COLOR_GREEN, COLOR_BLACK);
+         init_pair(4, COLOR_CYAN, COLOR_BLACK);
+         init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+         init_pair(6, COLOR_WHITE, COLOR_BLACK);
+         noecho();
+         if(has_colors() == FALSE)
+         {
+            clear();
+            endwin();
+            printf("Your terminal does not support color\n");
+            exit(1);
+         }
+         //echo();
+         WINDOW *mobileInventoryWin = newwin(5, 61, 0, 0);
+         currentWin = mobileInventoryWin;
+         wattron(currentWin, COLOR_PAIR(3));
+         box(currentWin, 0, 0);
+         wattroff(currentWin, COLOR_PAIR(3));
+         refresh();
+         wattron(currentWin, COLOR_PAIR(4));
+         mvwprintw(currentWin, 2, 1, "Enter Mobile Name: ");
+         wattroff(currentWin, COLOR_PAIR(4));
+         wrefresh(currentWin);
+         int curs_x, curs_y;
+         getyx(currentWin, curs_y, curs_x);
+         wmove(currentWin, curs_y, curs_x);
+         // change int to char *
+         int n;
+         char c = char(n);
+         input = "";
+         do
+         {
+            // Get the key
+            n = wgetch(currentWin);
+            if(n == 27)
+            {
+               clear();
+               endwin();
+               break;
+            } else if (n == 8 || n == 127) {
+               if (input.length() != 0){
+                  input.pop_back();
+                  wprintw(currentWin, "\b \b");
+                  wrefresh(currentWin);
+                  curs_x--;
+               }
+            } else if (n == 10 && input.length() >= 0 ) {
+               break;
+            }
+            else if (n == 10) {
+               attroff(COLOR_PAIR(1));
+               refresh();
+               sleep(2);
+               move(16, 0);
+               clrtoeol();
+               refresh();
+               wmove(currentWin, curs_y, curs_x);
+               wrefresh(currentWin);
+               ChatView::handleMenu(sock, 110);
+            }
+            else  {
+               c = char(n);
+               mvwprintw(currentWin, curs_y, curs_x, "%c",c);
+               wrefresh(currentWin);
+               input.push_back(c);
+               curs_x++;
+            }
+            getyx(currentWin, curs_y, curs_x);
+         } while (true);
+         
+         if (n == 27)
+         {
+            break;
+         }
+         else{
+            vector<Mobile>mobile;
+            ChatService::FindInventoryName(sock, mobile, input);
+            int spacePos = 0;
+            for (auto mb : mobile) {
+               mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(mb.getMobileId())).c_str());
+               mvprintw(6+spacePos, 20, "%s", ChatService::processString(mb.getMobileName()).c_str());
+               mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
+               mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
+               mvprintw(6+spacePos, 80, "%s", ChatService::processString(mb.getMobileDescription()).c_str());
+               spacePos += 1;
+            }
+
+            mvprintw(17, 0, "Press any key to continue!");
+            int back = getch();
+            if (back == 27)
+            {
+               clear();
+               endwin();
+               break;
+            }
+            endwin();
+         }
+         break;
+      }
+      case 105: //I
+      {
+         ChatService::RequestSend("GET_TRANSACTION_HISTORY|", sock);
+         string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY");
+         
+         mvprintw(5, 20, "%s", response.c_str());
+         int back = getch();
+         if (back == 27) {
+            clear();
+            endwin();
+            break;
+         }
+         break;
+      }
+      case 106: //J
+      {
+         break;
+      }
+      case 102: // F
       {
          clear();
          refresh();
@@ -1459,6 +1589,7 @@ void ChatView::handleMenu(int sock, int selection)
             map<int, UserClient> foundUser = ChatService::GetFoundUser(sock, currentUser, count, finduserWin);
             ChatView::interactUserMenu(count, foundUser, sock);
          }
+         break;
       }
       case 117: // U
          refresh();
@@ -1544,8 +1675,7 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
    mvwprintw(OrtherUserProfileWin, 1, 11, "--------User Profile Options--------");
    wattroff(OrtherUserProfileWin, COLOR_PAIR(3));
    mvwprintw(OrtherUserProfileWin, 3, 1, "1. User Information");
-   mvwprintw(OrtherUserProfileWin, 4, 1, "2. Create Chat");
-   mvwprintw(OrtherUserProfileWin, 5, 1, "3. Exit");
+   mvwprintw(OrtherUserProfileWin, 5, 1, "2. Exit");
    wattron(OrtherUserProfileWin, COLOR_PAIR(4));
    mvwprintw(OrtherUserProfileWin, 7, 1, "Select your option:");
    wattroff(OrtherUserProfileWin, COLOR_PAIR(4));
@@ -1613,12 +1743,12 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
    else
    {
       string select = input;
+      int sig;
+      char sig1 = char(sig);
       // int n;
       // n = stoi(select);
       if (select == "1")
       {
-         int sig;
-         char sig1 = char(sig);
          ChatService::GetUserProfile(sock, user, OrtherUserProfileWin);
          while (true)
          {
@@ -1633,7 +1763,7 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
             }
          }
       }
-      if (select == "3")
+      if (select == "2")
       {
          ChatView::handleMenu(sock, -1);
       }

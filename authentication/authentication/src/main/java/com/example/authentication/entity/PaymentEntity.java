@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 @Getter
@@ -20,8 +19,6 @@ public class PaymentEntity {
     public PaymentEntity() {
         this.paymentMethod = "";
         this.paymentDescription = "";
-        this.paymentDate = new Date();
-        this.mobiles = new MobileEntity();
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
     }
@@ -36,10 +33,6 @@ public class PaymentEntity {
             allocationSize = 1)
     private Long paymentId;
 
-    @ManyToOne
-    @JoinColumn(name = "MOB_ID")
-    private MobileEntity mobiles;
-
     @ManyToMany
     @JoinTable(
             name = "CUSTOMER_PAYMENT",
@@ -47,10 +40,6 @@ public class PaymentEntity {
             inverseJoinColumns = @JoinColumn(name = "CUS_ID")
     )
     Set<CustomerEntity> payedCustomers;
-
-    @Column(name = "PAY_DATE")
-    @Temporal(TemporalType.DATE)
-    private Date paymentDate;
 
     @Column(name = "PAY_DESC")
     private String paymentDescription;

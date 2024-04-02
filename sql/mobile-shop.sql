@@ -73,8 +73,6 @@ CREATE TABLE customers(
 
 CREATE TABLE payment(
     pay_id BIGINT NOT NULL AUTO_INCREMENT,
-    mob_id BIGINT NOT NULL,
-    pay_date DATE,
     pay_desc VARCHAR(255),
     pay_method VARCHAR(255) NOT NULL,
     create_at DATETIME(6), 
