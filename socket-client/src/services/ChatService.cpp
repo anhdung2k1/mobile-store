@@ -101,7 +101,6 @@ bool ChatService::HandlePattern(char *buffer, int sock)
 {
     string pattern, value;
     processPattern(buffer, pattern, value);
-    ChatView::View currentView = ChatView::GetCurrentView();
     WINDOW *win = ChatView::getCurrentWin();
     int y, x;
     getyx(win, y, x);
@@ -356,10 +355,10 @@ void ChatService::GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserP
     wrefresh(OrtherUserProfileWin);
 }
 
-void ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string input)
+void ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern)
 {
-    ChatService::RequestSend("FIND_INVENTORY_NAME|" + input, sock);
-    string response = ChatService::GetValueFromServer(sock, "FIND_INVENTORY_NAME");
+    ChatService::RequestSend(pattern + "|" + input, sock);
+    string response = ChatService::GetValueFromServer(sock, pattern);
     if (response.length() > 0) {
         nlohmann::json j = nlohmann::json::parse(response);
         mvprintw(5, 20, "%s", "Mobile Name");
