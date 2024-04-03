@@ -28,7 +28,9 @@ public:
         OrtherUserProfile = 5,
         LoginInput = 6,
         RegisterInput = 7,
-        MobileInventory = 8
+        MobileInventory = 8,
+        Transaction = 9,
+        Customer = 10
     };
     static void handleLogin(int sock, int selection);
     static void UserConsole(int sock);

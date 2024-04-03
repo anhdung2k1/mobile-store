@@ -127,7 +127,7 @@ build_repo() {
     if [[ -n "$mysql_container" ]]; then
         docker rm -f $mysql_con
     fi
-    # Start docker mysql container
+    #Start docker mysql container
     docker run -d --name $mysql_con \
         -e MYSQL_ROOT_PASSWORD=root \
         -e MYSQL_DATABASE=${COMMON_DB} \
