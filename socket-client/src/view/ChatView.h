@@ -41,8 +41,6 @@ public:
     static void handleMenu(int sock, int selection);
     static void interactUserMenu(int count, map<int, UserClient> foundUser, int sock);
     static void UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin);
-    static View GetCurrentView();
-    static void ReloadView(View view, int sock);
     static UserClient getUser();
     static WINDOW *getCurrentWin();
 };

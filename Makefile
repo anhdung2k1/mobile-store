@@ -26,6 +26,7 @@ build: build-authentication \
 build-authentication:
 	@echo "build authentication Repository"
 	./vas.sh build_repo --name=authentication
+	sleep 5
 build-socket-server:
 	@echo "build socket-server"
 	./vas.sh build_repo --name=socket-server

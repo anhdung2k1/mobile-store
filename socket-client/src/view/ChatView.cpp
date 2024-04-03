@@ -938,7 +938,7 @@ void ChatView::Menu()
    mvwprintw(userMenu, 4, 2, "------------------------------------------------------------------");
    wattroff(userMenu, COLOR_PAIR(3));
    wattron(userMenu, COLOR_PAIR(4));
-   mvwprintw(userMenu, 2, (userMenu->_maxx - 28) / 2, ">>>>> Chat Application <<<<<");
+   mvwprintw(userMenu, 2, (userMenu->_maxx - 28) / 2, ">>>>> Mobile Store Management <<<<<");
    mvwprintw(userMenu, 6, 3, "Mobile Inventory");
    mvwprintw(userMenu, 8, 3, "Transaction History");
    mvwprintw(userMenu, 10, 3, "List of Customers");
@@ -1355,16 +1355,21 @@ void ChatView::handleMenu(int sock, int selection)
       case 110: //N
       {
          clear();
-         refresh();
          endwin();
          currentView = MobileInventory;
-         system("clear");
-         string input;
-         // Start regigter window design
          initscr();
          keypad(stdscr, TRUE);
          cbreak();
          refresh();
+         noecho();
+         curs_set(0);
+         if (has_colors() == FALSE)
+         {
+            clear();
+            endwin();
+            printf("Your terminal does not support color\n");
+            exit(1);
+         }
          start_color();
          init_pair(1, COLOR_YELLOW, COLOR_BLACK);
          init_pair(2, COLOR_RED, COLOR_BLACK);
@@ -1372,101 +1377,260 @@ void ChatView::handleMenu(int sock, int selection)
          init_pair(4, COLOR_CYAN, COLOR_BLACK);
          init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
          init_pair(6, COLOR_WHITE, COLOR_BLACK);
-         noecho();
-         if(has_colors() == FALSE)
-         {
-            clear();
-            endwin();
-            printf("Your terminal does not support color\n");
-            exit(1);
-         }
-         //echo();
-         WINDOW *mobileInventoryWin = newwin(5, 61, 0, 0);
-         currentWin = mobileInventoryWin;
-         wattron(currentWin, COLOR_PAIR(3));
-         box(currentWin, 0, 0);
-         wattroff(currentWin, COLOR_PAIR(3));
-         refresh();
-         wattron(currentWin, COLOR_PAIR(4));
-         mvwprintw(currentWin, 2, 1, "Enter Mobile Name: ");
-         wattroff(currentWin, COLOR_PAIR(4));
-         wrefresh(currentWin);
+         init_pair(7, COLOR_BLUE, COLOR_WHITE);
+         string input;
+         WINDOW *updateWin = newwin(22, 60, 0, 0);
+         wattron(updateWin, COLOR_PAIR(3));
+         box(updateWin, 0, 0);
+         mvwprintw(updateWin, 4, 2, "--------------------------------------------------------");
+         mvwprintw(updateWin, 12, 2, "--------------------------------------------------------");
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 2, (updateWin->_maxx - 40), "*** Mobile Inventory ***");
+         mvwprintw(updateWin, 6, 3, "1. Find Mobile Devices by Mobile Name: ");
+         mvwprintw(updateWin, 8, 3, "2. Find Mobile Devices by Mobile Category: ");
+         mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
+         mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
+         mvwprintw(updateWin, 14, (updateWin->_maxx - 40) / 2, "Select an option that you want to find");
+         wattroff(updateWin, COLOR_PAIR(4));
+         wattron(updateWin, COLOR_PAIR(6));
          int curs_x, curs_y;
-         getyx(currentWin, curs_y, curs_x);
-         wmove(currentWin, curs_y, curs_x);
-         // change int to char *
+         wmove(updateWin, 43, 13);
          int n;
          char c = char(n);
-         input = "";
-         do
-         {
-            // Get the key
-            n = wgetch(currentWin);
-            if(n == 27)
+         do {
+            n = wgetch(updateWin);
+            if(n == 97)
             {
                clear();
+               refresh();
                endwin();
-               break;
-            } else if (n == 8 || n == 127) {
-               if (input.length() != 0){
-                  input.pop_back();
-                  wprintw(currentWin, "\b \b");
-                  wrefresh(currentWin);
-                  curs_x--;
+               currentView = MobileInventory;
+               system("clear");
+               string input;
+               // Start regigter window design
+               initscr();
+               keypad(stdscr, TRUE);
+               cbreak();
+               refresh();
+               start_color();
+               init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+               init_pair(2, COLOR_RED, COLOR_BLACK);
+               init_pair(3, COLOR_GREEN, COLOR_BLACK);
+               init_pair(4, COLOR_CYAN, COLOR_BLACK);
+               init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+               init_pair(6, COLOR_WHITE, COLOR_BLACK);
+               noecho();
+               if(has_colors() == FALSE)
+               {
+                  clear();
+                  endwin();
+                  printf("Your terminal does not support color\n");
+                  exit(1);
                }
-            } else if (n == 10 && input.length() >= 0 ) {
-               break;
-            }
-            else if (n == 10) {
-               attroff(COLOR_PAIR(1));
+               //echo();
+               WINDOW *mobileInventoryWin = newwin(5, 61, 0, 0);
+               currentWin = mobileInventoryWin;
+               wattron(currentWin, COLOR_PAIR(3));
+               box(currentWin, 0, 0);
+               wattroff(currentWin, COLOR_PAIR(3));
                refresh();
-               sleep(2);
-               move(16, 0);
-               clrtoeol();
-               refresh();
+               wattron(currentWin, COLOR_PAIR(4));
+               mvwprintw(currentWin, 2, 1, "Enter Mobile Name: ");
+               wattroff(currentWin, COLOR_PAIR(4));
+               wrefresh(currentWin);
+               int curs_x, curs_y;
+               getyx(currentWin, curs_y, curs_x);
                wmove(currentWin, curs_y, curs_x);
-               wrefresh(currentWin);
-               ChatView::handleMenu(sock, 110);
-            }
-            else  {
-               c = char(n);
-               mvwprintw(currentWin, curs_y, curs_x, "%c",c);
-               wrefresh(currentWin);
-               input.push_back(c);
-               curs_x++;
-            }
-            getyx(currentWin, curs_y, curs_x);
-         } while (true);
-         
-         if (n == 27)
-         {
-            break;
-         }
-         else{
-            vector<Mobile>mobile;
-            ChatService::FindInventoryName(sock, mobile, input);
-            int spacePos = 0;
-            for (auto mb : mobile) {
-               mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(mb.getMobileId())).c_str());
-               mvprintw(6+spacePos, 20, "%s", ChatService::processString(mb.getMobileName()).c_str());
-               mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
-               mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
-               mvprintw(6+spacePos, 80, "%s", ChatService::processString(to_string(mb.getMobileQuantity())).c_str());
-               mvprintw(6+spacePos, 100, "%s", ChatService::processString(mb.getMobilePrice()).c_str());
-               mvprintw(6+spacePos, 120, "%s", ChatService::processString(mb.getMobileDescription()).c_str());
-               spacePos += 1;
-            }
+               // change int to char *
+               int n;
+               char c = char(n);
+               input = "";
+               do
+               {
+                  // Get the key
+                  n = wgetch(currentWin);
+                  if(n == 27)
+                  {
+                     clear();
+                     endwin();
+                     break;
+                  } else if (n == 8 || n == 127) {
+                     if (input.length() != 0){
+                        input.pop_back();
+                        wprintw(currentWin, "\b \b");
+                        wrefresh(currentWin);
+                        curs_x--;
+                     }
+                  } else if (n == 10 && input.length() >= 0 ) {
+                     break;
+                  }
+                  else if (n == 10) {
+                     attroff(COLOR_PAIR(1));
+                     refresh();
+                     sleep(2);
+                     move(16, 0);
+                     clrtoeol();
+                     refresh();
+                     wmove(currentWin, curs_y, curs_x);
+                     wrefresh(currentWin);
+                     ChatView::handleMenu(sock, 110);
+                  }
+                  else  {
+                     c = char(n);
+                     mvwprintw(currentWin, curs_y, curs_x, "%c",c);
+                     wrefresh(currentWin);
+                     input.push_back(c);
+                     curs_x++;
+                  }
+                  getyx(currentWin, curs_y, curs_x);
+               } while (true);
+               
+               if (n == 27)
+               {
+                  break;
+               }
+               else{
+                  vector<Mobile>mobile;
+                  ChatService::FindInventoryName(sock, mobile, input, "FIND_INVENTORY_NAME");
+                  int spacePos = 0;
+                  for (auto mb : mobile) {
+                     mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(mb.getMobileId())).c_str());
+                     mvprintw(6+spacePos, 20, "%s", ChatService::processString(mb.getMobileName()).c_str());
+                     mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
+                     mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
+                     mvprintw(6+spacePos, 80, "%s", ChatService::processString(to_string(mb.getMobileQuantity())).c_str());
+                     mvprintw(6+spacePos, 100, "%s", ChatService::processString(mb.getMobilePrice()).c_str());
+                     mvprintw(6+spacePos, 120, "%s", ChatService::processString(mb.getMobileDescription()).c_str());
+                     spacePos += 1;
+                  }
 
-            mvprintw(17, 0, "Press any key to continue!");
-            int back = getch();
-            if (back == 27)
-            {
-               clear();
-               endwin();
-               break;
+                  mvprintw(17, 0, "Press any key to continue!");
+                  int back = getch();
+                  if (back == 27)
+                  {
+                     clear();
+                     endwin();
+                     break;
+                  }
+                  break;
+               }
             }
-            endwin();
-         }
+            else if (n == 103) {
+               clear();
+               refresh();
+               endwin();
+               currentView = MobileInventory;
+               system("clear");
+               string input;
+               // Start regigter window design
+               initscr();
+               keypad(stdscr, TRUE);
+               cbreak();
+               refresh();
+               start_color();
+               init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+               init_pair(2, COLOR_RED, COLOR_BLACK);
+               init_pair(3, COLOR_GREEN, COLOR_BLACK);
+               init_pair(4, COLOR_CYAN, COLOR_BLACK);
+               init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+               init_pair(6, COLOR_WHITE, COLOR_BLACK);
+               noecho();
+               if(has_colors() == FALSE)
+               {
+                  clear();
+                  endwin();
+                  printf("Your terminal does not support color\n");
+                  exit(1);
+               }
+               //echo();
+               WINDOW *mobileInventoryWin = newwin(5, 61, 0, 0);
+               currentWin = mobileInventoryWin;
+               wattron(currentWin, COLOR_PAIR(3));
+               box(currentWin, 0, 0);
+               wattroff(currentWin, COLOR_PAIR(3));
+               refresh();
+               wattron(currentWin, COLOR_PAIR(4));
+               mvwprintw(currentWin, 2, 1, "Enter Mobile Type: ");
+               wattroff(currentWin, COLOR_PAIR(4));
+               wrefresh(currentWin);
+               int curs_x, curs_y;
+               getyx(currentWin, curs_y, curs_x);
+               wmove(currentWin, curs_y, curs_x);
+               // change int to char *
+               int n;
+               char c = char(n);
+               input = "";
+               do
+               {
+                  // Get the key
+                  n = wgetch(currentWin);
+                  if(n == 27)
+                  {
+                     clear();
+                     endwin();
+                     break;
+                  } else if (n == 8 || n == 127) {
+                     if (input.length() != 0){
+                        input.pop_back();
+                        wprintw(currentWin, "\b \b");
+                        wrefresh(currentWin);
+                        curs_x--;
+                     }
+                  } else if (n == 10 && input.length() >= 0 ) {
+                     break;
+                  }
+                  else if (n == 10) {
+                     attroff(COLOR_PAIR(1));
+                     refresh();
+                     sleep(2);
+                     move(16, 0);
+                     clrtoeol();
+                     refresh();
+                     wmove(currentWin, curs_y, curs_x);
+                     wrefresh(currentWin);
+                     ChatView::handleMenu(sock, 110);
+                  }
+                  else  {
+                     c = char(n);
+                     mvwprintw(currentWin, curs_y, curs_x, "%c",c);
+                     wrefresh(currentWin);
+                     input.push_back(c);
+                     curs_x++;
+                  }
+                  getyx(currentWin, curs_y, curs_x);
+               } while (true);
+               
+               if (n == 27)
+               {
+                  break;
+               }
+               else{
+                  vector<Mobile>mobile;
+                  ChatService::FindInventoryName(sock, mobile, input, "FIND_INVENTORY_TYPE");
+                  int spacePos = 0;
+                  for (auto mb : mobile) {
+                     mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(mb.getMobileId())).c_str());
+                     mvprintw(6+spacePos, 20, "%s", ChatService::processString(mb.getMobileName()).c_str());
+                     mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
+                     mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
+                     mvprintw(6+spacePos, 80, "%s", ChatService::processString(to_string(mb.getMobileQuantity())).c_str());
+                     mvprintw(6+spacePos, 100, "%s", ChatService::processString(mb.getMobilePrice()).c_str());
+                     mvprintw(6+spacePos, 120, "%s", ChatService::processString(mb.getMobileDescription()).c_str());
+                     spacePos += 1;
+                  }
+
+                  mvprintw(17, 0, "Press any key to continue!");
+                  int back = getch();
+                  if (back == 27)
+                  {
+                     clear();
+                     endwin();
+                     break;
+                  }
+                  break;
+               }
+            }
+         } while(true);
          break;
       }
       case 105: //I
@@ -1568,7 +1732,7 @@ void ChatView::handleMenu(int sock, int selection)
          else {
             ChatService::RequestSend("GET_CUSTOMERS|", sock);
             string response = ChatService::GetValueFromServer(sock, "GET_CUSTOMERS");
-            mvprintw(5, 20, "%s", response.c_str());
+            mvprintw(2, 0, "%s", response.c_str());
 
             int back = getch();
             if (back == 27) {
@@ -1866,48 +2030,6 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
    if (n == 27)
    {
       ChatView::handleMenu(sock, -1);
-   }
-}
-
-ChatView::View ChatView::GetCurrentView()
-{
-   return currentView;
-}
-
-void ChatView::ReloadView(View view, int sock)
-{
-   switch (view)
-   {
-   case 0:
-      endwin();
-      ChatView::handleLogin(sock, -1);
-      break;
-   case 1:
-      endwin();
-      ChatView::handleMenu(sock, -1);
-      break;
-   case 2:
-      ChatView::handleMenu(sock, 110);
-      break;
-   case 3:
-      ChatView::handleMenu(sock, 106);
-      break;
-   case 4:
-      ChatView::handleMenu(sock, 102);
-      break;
-   case 5:
-      ChatView::handleMenu(sock, 117);
-      break;
-   case 6:
-      endwin();
-      ChatView::handleLogin(sock, 114);
-      break;
-   case 7:
-      endwin();
-      ChatView::handleLogin(sock, 108);
-      break;
-   default:
-      break;
    }
 }
 
