@@ -5,6 +5,7 @@
 #include <vector>
 #include "../model/UserClient.h"
 #include "../model/Mobile.h"
+#include "../model/Transaction.h"
 #include "../view/StatusBar.h"
 #include <thread>
 #include <cstdlib>
@@ -29,7 +30,7 @@ public:
         LoginInput = 6,
         RegisterInput = 7,
         MobileInventory = 8,
-        Transaction = 9,
+        Transactions = 9,
         Customer = 10
     };
     static void handleLogin(int sock, int selection);

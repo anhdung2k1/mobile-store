@@ -44,25 +44,33 @@ public class MobileServiceImpl implements MobileService {
     }
 
     @Override
-    public List<Map<String, Object>> getAllMobilesByName(String mobileName) {
-        List<Map<String, Object>> mobilesMapList = new ArrayList<>();
-        List<MobileEntity> mobileEntities = mobileRepository.findAllByMobileNameContains(mobileName).isPresent()
-                ? mobileRepository.findAllByMobileNameContains(mobileName).get() : null;
-        assert mobileEntities != null;
-        mobileEntities.forEach((mobileEntity
-                -> mobilesMapList.add(mobileMap(mobileEntity))));
-        return mobilesMapList;
+    public List<Map<String, Object>> getAllMobilesByName(String mobileName) throws Exception {
+        try {
+            List<Map<String, Object>> mobilesMapList = new ArrayList<>();
+            List<MobileEntity> mobileEntities = mobileRepository.findAllByMobileNameContains(mobileName).isPresent()
+                    ? mobileRepository.findAllByMobileNameContains(mobileName).get() : null;
+            assert mobileEntities != null;
+            mobileEntities.forEach((mobileEntity
+                    -> mobilesMapList.add(mobileMap(mobileEntity))));
+            return mobilesMapList;
+        } catch (NoSuchElementException e) {
+            throw new Exception("Could not retrieve all mobiles by mobile Name: " + mobileName + e.getMessage());
+        }
     }
 
     @Override
-    public List<Map<String, Object>> getAllMobilesByType(String mobileType) {
-        List<Map<String, Object>> mobilesMapList = new ArrayList<>();
-        List<MobileEntity> mobileEntities = mobileRepository.findAllByMobileTypeContains(mobileType).isPresent()
-                ? mobileRepository.findAllByMobileTypeContains(mobileType).get() : null;
-        assert mobileEntities != null;
-        mobileEntities.forEach((mobileEntity
-                -> mobilesMapList.add(mobileMap(mobileEntity))));
-        return mobilesMapList;
+    public List<Map<String, Object>> getAllMobilesByType(String mobileType) throws Exception {
+        try {
+            List<Map<String, Object>> mobilesMapList = new ArrayList<>();
+            List<MobileEntity> mobileEntities = mobileRepository.findAllByMobileTypeContains(mobileType).isPresent()
+                    ? mobileRepository.findAllByMobileTypeContains(mobileType).get() : null;
+            assert mobileEntities != null;
+            mobileEntities.forEach((mobileEntity
+                    -> mobilesMapList.add(mobileMap(mobileEntity))));
+            return mobilesMapList;
+        } catch (NoSuchElementException e) {
+            throw new Exception("Could not retrieve all mobiles by mobile Type: " + mobileType + e.getMessage());
+        }
     }
 
     @Override

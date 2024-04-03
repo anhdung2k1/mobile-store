@@ -15,4 +15,8 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             "SELECT pu.pay_id FROM customer_payment pu " +
             "WHERE pu.cus_id =:customerId)", nativeQuery = true)
     Optional<List<TransactionEntity>> findAllTransactionByCustomerId(Long customerId);
+
+    @Query(value = "SELECT trans.* FROM transactions trans " +
+            "LIMIT 7", nativeQuery = true)
+    Optional<List<TransactionEntity>> findAllTransaction();
 }

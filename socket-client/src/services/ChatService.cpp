@@ -2,8 +2,6 @@
 #include "ChatService.h"
 #include <iomanip>
 #include <cstdlib>
-// #define PORT 31226
-// #define ADDRESS "192.168.122.239"
 #define PORT 8000
 #define ADDRESS "172.17.0.5"
 
@@ -372,8 +370,8 @@ void ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string inp
             Mobile mb(
                 it.at("mobileID").get<int>(),
                 it.at("mobileName").get<string>(),
-                it.at("mobileType").get<string>(),
                 it.at("mobileModel").get<string>(),
+                it.at("mobileType").get<string>(),
                 it.at("mobileQuantity").get<int>(),
                 it.at("mobilePrice").get<string>(),
                 it.at("mobileDescription").get<string>()
@@ -383,6 +381,29 @@ void ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string inp
     } else {
         mvprintw(5, 20, "%s", "Could not found any mobile device!!");
     }
+}
+
+void ChatService::GetTransactionHistory(int sock, vector<Transaction> &transaction) {
+    ChatService::RequestSend("GET_TRANSACTION_HISTORY|", sock);
+    string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY");
+    if(response.length() > 0) {
+        nlohmann::json j = nlohmann::json::parse(response);
+        mvprintw(0, 20, "%s", "Transaction Name");
+        mvprintw(0, 40, "%s", "Transaction Type");
+        mvprintw(0, 60, "%s", "Payment Method");
+        
+        for(auto tr : j) {
+            Transaction trans(
+                tr.at("transactionName").get<string>(),
+                tr.at("transactionType").get<string>(),
+                tr.at("paymentMethod").get<string>()
+            ); 
+            transaction.push_back(trans);
+        }
+    }
+    else {
+        mvprintw(5, 20, "%s", "Could not found any transaction history!!");
+    }    
 }
 
 bool ChatService::HandleName(string username)

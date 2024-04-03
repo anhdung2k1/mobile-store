@@ -7,8 +7,8 @@ import java.util.Map;
 
 public interface MobileService {
     Mobile createMobile(Mobile mobile) throws Exception;
-    List<Map<String, Object>> getAllMobilesByName(String mobileName);
-    List<Map<String, Object>> getAllMobilesByType(String mobileType);
+    List<Map<String, Object>> getAllMobilesByName(String mobileName) throws Exception;
+    List<Map<String, Object>> getAllMobilesByType(String mobileType) throws Exception;
     Map<String, Object> getMobileById(Long mobileId) throws Exception;
     Mobile updateMobileInformation(Long mobileId, Mobile mobile) throws Exception;
     Boolean deleteMobile(Long mobileId) throws Exception;

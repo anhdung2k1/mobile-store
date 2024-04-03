@@ -37,6 +37,7 @@ public:
     static bool ConvertToBool(string s);
     static void GetCurrentProfile(int sock, UserClient &user);
     static void FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern);
+    static void GetTransactionHistory(int sock, vector<Transaction> &transaction);
     static map<int, UserClient> GetFoundUser(int sock, UserClient user, int &count, WINDOW *finduserWin);
     static void HandleInput();
     static int handleConnect(const char *address, int port);

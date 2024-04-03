@@ -53,6 +53,9 @@ dir_est() {
 get_version() {
     suffix=$(git rev-parse HEAD | sed 's/^0*//g' | cut -c1-7 | tr 'a-f' '1-6')
     suffix+=$(git diff --quiet && git diff --cached --quiet || echo '9999')
+    if [[ -n "$BUILD_DIR/var/.version)" ]]; then
+        suffix=$(cat $BUILD_DIR/var/.version)
+    fi
     echo "$(<$VAS_GIT/VERSION_PREFIX)-${suffix}"
 }
 

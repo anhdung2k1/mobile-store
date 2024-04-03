@@ -74,7 +74,7 @@ void ChatView::LoginMenu()
    curs_set(0);
    refresh();
    wattron(loginMenu, COLOR_PAIR(4));
-   mvwprintw(loginMenu, 2, (loginMenu->_maxx - 24) / 2, ">>>>====Messager====<<<<");
+   mvwprintw(loginMenu, 2, (loginMenu->_maxx - 24) / 2, ">>>>====Mobile Shop====<<<<");
    mvwprintw(loginMenu, 6, 3, "Register");
    mvwprintw(loginMenu, 8, 3, "Login");
    mvwprintw(loginMenu, 6, (loginMenu->_maxx - 12), "(Press R)");
@@ -1343,7 +1343,7 @@ void ChatView::interactUserMenu(int count, map<int, UserClient> foundUser, int s
 void ChatView::handleMenu(int sock, int selection)
 {
    bool isSuccess = false;
-
+   vector<Mobile>mobile;
    do
    {
       if (selection < 0)
@@ -1399,7 +1399,7 @@ void ChatView::handleMenu(int sock, int selection)
          char c = char(n);
          do {
             n = wgetch(updateWin);
-            if(n == 97)
+            if(n == 97) // A
             {
                clear();
                refresh();
@@ -1490,7 +1490,6 @@ void ChatView::handleMenu(int sock, int selection)
                   break;
                }
                else{
-                  vector<Mobile>mobile;
                   ChatService::FindInventoryName(sock, mobile, input, "FIND_INVENTORY_NAME");
                   int spacePos = 0;
                   for (auto mb : mobile) {
@@ -1515,7 +1514,7 @@ void ChatView::handleMenu(int sock, int selection)
                   break;
                }
             }
-            else if (n == 103) {
+            else if (n == 103) { // G
                clear();
                refresh();
                endwin();
@@ -1605,7 +1604,6 @@ void ChatView::handleMenu(int sock, int selection)
                   break;
                }
                else{
-                  vector<Mobile>mobile;
                   ChatService::FindInventoryName(sock, mobile, input, "FIND_INVENTORY_TYPE");
                   int spacePos = 0;
                   for (auto mb : mobile) {
@@ -1633,12 +1631,13 @@ void ChatView::handleMenu(int sock, int selection)
          } while(true);
          break;
       }
-      case 105: //I
+      case 105: //I: Transaction History
       {
+         vector<Transaction>transaction;
          clear();
          refresh();
          endwin();
-         currentView = Transaction;
+         currentView = Transactions;
          system("clear");
          string input;
          // Start regigter window design
@@ -1675,10 +1674,15 @@ void ChatView::handleMenu(int sock, int selection)
             break;
          }
          else {
-            ChatService::RequestSend("GET_TRANSACTION_HISTORY|", sock);
-            string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY");
+            ChatService::GetTransactionHistory(sock, transaction);
+            int spacePos = 2;
+            for(auto tr : transaction) {
+               mvprintw(spacePos, 20, "%s", tr.getTransactionName().c_str());
+               mvprintw(spacePos, 40, "%s", tr.getTransactionType().c_str());
+               mvprintw(spacePos, 60, "%s", tr.getPaymentMethod().c_str());
+               spacePos += 1;
+            }
             
-            mvprintw(2, 0, "%s", response.c_str());
             int back = getch();
             if (back == 27) {
                clear();

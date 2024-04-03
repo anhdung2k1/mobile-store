@@ -10,16 +10,16 @@ class Transaction {
         int transactionId;
         string transactionName;
         string transactionType;
-        Payment payment;
+        string paymentMethod;
     public:
         Transaction();
         Transaction(int transactionId, string transactionName, string transactionType);
-        Transaction(string transactionName, string transactionType, Payment payment);
+        Transaction(string transactionName, string transactionType, string paymentMethod);
         int getTransactionId();
         string getTransactionName();
         string getTransactionType();
-        Payment getPayment();
+        string getPaymentMethod();
         void setTransactionName(string transactionName);
         void setTransactionType(string transactionType);
-        void setPayment(Payment payment);
+        void setPaymentMethod(string paymentMethod);
 };
