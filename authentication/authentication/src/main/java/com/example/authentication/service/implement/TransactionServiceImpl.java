@@ -21,7 +21,7 @@ public class TransactionServiceImpl implements TransactionService {
         return new HashMap<>(){{
             put("transactionName", transactionEntity.getTransactionName());
             put("transactionType", transactionEntity.getTransactionType());
-            put("payment", transactionEntity.getPayments());
+            put("paymentMethod", transactionEntity.getPayments().getPaymentMethod());
         }};
     }
 
@@ -41,7 +41,9 @@ public class TransactionServiceImpl implements TransactionService {
     public List<Map<String, Object>> getAllTransactions() throws Exception {
         try {
             List<Map<String, Object>> transactionMapList = new ArrayList<>();
-            List<TransactionEntity> transactionEntities = transactionRepository.findAll();
+            List<TransactionEntity> transactionEntities = transactionRepository.findAllTransaction().isPresent()
+                    ? transactionRepository.findAllTransaction().get() : null;
+            assert transactionEntities != null;
 
             transactionEntities.forEach((transactionEntity
                     -> transactionMapList.add(transactionMap(transactionEntity))));

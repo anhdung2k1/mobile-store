@@ -17,6 +17,8 @@ class Mobile {
         string mobileDescription;
     public:
         Mobile();
+        Mobile(string mobileName, string mobileModel, string mobileType,
+                int mobileQuantity, string mobilePrice,string setMobileDescription);
         Mobile(int mobileId, string mobileName, string mobileModel, string mobileType,
                 int mobileQuantity, string mobilePrice,string setMobileDescription);
         int getMobileId();

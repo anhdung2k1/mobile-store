@@ -15,7 +15,7 @@ init:
 	@echo "Get version"
 	./vas.sh get_version > $(VAR_DIR)/.version
 	@echo "Get commit hash"
-	git rev-parse --short=7 HEAD > $(VAR_DIR)/.version
+	git rev-parse --short=7 HEAD > $(VAR_DIR)/.commit_hash
 	@echo "Generate release version"
 	@git tag | grep -v + | sort -V | tail -1 | sed 's/-/+/g' > $(VAR_DIR)/.released-version
 
@@ -26,7 +26,6 @@ build: build-authentication \
 build-authentication:
 	@echo "build authentication Repository"
 	./vas.sh build_repo --name=authentication
-	sleep 5
 build-socket-server:
 	@echo "build socket-server"
 	./vas.sh build_repo --name=socket-server
