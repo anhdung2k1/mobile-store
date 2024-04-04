@@ -5,6 +5,10 @@
 Mobile::Mobile()
         : mobileName(""), mobileModel(""), mobileType(""), mobileDescription("") {}
 
+Mobile::Mobile(string mobileName, string mobileModel, string mobileType, int mobileQuantity, string mobilePrice, string mobileDescription) 
+    : mobileName(mobileName), mobileModel(mobileModel), mobileType(mobileType),
+        mobileQuantity(mobileQuantity), mobilePrice(mobilePrice),mobileDescription(mobileDescription) {}
+
 Mobile::Mobile(int mobileId, string mobileName, string mobileModel, string mobileType, int mobileQuantity, string mobilePrice, string mobileDescription) 
     : mobileId(mobileId) ,mobileName(mobileName), mobileModel(mobileModel), mobileType(mobileType),
         mobileQuantity(mobileQuantity), mobilePrice(mobilePrice),mobileDescription(mobileDescription) {}

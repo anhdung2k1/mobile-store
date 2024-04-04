@@ -13,11 +13,11 @@ import java.util.Optional;
 public interface MobileRepository extends JpaRepository<MobileEntity, Long> {
     @Query(value = "SELECT m.* FROM mobile m " +
             "WHERE m.mob_name LIKE %:mobileName% " +
-            "LIMIT 5", nativeQuery = true)
+            "LIMIT 30", nativeQuery = true)
     Optional<List<MobileEntity>> findAllByMobileNameContains(@Param("mobileName") String mobileName);
 
     @Query(value = "SELECT m.* FROM mobile m " +
             "WHERE m.mob_type LIKE %:mobileType% " +
-            "LIMIT 5", nativeQuery = true)
+            "LIMIT 30", nativeQuery = true)
     Optional<List<MobileEntity>> findAllByMobileTypeContains(@Param("mobileType") String mobileType);
 }

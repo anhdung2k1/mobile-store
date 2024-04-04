@@ -1,10 +1,6 @@
 // Copyright [2024] <Anh Dung>
 #include "ChatView.h"
 #include "../services/ChatService.h"
-#include <chrono>
-#include <iomanip>
-#include "locale.h"
-#include "ncurses.h"
 
 using std::cin;
 using std::cout;
@@ -26,9 +22,21 @@ WINDOW *currentWin;
 bool atTop = false;
 bool isEmptyChat = true;
 
+
+// The function to read the key by value
+template<typename KeyType, typename ValueType>
+KeyType getKeyByValue(const std::map<KeyType, ValueType>& map, const ValueType& value) {
+    for (const auto& pair : map) {
+        if (pair.second == value) {
+            return pair.first; // Return the key
+        }
+    }
+    throw out_of_range("Value not found in map");
+}
+
 void ChatView::UI()
 {
-   char buffer[1024];
+   char buffer[buffer_size];
    int sock = ChatService::handleConnect(ADDRESS, PORT);
    readThread = thread(ChatService::HandleReceive, sock, buffer);
    ChatService::RequestSend("ACTIVATE_THREAD", sock);
@@ -1218,8 +1226,6 @@ int ChatView::selectMenu()
 
 void ChatView::interactUserMenu(int count, map<int, UserClient> foundUser, int sock)
 {
-   int choice;
-   bool reSelect;
    refresh();
    endwin();
    string input;
@@ -1269,7 +1275,7 @@ void ChatView::interactUserMenu(int count, map<int, UserClient> foundUser, int s
          break;
       }
       else if (n == 8 || n == 127)
-      { // If the key press is backspace, erase current char, ex: hoangmy -> hoangm
+      { // If the key press is backspace, erase current char
          // ChatView::ChangeBarText(std::to_string(input.length()));
          if (input.length() != 0) // check if input length == 0 then no need to pop from string input
          {
@@ -1340,10 +1346,111 @@ void ChatView::interactUserMenu(int count, map<int, UserClient> foundUser, int s
    }
 }
 
+void ChatView::findMobileMenu(int sock, map<int,int>& idMobileInventory) {
+   string input;
+   refresh();
+   endwin();
+   initscr();
+   start_color();
+   init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+   init_pair(2, COLOR_RED, COLOR_BLACK);
+   init_pair(3, COLOR_GREEN, COLOR_BLACK);
+   init_pair(4, COLOR_CYAN, COLOR_BLACK);
+   init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+   init_pair(6, COLOR_WHITE, COLOR_BLACK);
+   noecho();
+   if (has_colors() == FALSE)
+   {
+      clear();
+      endwin();
+      printf("Your terminal does not support color\n");
+      exit(1);
+   }
+   echo();
+   WINDOW *interactMobileMenuWin = newwin(5, 61, 46, 0);
+   currentWin = interactMobileMenuWin;
+   wattron(currentWin, COLOR_PAIR(3));
+   box(currentWin, 0, 0);
+   wattroff(currentWin, COLOR_PAIR(3));
+   refresh();
+   wattron(currentWin, COLOR_PAIR(4));
+   mvwprintw(currentWin, 1, 1, "Select mobile option interact: ");
+   wattroff(currentWin, COLOR_PAIR(4));
+   wrefresh(currentWin);
+   int curs_x, curs_y;
+   wmove(currentWin, 1, 34);
+   // change int to char *
+   int n;
+   char c = char(n);
+   char *ch = &c;
+   input = "";
+   do
+   {
+      // Get the key
+      n = wgetch(currentWin);
+      if (n == 27) // back to login menu
+      {
+         clear();
+         endwin();
+         break;
+      }
+      else if (n == 8 || n == 127)
+      { 
+         if (input.length() != 0) // check if input length == 0 then no need to pop from string input
+         {
+            input.pop_back();
+            wprintw(currentWin, " \b");
+            wrefresh(currentWin);
+            curs_x--;
+         }
+         else if (input.length() == 0)
+         {
+            wattron(currentWin, COLOR_PAIR(4));
+            mvwprintw(currentWin, 1, 1, "Select mobile option interact: ");
+            wattroff(currentWin, COLOR_PAIR(4));
+            wrefresh(currentWin);
+         }
+      }
+      else if (n == 10 && input.length() == 0)
+      {
+         move(1, 1);
+         clrtoeol();
+         wattron(currentWin, COLOR_PAIR(4));
+         mvwprintw(currentWin, 1, 1, "Select mobile option interact: ");
+         wattroff(currentWin, COLOR_PAIR(4));
+         wrefresh(currentWin);
+         continue;
+      }
+      else if (n == 10 && input.length() != 0)
+      {
+         break;
+      }
+      else
+      {
+         c = char(n);
+         mvwprintw(currentWin, curs_y, curs_x, "%c", c);
+         wrefresh(currentWin);
+         input.push_back(c);
+         curs_x++;
+      }
+   } while (true);
+
+   if (n == 27)
+   {
+      ChatView::handleMenu(sock, -1);
+   }
+   else
+   {
+      int choice = stoi(input);
+      ChatView::MobileUI(sock, getKeyByValue(idMobileInventory, choice), currentWin);
+   }
+}
+
 void ChatView::handleMenu(int sock, int selection)
 {
    bool isSuccess = false;
-   vector<Mobile>mobile;
+   vector<Mobile>mobileList;
+   Mobile mobile;
    do
    {
       if (selection < 0)
@@ -1490,11 +1597,11 @@ void ChatView::handleMenu(int sock, int selection)
                   break;
                }
                else{
-                  ChatService::FindInventoryName(sock, mobile, input, "FIND_INVENTORY_NAME");
+                  map<int,int> idInventory = ChatService::FindInventoryName(sock, mobileList, input, "FIND_INVENTORY_NAME");
                   int spacePos = 0;
-                  for (auto mb : mobile) {
-                     mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(mb.getMobileId())).c_str());
-                     mvprintw(6+spacePos, 20, "%s", ChatService::processString(mb.getMobileName()).c_str());
+                  for (auto mb : mobileList) {
+                     mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(idInventory[mb.getMobileId()])).c_str());
+                     mvprintw(6+spacePos, 5, "%s", ChatService::processString(mb.getMobileName()).c_str());
                      mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
                      mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
                      mvprintw(6+spacePos, 80, "%s", ChatService::processString(to_string(mb.getMobileQuantity())).c_str());
@@ -1503,7 +1610,7 @@ void ChatView::handleMenu(int sock, int selection)
                      spacePos += 1;
                   }
 
-                  mvprintw(17, 0, "Press any key to continue!");
+                  mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
                   int back = getch();
                   if (back == 27)
                   {
@@ -1511,7 +1618,9 @@ void ChatView::handleMenu(int sock, int selection)
                      endwin();
                      break;
                   }
-                  break;
+                  
+                  // Search information details for mobile ID
+                  findMobileMenu(sock, idInventory);
                }
             }
             else if (n == 103) { // G
@@ -1604,11 +1713,11 @@ void ChatView::handleMenu(int sock, int selection)
                   break;
                }
                else{
-                  ChatService::FindInventoryName(sock, mobile, input, "FIND_INVENTORY_TYPE");
+                  map<int,int> idInventory = ChatService::FindInventoryName(sock, mobileList, input, "FIND_INVENTORY_TYPE");
                   int spacePos = 0;
-                  for (auto mb : mobile) {
-                     mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(mb.getMobileId())).c_str());
-                     mvprintw(6+spacePos, 20, "%s", ChatService::processString(mb.getMobileName()).c_str());
+                  for (auto mb : mobileList) {
+                     mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(idInventory[mb.getMobileId()])).c_str());
+                     mvprintw(6+spacePos, 5, "%s", ChatService::processString(mb.getMobileName()).c_str());
                      mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
                      mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
                      mvprintw(6+spacePos, 80, "%s", ChatService::processString(to_string(mb.getMobileQuantity())).c_str());
@@ -1617,7 +1726,7 @@ void ChatView::handleMenu(int sock, int selection)
                      spacePos += 1;
                   }
 
-                  mvprintw(17, 0, "Press any key to continue!");
+                  mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
                   int back = getch();
                   if (back == 27)
                   {
@@ -1625,7 +1734,9 @@ void ChatView::handleMenu(int sock, int selection)
                      endwin();
                      break;
                   }
-                  break;
+
+                  // Search information details for mobile ID
+                  findMobileMenu(sock, idInventory);
                }
             }
          } while(true);
@@ -1895,8 +2006,6 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
    refresh();
    endwin();
    currentView = OrtherUserProfile;
-   bool exit = false;
-   int exitValue;
    system("clear");
    string input;
    // Start regigter window design
@@ -1914,7 +2023,6 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
       clear();
       endwin();
       printf("Your terminal does not support color\n");
-      // exit(1);
    }
    echo();
    curs_set(1);
@@ -1942,7 +2050,6 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
    mvwprintw(OrtherUserProfileWin, 7, 1, "Select your option:");
    wattroff(OrtherUserProfileWin, COLOR_PAIR(4));
    wrefresh(OrtherUserProfileWin);
-   bool F;
    do
    {
       // Get the key
@@ -2006,7 +2113,6 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
    {
       string select = input;
       int sig;
-      char sig1 = char(sig);
       // int n;
       // n = stoi(select);
       if (select == "1")
@@ -2030,10 +2136,119 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
          ChatView::handleMenu(sock, -1);
       }
    }
+}
 
-   if (n == 27)
+void ChatView::MobileUI(int sock, int mobileId, WINDOW* mobileInformation) {
+   clear();
+   refresh();
+   endwin();
+   currentView = MobileDetails;
+
+   system("clear");
+   string input;
+   initscr();
+   start_color();
+   init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+   init_pair(2, COLOR_RED, COLOR_BLACK);
+   init_pair(3, COLOR_GREEN, COLOR_BLACK);
+   init_pair(4, COLOR_CYAN, COLOR_BLACK);
+   init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+   init_pair(6, COLOR_WHITE, COLOR_BLACK);
+   noecho();
+   if (has_colors() == FALSE)
    {
+      clear();
+      endwin();
+      printf("Your terminal does not support color\n");
+   }
+   echo();
+   curs_set(1);
+   WINDOW *mobileSearchWin = newwin(20, 61, 0, 0);
+   currentWin = mobileSearchWin;
+   wattron(currentWin, COLOR_PAIR(3));
+   box(currentWin, 0, 0);
+   wattroff(currentWin, COLOR_PAIR(3));
+   int count = 1;
+   refresh();
+   int curs_x, curs_y;
+   curs_x = 34;
+   curs_y = (currentWin->_maxx - 30);
+   wmove(currentWin, curs_x, curs_y);
+
+   int n;
+   char c = char(n);
+   char *ch = &c;
+   wattroff(currentWin, COLOR_PAIR(4));
+   mvprintw(curs_y, 0, "------------Mobile Device Information------------");
+   wattroff(currentWin, COLOR_PAIR(3));
+   mvwprintw(currentWin, 3, 1, "1. Mobile Information");
+   mvwprintw(currentWin, 5, 1, "2. Exit");
+   wattroff(currentWin, COLOR_PAIR(4));
+   mvwprintw(currentWin, 7, 1, "Select your option: ");
+   wattroff(currentWin, COLOR_PAIR(4));
+   wrefresh(currentWin);
+   
+   do {
+      // Get the key
+      n = wgetch(currentWin);
+      if (n == 27) {
+         clear();
+         endwin();
+         ChatView::handleMenu(sock, -1);
+      } 
+      else if (n == 8 || n == 127) {
+         // If the key press is backspace, erase current char
+         if (input.length() != 0) {
+            input.pop_back();
+            wprintw(currentWin, " \b");
+            wrefresh(currentWin);
+         } else if (input.length() == 0) {
+            wattron(currentWin, COLOR_PAIR(4));
+            mvwprintw(currentWin, 7, 1, "Select your option: ");
+            wattroff(currentWin, COLOR_PAIR(4));
+            wrefresh(currentWin);
+         }
+      } else if (n == 10 && input.length() == 0) {
+         move(7, 1);
+         clrtoeol();
+         wattron(currentWin, COLOR_PAIR(4));
+         mvwprintw(currentWin, 7, 1, "Select your option: ");
+         wattroff(currentWin, COLOR_PAIR(4));
+         wrefresh(currentWin);
+         continue;
+      } else if (n == 10 && input.length() != 0) {
+         break;
+      } else {
+         c = char(n);
+         mvwprintw(currentWin, curs_y, curs_x, "%s", ch);
+         wrefresh(currentWin);
+         input.push_back(c);
+      }
+   } while (true);
+   
+   if (n == 27) {
       ChatView::handleMenu(sock, -1);
+   }
+   else {
+      string select = input;
+      int sig;
+
+      if (select == "1") {
+         ChatService::GetMobileInformation(sock, mobileId, currentWin);
+         while (true) {
+            wattron(currentWin, COLOR_PAIR(4));
+            mvwprintw(currentWin, 18, 1, "Press Enter to continue");
+            wattroff(currentWin, COLOR_PAIR(4));
+            sig = wgetch(currentWin);
+            if (sig == 10) {
+               ChatView::MobileUI(sock, mobileId, currentWin);
+               break;
+            }
+         }
+      }
+      else if (select == "2") {
+         ChatView::handleMenu(sock, -1);
+      }
    }
 }
 

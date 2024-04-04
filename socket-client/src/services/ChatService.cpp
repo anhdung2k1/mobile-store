@@ -1,29 +1,11 @@
 // Copyright [2024] <Anh Dung>
-#include "ChatService.h"
-#include <iomanip>
-#include <cstdlib>
 #define PORT 8000
 #define ADDRESS "172.17.0.5"
 
-using std::cin;
-using std::cout;
-using std::endl;
-using std::map;
-using std::queue;
-using std::stack;
-using std::string;
-using std::stringstream;
-using std::thread;
-using std::vector;
+#include "ChatService.h"
 
-bool exitChat = false;
-bool checkingUpdate;
 bool exitApp = false;
 bool reconnect = false;
-int posMsg;
-int overflowLength;
-string tempMsg;
-int latestMsgId;
 queue<string> pendingMsg;
 stack<string> hiddenMsgUp;
 stack<string> hiddenMsgDown;
@@ -141,8 +123,8 @@ string ChatService::GetValueFromServer(int sock, string pattern)
 
 bool ChatService::ResponseReceive(int sock, char *buffer)
 {
-    bzero(buffer, 1024);
-    int valread = recv(sock, buffer, 1024, 0);
+    bzero(buffer, buffer_size);
+    int valread = recv(sock, buffer, buffer_size, 0);
     // cout << "DEBUG: ResponseReceive()\n";
     // cout << (string)buffer << endl;
     // cout << "ENDDEBUG: ResponseReceive()\n";
@@ -187,10 +169,6 @@ bool ChatService::ConvertToBool(string s)
     return b;
 }
 
-void ChatService::touchUpdate(bool F)
-{
-    checkingUpdate = F;
-}
 
 map<int, UserClient> ChatService::GetFoundUser(int sock, UserClient user, int &count, WINDOW *finduserWin)
 {
@@ -347,19 +325,47 @@ void ChatService::GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserP
     user.setAddress(j.at("address"));
     user.setGender(j.at("gender"));
     // mvwprintw(OrtherUserProfileWin, 15, 1,"hello");
-    mvwprintw(OrtherUserProfileWin, 8, 1, "%s :%s", "Name ", user.getName().c_str());
-    mvwprintw(OrtherUserProfileWin, 9, 1, "%s :%s", "Address ", user.getAddress().c_str());
-    mvwprintw(OrtherUserProfileWin, 10, 1, "%s :%s", "Gender ", user.getGender().c_str());
+    mvwprintw(OrtherUserProfileWin, 8, 1, "%s: %s", "Name", user.getName().c_str());
+    mvwprintw(OrtherUserProfileWin, 9, 1, "%s: %s", "Address", user.getAddress().c_str());
+    mvwprintw(OrtherUserProfileWin, 10, 1, "%s: %s", "Gender", user.getGender().c_str());
     wrefresh(OrtherUserProfileWin);
 }
 
-void ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern)
+void ChatService::GetMobileInformation(int sock, int mobileId, WINDOW *MobileInventoryWin)
 {
+    string str = to_string(mobileId);
+    ChatService::RequestSend("MOBILE_INFORMATION|" + str, sock);
+    string response = GetValueFromServer(sock, "MOBILE_INFORMATION");
+    nlohmann::json j = nlohmann::json::parse(response);
+    Mobile mb(
+        j.at("mobileID").get<int>(),
+        j.at("mobileName").get<string>(),
+        j.at("mobileModel").get<string>(),
+        j.at("mobileType").get<string>(),
+        j.at("mobileQuantity").get<int>(),
+        j.at("mobilePrice").get<string>(),
+        j.at("mobileDescription").get<string>()
+    );
+    mvwprintw(MobileInventoryWin, 9, 1, "%s: %s", "Mobile ID", to_string(mb.getMobileId()).c_str());
+    mvwprintw(MobileInventoryWin, 10, 1, "%s: %s", "Mobile Name", mb.getMobileName().c_str());
+    mvwprintw(MobileInventoryWin, 11, 1, "%s: %s", "Mobile Type", mb.getMobileType().c_str());
+    mvwprintw(MobileInventoryWin, 12, 1, "%s: %s", "Mobile Model", mb.getMobileModel().c_str());
+    mvwprintw(MobileInventoryWin, 13, 1, "%s: %s", "Mobile Quantity", to_string(mb.getMobileQuantity()).c_str());
+    mvwprintw(MobileInventoryWin, 14, 1, "%s: %s", "Mobile Price", mb.getMobilePrice().c_str());
+    mvwprintw(MobileInventoryWin, 15, 1, "%s: %s", "Mobile Description", mb.getMobileDescription().c_str());
+}
+
+// Return two values [map<int, int> idMapping, vector<Mobile>mobile]
+map<int, int> ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern)
+{
+    mobile.clear();
+    int idx = 1;
+    map<int, int> idMapping; // key: mobileID, value: index
     ChatService::RequestSend(pattern + "|" + input, sock);
     string response = ChatService::GetValueFromServer(sock, pattern);
     if (response.length() > 0) {
         nlohmann::json j = nlohmann::json::parse(response);
-        mvprintw(5, 20, "%s", "Mobile Name");
+        mvprintw(5, 5, "%s", "Mobile Name");
         mvprintw(5, 40, "%s", "Mobile Type");
         mvprintw(5, 60, "%s", "Mobile Model");
         mvprintw(5, 80, "%s", "Mobile Quantity");
@@ -367,6 +373,7 @@ void ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string inp
         mvprintw(5, 120, "%s", "Mobile Description");
 
         for (auto it : j) {
+            idMapping[it.at("mobileID").get<int>()] = idx++;
             Mobile mb(
                 it.at("mobileID").get<int>(),
                 it.at("mobileName").get<string>(),
@@ -381,6 +388,31 @@ void ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string inp
     } else {
         mvprintw(5, 20, "%s", "Could not found any mobile device!!");
     }
+    return idMapping;
+}
+
+void ChatService::GetTransactionHistory(int sock, vector<Transaction> &transaction) {
+    transaction.clear();
+    ChatService::RequestSend("GET_TRANSACTION_HISTORY|", sock);
+    string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY");
+    if(response.length() > 0) {
+        nlohmann::json j = nlohmann::json::parse(response);
+        mvprintw(0, 20, "%s", "Transaction Name");
+        mvprintw(0, 40, "%s", "Transaction Type");
+        mvprintw(0, 60, "%s", "Payment Method");
+        
+        for(auto tr : j) {
+            Transaction trans(
+                tr.at("transactionName").get<string>(),
+                tr.at("transactionType").get<string>(),
+                tr.at("paymentMethod").get<string>()
+            ); 
+            transaction.push_back(trans);
+        }
+    }
+    else {
+        mvprintw(5, 20, "%s", "Could not found any transaction history!!");
+    }    
 }
 
 void ChatService::GetTransactionHistory(int sock, vector<Transaction> &transaction) {

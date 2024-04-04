@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, Long>{
     @Query(value = "SELECT u.* FROM users u " +
             "WHERE u.user_name LIKE %:userName% " +
-            "LIMIT 10", nativeQuery = true)
+            "LIMIT 27", nativeQuery = true)
     List<UserEntity> findByUserNameContains(String userName);
     
     @Query(value = "SELECT u.* FROM users u " +

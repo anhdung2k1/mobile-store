@@ -19,11 +19,14 @@
 #include <ncurses.h>
 #include <queue>
 #include <stack>
-using std::map;
-using std::string;
-using std::thread;
+#include <iomanip>
+#include <cstdlib>
+
+using namespace std;
 class ChatService
 {
+private:
+    static const int buffer_size = 8124;
 public:
     struct Response;
     static void pushStackUp(string message);
@@ -36,7 +39,7 @@ public:
     static void HandleReceive(int sock, char *buffer);
     static bool ConvertToBool(string s);
     static void GetCurrentProfile(int sock, UserClient &user);
-    static void FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern);
+    static map<int,int> FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern);
     static void GetTransactionHistory(int sock, vector<Transaction> &transaction);
     static map<int, UserClient> GetFoundUser(int sock, UserClient user, int &count, WINDOW *finduserWin);
     static void HandleInput();
@@ -44,10 +47,10 @@ public:
     static void processPattern(char *buffer, string &pattern, string &value);
     static string processString(string msg);
     static void GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserProfileWin);
+    static void GetMobileInformation(int sock, int mobileId, WINDOW *MobileInventoryWin);
     static string GetValueFromServer(int sock, string pattern);
     static bool HandlePattern(char *buffer, int sock);
     static void exitAppChat(int sock);
     static bool HandleName(string username);
     static bool HandlePassword(string password);
-    static void touchUpdate(bool F);
 };

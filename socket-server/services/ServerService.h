@@ -21,6 +21,8 @@ using std::thread;
 using std::map;
 
 class ServerService {
+    private:
+        static const int buffer_size = 8124;
     public:
         struct Client;
         static void CheckConnected(int new_socket, bool F);

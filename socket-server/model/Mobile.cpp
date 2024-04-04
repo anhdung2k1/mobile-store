@@ -5,9 +5,10 @@
 Mobile::Mobile()
         : mobileName(""), mobileModel(""), mobileType(""), mobileDescription("") {}
 
-Mobile::Mobile(string mobileName, string mobileModel, string mobileType) 
-    : mobileName(mobileName), mobileModel(mobileModel), mobileType(mobileType), mobileDescription("") {}
-
+Mobile::Mobile(string mobileName, string mobileModel, string mobileType, int mobileQuantity, string mobilePrice, string mobileDescription) 
+    : mobileName(mobileName), mobileModel(mobileModel), mobileType(mobileType),
+        mobileQuantity(mobileQuantity), mobilePrice(mobilePrice),mobileDescription(mobileDescription) {}
+        
 int Mobile::getMobileId() {
     return mobileId;
 }
@@ -55,7 +56,6 @@ void Mobile::setMobileQuantity(int mobileQuantity) {
 void Mobile::setMobilePrice(string mobilePrice) {
     this->mobilePrice = mobilePrice;
 }
-
 void Mobile::setMobileDescription(string mobileDescription) {
     this->mobileDescription = mobileDescription;
 }

@@ -3,10 +3,13 @@
 
 #include <iostream>
 #include <vector>
+<<<<<<< HEAD
 #include "../model/UserClient.h"
 #include "../model/Mobile.h"
 #include "../model/Transaction.h"
 #include "../view/StatusBar.h"
+=======
+>>>>>>> 46a6187 (Adapt client and server)
 #include <thread>
 #include <cstdlib>
 #include <unistd.h>
@@ -15,9 +18,19 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <map>
+#include <chrono>
+#include <iomanip>
+#include "locale.h"
+#include "../model/UserClient.h"
+#include "../model/Mobile.h"
+#include "../model/Transaction.h"
+#include "../view/StatusBar.h"
+
 using std::map;
 class ChatView
 {
+private:
+    static const int buffer_size = 8124;
 public:
     enum View
     {
@@ -31,7 +44,8 @@ public:
         RegisterInput = 7,
         MobileInventory = 8,
         Transactions = 9,
-        Customer = 10
+        Customer = 10,
+        MobileDetails = 11
     };
     static void handleLogin(int sock, int selection);
     static void UserConsole(int sock);
@@ -41,7 +55,9 @@ public:
     static int selectMenu();
     static void handleMenu(int sock, int selection);
     static void interactUserMenu(int count, map<int, UserClient> foundUser, int sock);
+    static void findMobileMenu(int sock, map<int, int>& idMobileInventory);
     static void UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin);
+    static void MobileUI(int sock, int mobileId, WINDOW *mobileInformation);
     static UserClient getUser();
     static WINDOW *getCurrentWin();
 };

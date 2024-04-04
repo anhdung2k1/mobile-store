@@ -29,7 +29,7 @@ void ServerService::CheckConnected(int new_socket, bool flag)
 
 void ServerService::SendResponse(int new_socket, string response)
 {
-    if (!send(new_socket, response.c_str(), 1024, 0))
+    if (!send(new_socket, response.c_str(), buffer_size, 0))
     {
         cout << "Failed!\n";
     }
@@ -47,7 +47,7 @@ struct ServerService::Client
 
 bool ServerService::ReadResponse(Client client, char *buffer, map<int, Client> clientMap)
 {
-    int bytes_received = recv(client.sock, buffer, 1024, 0);
+    int bytes_received = recv(client.sock, buffer, buffer_size, 0);
     if (bytes_received <= 0)
     {
         cout << "User " << client.user.getName() << " has disconnected" << endl;
@@ -71,12 +71,12 @@ void ServerService::processPattern(char *buffer, string &pattern, string &value)
 }
 bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, pollfd fds[], int i, string apiIp, string mysqlIp)
 {
-    char buffer[1024];
+    char buffer[buffer_size];
     CurlUtils curlUtils;
     stringstream formData;
-    string pattern, value;
+    string pattern, value, response;
     bool flag = true;
-    bzero(buffer, 1024);
+    bzero(buffer, buffer_size);
     // Receive data from client
     if (!ReadResponse(client, buffer, clientMap))
     {
@@ -108,7 +108,7 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         curlUtils.authUtil(apiIp + "/accounts/signin", formData.str(), flag, client.curl, client.res, client.slist);
         if (flag)
         {
-            string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/find?user_name=" + client.user.getName(), flag);
+            response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/find?user_name=" + client.user.getName(), flag);
             nlohmann::json j = nlohmann::json::parse(response);
             client.user.setId(j.at("user_id"));
         }
@@ -134,7 +134,7 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         curlUtils.authUtil(apiIp + "/accounts/signup", formData.str(), flag, client.curl, client.res, client.slist);
         if (flag)
         {
-            string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/find?user_name=" + client.user.getName(), flag);
+            response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/find?user_name=" + client.user.getName(), flag);
             nlohmann::json j = nlohmann::json::parse(response);
             client.user.setId(j.at("user_id"));
         }
@@ -151,14 +151,12 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
     }
     else if (pattern == "FIND_USER")
     {
-        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/search?userName=" + value, flag);
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/search?userName=" + value, flag);
         SendResponse(client.sock, "FIND_USER|" + response);
     }
     else if (pattern == "UPDATE_PROFILE")
     {
-        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/" + ConvertIntToString(client.user.getId()), flag);
-        // cout << ConvertIntToString(client.user.getId()) << endl;
-        // cout << response << endl;
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/" + ConvertIntToString(client.user.getId()), flag);;
         nlohmann::json j = nlohmann::json::parse(response);
         if (j.at("address").is_null())
         {
@@ -175,44 +173,45 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
     else if (pattern == "UPDATE_ADDRESS")
     {
         formData << "{\"address\": \"" + value + "\",\"gender\": \"" + client.user.getGender() + "\"}";
-        // cout << formData.str() << endl;
-        string response = curlUtils.patchUtil(client.curl, client.res, apiIp + "/users/" + ConvertIntToString(client.user.getId()), formData.str(), flag);
+        response = curlUtils.patchUtil(client.curl, client.res, apiIp + "/users/" + ConvertIntToString(client.user.getId()), formData.str(), flag);
     }
     else if (pattern == "UPDATE_GENDER")
     {
         formData << "{\"address\": \"" + client.user.getAddress() + "\",\"gender\": \"" + value + "\"}";
-        // cout << formData.str() << endl;
-        string response = curlUtils.patchUtil(client.curl, client.res, apiIp + "/users/" + ConvertIntToString(client.user.getId()), formData.str(), flag);
+        response = curlUtils.patchUtil(client.curl, client.res, apiIp + "/users/" + ConvertIntToString(client.user.getId()), formData.str(), flag);
     }
     else if (pattern == "CHANGE_PASSWORD")
     {
         formData << "{\"password\": \"" + value + "\"}";
-        // cout << formData.str() << endl;
-        // cout << client.user.getName() << " changed password!\n";
         string accountId = curlUtils.getUtil(client.curl, client.res, apiIp + "/accounts/find?userName=" + client.user.getName(), flag);
         string url = apiIp + "/accounts/" + accountId;
-        string response = curlUtils.putUtil(client.curl, client.res, url, formData.str(), flag);
+        response = curlUtils.putUtil(client.curl, client.res, url, formData.str(), flag);
     }
     else if (pattern == "FIND_INVENTORY_NAME") {
-        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/products/query?query=" + value, flag);
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/products/query?query=" + value, flag);
         SendResponse(client.sock, "FIND_INVENTORY_NAME|" + response);
     }
     else if (pattern == "FIND_INVENTORY_TYPE") {
-        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/types/query?query=" + value, flag);
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/types/query?query=" + value, flag);
         SendResponse(client.sock, "FIND_INVENTORY_TYPE|" + response);
     }
     else if (pattern == "GET_TRANSACTION_HISTORY")
     {
-        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/transactions", flag);
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/transactions", flag);
         SendResponse(client.sock, "GET_TRANSACTION_HISTORY|" + response);
     }
+    else if (pattern == "MOBILE_INFORMATION") // Get specific information of mobile device
+    {
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/" + value, flag);
+        SendResponse(client.sock, "MOBILE_INFORMATION|" + response);
+    }
     else if (pattern == "GET_CUSTOMERS") {
-        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/customers", flag);
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/customers", flag);
         SendResponse(client.sock, "GET_CUSTOMERS|" + response);
     }
     else if (pattern == "GET_PAYMENT_METHOD") {
-        string reponse = curlUtils.getUtil(client.curl, client.res, apiIp + "/payments", flag);
-        SendResponse(client.sock, "GET_PAYMENT_METHOD|" + reponse);
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/payments", flag);
+        SendResponse(client.sock, "GET_PAYMENT_METHOD|" + response);
     }
     else if (pattern == "USER_EXIT_APP")
     {
@@ -223,24 +222,7 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
     }
     else if (pattern == "USER_PROFILE")
     {
-        string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/" + value, flag);
-        cout << response << endl;
-        nlohmann::json j = nlohmann::json::parse(response);
-        if (j.at("userName").is_null())
-        {
-            j.at("userName") = to_string(j.at("userName"));
-        }
-        if (j.at("address").is_null())
-        {
-            j.at("address") = to_string(j.at("address"));
-        }
-        if (j.at("gender").is_null())
-        {
-            j.at("gender") = to_string(j.at("gender"));
-        }
-        client.user.setName(j.at("userName"));
-        client.user.setAddress(j.at("address"));
-        client.user.setGender(j.at("gender"));
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/" + value, flag);
         SendResponse(client.sock, "USER_PROFILE|" + response);
     }
     else if (pattern == "ACTIVATE_THREAD")
@@ -259,12 +241,13 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         curlUtils.authUtil(apiIp + "/accounts/signin", formData.str(), flag, client.curl, client.res, client.slist);
         if (flag)
         {
-            string response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/find?user_name=" + client.user.getName(), flag);
+            response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/find?user_name=" + client.user.getName(), flag);
             nlohmann::json j = nlohmann::json::parse(response);
             client.user.setId(j.at("user_id"));
         }
         SendResponse(client.sock, "RECONNECT|");
     }
+    cout << response << endl;
     return flag;
 }
 
