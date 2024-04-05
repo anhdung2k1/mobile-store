@@ -392,30 +392,6 @@ map<int, int> ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, s
 }
 
 void ChatService::GetTransactionHistory(int sock, vector<Transaction> &transaction) {
-    transaction.clear();
-    ChatService::RequestSend("GET_TRANSACTION_HISTORY|", sock);
-    string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY");
-    if(response.length() > 0) {
-        nlohmann::json j = nlohmann::json::parse(response);
-        mvprintw(0, 20, "%s", "Transaction Name");
-        mvprintw(0, 40, "%s", "Transaction Type");
-        mvprintw(0, 60, "%s", "Payment Method");
-        
-        for(auto tr : j) {
-            Transaction trans(
-                tr.at("transactionName").get<string>(),
-                tr.at("transactionType").get<string>(),
-                tr.at("paymentMethod").get<string>()
-            ); 
-            transaction.push_back(trans);
-        }
-    }
-    else {
-        mvprintw(5, 20, "%s", "Could not found any transaction history!!");
-    }    
-}
-
-void ChatService::GetTransactionHistory(int sock, vector<Transaction> &transaction) {
     ChatService::RequestSend("GET_TRANSACTION_HISTORY|", sock);
     string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY");
     if(response.length() > 0) {
