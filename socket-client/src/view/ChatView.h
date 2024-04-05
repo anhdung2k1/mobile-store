@@ -3,13 +3,6 @@
 
 #include <iostream>
 #include <vector>
-<<<<<<< HEAD
-#include "../model/UserClient.h"
-#include "../model/Mobile.h"
-#include "../model/Transaction.h"
-#include "../view/StatusBar.h"
-=======
->>>>>>> 46a6187 (Adapt client and server)
 #include <thread>
 #include <cstdlib>
 #include <unistd.h>
