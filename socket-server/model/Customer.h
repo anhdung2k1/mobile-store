@@ -22,6 +22,7 @@ class Customer {
         string getCustomerAddress();
         string getCustomerGender();
         Date getCustomerBirthday();
+        void setCustomerId(int customerId);
         void setCustomerName(string customerName);
         void setCustomerEmail(string customerEmail);
         void setCustomerAddress(string customerAdress);

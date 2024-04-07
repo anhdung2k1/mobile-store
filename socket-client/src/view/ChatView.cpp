@@ -947,22 +947,24 @@ void ChatView::Menu()
    wattroff(userMenu, COLOR_PAIR(3));
    wattron(userMenu, COLOR_PAIR(4));
    mvwprintw(userMenu, 2, (userMenu->_maxx - 28) / 2, ">>>>> Mobile Store Management <<<<<");
-   mvwprintw(userMenu, 6, 3, "Mobile Inventory");
-   mvwprintw(userMenu, 8, 3, "Transaction History");
-   mvwprintw(userMenu, 10, 3, "List of Customers");
-   mvwprintw(userMenu, 12, 3, "Find user(s)");
-   mvwprintw(userMenu, 14, 3, "Update profile");
-   mvwprintw(userMenu, 16, 3, "Log out");
-   mvwprintw(userMenu, 6, (userMenu->_maxx - 11), "(Press N)");
-   mvwprintw(userMenu, 8, (userMenu->_maxx - 11), "(Press I)");
-   mvwprintw(userMenu, 10, (userMenu->_maxx - 11), "(Press J)");
-   mvwprintw(userMenu, 12, (userMenu->_maxx - 11), "(Press F)");
-   mvwprintw(userMenu, 14, (userMenu->_maxx - 11), "(Press U)");
-   mvwprintw(userMenu, 16, (userMenu->_maxx - 11), "(Press O)");
+   mvwprintw(userMenu, 6, 3, "Create Mobile Instances");
+   mvwprintw(userMenu, 8, 3, "Manage Mobile Inventory");
+   mvwprintw(userMenu, 10, 3, "Transaction History");
+   mvwprintw(userMenu, 12, 3, "List of Customers");
+   mvwprintw(userMenu, 14, 3, "Find user(s)");
+   mvwprintw(userMenu, 16, 3, "Update profile");
+   mvwprintw(userMenu, 18, 3, "Log out");
+   mvwprintw(userMenu, 6, (userMenu->_maxx - 11), "(Press A)");
+   mvwprintw(userMenu, 8, (userMenu->_maxx - 11), "(Press N)");
+   mvwprintw(userMenu, 10, (userMenu->_maxx - 11), "(Press I)");
+   mvwprintw(userMenu, 12, (userMenu->_maxx - 11), "(Press J)");
+   mvwprintw(userMenu, 14, (userMenu->_maxx - 11), "(Press F)");
+   mvwprintw(userMenu, 16, (userMenu->_maxx - 11), "(Press U)");
+   mvwprintw(userMenu, 18, (userMenu->_maxx - 11), "(Press O)");
    wattroff(userMenu, COLOR_PAIR(4));
    wattron(userMenu, COLOR_PAIR(2));
-   mvwprintw(userMenu, 18, 3, "Exit");
-   mvwprintw(userMenu, 18, (userMenu->_maxx - 13), "(Press Esc)");
+   mvwprintw(userMenu, 20, 3, "Exit");
+   mvwprintw(userMenu, 20, (userMenu->_maxx - 13), "(Press Esc)");
    wattroff(userMenu, COLOR_PAIR(2));
    wrefresh(userMenu);
 }
@@ -1198,6 +1200,793 @@ void ChatView::UserConsole(int sock)
          endwin();
          break;
       }
+      if (n == 10)
+      {
+         break;
+      }
+   } while (true);
+}
+
+void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
+{
+   clear();
+   endwin();
+   system("clear");
+   currentView = MobileDetails;
+   initscr();
+   keypad(stdscr, TRUE);
+   cbreak();
+   refresh();
+   noecho();
+   curs_set(0);
+   if (has_colors() == FALSE)
+   {
+      clear();
+      endwin();
+      printf("Your terminal does not support color\n");
+      exit(1);
+   }
+   start_color();
+   init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+   init_pair(2, COLOR_RED, COLOR_BLACK);
+   init_pair(3, COLOR_GREEN, COLOR_BLACK);
+   init_pair(4, COLOR_CYAN, COLOR_BLACK);
+   init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+   init_pair(6, COLOR_WHITE, COLOR_BLACK);
+   init_pair(7, COLOR_BLUE, COLOR_WHITE);
+   string input;
+   WINDOW *updateWin = newwin(35, 100, 0, 0);
+   wattron(updateWin, COLOR_PAIR(3));
+   box(updateWin, 0, 0);
+   mvwprintw(updateWin, 4, 2, "--------------------------------------------------------");
+   mvwprintw(updateWin, 20, 2, "--------------------------------------------------------");
+   wattroff(updateWin, COLOR_PAIR(3));
+   refresh();
+   wattron(updateWin, COLOR_PAIR(4));
+   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + currentUser.getName().length())) / 2, "*** Current user: %s ***", currentUser.getName().c_str());
+   mvwprintw(updateWin, 6, 3, "1. Mobile Name: ");
+   mvwprintw(updateWin, 8, 3, "2. Mobile Type: ");
+   mvwprintw(updateWin, 10, 3, "3. Mobile Model: ");
+   mvwprintw(updateWin, 12, 3, "4. Mobile Quantity: ");
+   mvwprintw(updateWin, 14, 3, "5. Mobile Price: ");
+   mvwprintw(updateWin, 16, 3, "6. Mobile Description: ");
+   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
+   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
+   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
+   mvwprintw(updateWin, 12, (updateWin->_maxx - 6), "(O)");
+   mvwprintw(updateWin, 14, (updateWin->_maxx - 6), "(R)");
+   mvwprintw(updateWin, 16, (updateWin->_maxx - 6), "(D)");
+   mvwprintw(updateWin, 22, (updateWin->_maxx - 40) / 2, "Select an option that you want to fill");
+   wattroff(updateWin, COLOR_PAIR(4));
+   wattron(updateWin, COLOR_PAIR(6));
+   mvwprintw(updateWin, 6, 27, "%s", mobile.getMobileName().c_str());
+   mvwprintw(updateWin, 8, 27, "%s", mobile.getMobileType().c_str());
+   mvwprintw(updateWin, 10, 27, "%s", mobile.getMobileModel().c_str());
+   if (mobile.getMobileQuantity() != 0) {
+      mvwprintw(updateWin, 12, 27, "%s", to_string(mobile.getMobileQuantity()).c_str());
+   } else {
+      mvwprintw(updateWin, 12, 27, "%s", "0");
+   }
+   mvwprintw(updateWin, 14, 27, "%s", mobile.getMobilePrice().c_str());
+   mvwprintw(updateWin, 16, 27, "%s", mobile.getMobileDescription().c_str());
+   wattroff(updateWin, COLOR_PAIR(6));
+   wrefresh(updateWin);
+   int curs_x, curs_y;
+   wmove(updateWin, 63, 13);
+   int n;
+   char c = char(n);
+   char *ch = &c;
+   do
+   {
+      input = "";
+      n = wgetch(updateWin);
+      switch (n)
+      {
+      case 97: // A
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Mobile Name: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               mobile.setMobileName(input);
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(c);
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 103: // G
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Mobile Type: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               curs_set(0);
+               mobile.setMobileType(input);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(c);
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 112: // P
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Mobile Model: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               mobile.setMobileModel(input);
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x + 1, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(char(n));
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 111: // O
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Mobile Quantity: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               mobile.setMobileQuantity(stoi(input));
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x + 1, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(char(n));
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 114: // R
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Mobile Price: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               mobile.setMobilePrice(input + " VND");
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x + 1, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(char(n));
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 100: // D
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Mobile Description: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               mobile.setMobileDescription(input);
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x + 1, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(char(n));
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      default:
+         do {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::handleMenu(sock, -1);
+            }
+            else if (n == 10) {
+               if(isUpdate) {
+                  ChatService::UpdateMobileDevice(sock, mobile);
+               } else {
+                  ChatService::CreateMobileDevice(sock, mobile);
+               }
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 26, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               while (getch() != 10) {}
+               refresh();
+               printf("\n");
+               return ChatView::MobileConsole(sock, mobile, isUpdate);
+            } 
+         } while (true);
+         break;
+      }
+          
+      if (n == 27)
+      {
+         clear();
+         endwin();
+         break;
+      }
+
+      if (n == 10)
+      {
+         break;
+      }
+   } while (true);
+}
+
+void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
+   clear();
+   endwin();
+   system("clear");
+   currentView = MobileDetails;
+   initscr();
+   keypad(stdscr, TRUE);
+   cbreak();
+   refresh();
+   noecho();
+   curs_set(0);
+   if (has_colors() == FALSE)
+   {
+      clear();
+      endwin();
+      printf("Your terminal does not support color\n");
+      exit(1);
+   }
+   start_color();
+   init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+   init_pair(2, COLOR_RED, COLOR_BLACK);
+   init_pair(3, COLOR_GREEN, COLOR_BLACK);
+   init_pair(4, COLOR_CYAN, COLOR_BLACK);
+   init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+   init_pair(6, COLOR_WHITE, COLOR_BLACK);
+   init_pair(7, COLOR_BLUE, COLOR_WHITE);
+   string input;
+   WINDOW *updateWin = newwin(35, 100, 0, 0);
+   wattron(updateWin, COLOR_PAIR(3));
+   box(updateWin, 0, 0);
+   mvwprintw(updateWin, 4, 2, "--------------------------------------------------------");
+   mvwprintw(updateWin, 20, 2, "--------------------------------------------------------");
+   wattroff(updateWin, COLOR_PAIR(3));
+   refresh();
+   wattron(updateWin, COLOR_PAIR(4));
+   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + currentUser.getName().length())) / 2, "*** Current user: %s ***", currentUser.getName().c_str());
+   mvwprintw(updateWin, 6, 3, "1. Customer Name: ");
+   mvwprintw(updateWin, 8, 3, "2. Customer Address: ");
+   mvwprintw(updateWin, 10, 3, "3. Customer Gender: ");
+   mvwprintw(updateWin, 12, 3, "4. Customer Birthday: ");
+   mvwprintw(updateWin, 14, 3, "5. Customer Email: ");
+   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
+   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
+   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
+   mvwprintw(updateWin, 12, (updateWin->_maxx - 6), "(O)");
+   mvwprintw(updateWin, 14, (updateWin->_maxx - 6), "(R)");
+   mvwprintw(updateWin, 22, (updateWin->_maxx - 40) / 2, "Select an option that you want to fill");
+   wattroff(updateWin, COLOR_PAIR(4));
+   wattron(updateWin, COLOR_PAIR(6));
+   mvwprintw(updateWin, 6, 27, "%s", customer.getCustomerName().c_str());
+   mvwprintw(updateWin, 8, 27, "%s", customer.getCustomerAddress().c_str());
+   mvwprintw(updateWin, 10, 27, "%s", customer.getCustomerGender().c_str());
+   mvwprintw(updateWin, 12, 27, "%s", customer.getCustomerBirthday().c_str());
+   mvwprintw(updateWin, 14, 27, "%s", customer.getCustomerEmail().c_str());
+   wattroff(updateWin, COLOR_PAIR(6));
+   wrefresh(updateWin);
+   int curs_x, curs_y;
+   wmove(updateWin, 63, 13);
+   int n;
+   char c = char(n);
+   char *ch = &c;
+   do
+   {
+      input = "";
+      n = wgetch(updateWin);
+      switch (n)
+      {
+      case 97: // A
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Customer Name: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               customer.setCustomerName(input);
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(c);
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 103: // G
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Customer Address: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               curs_set(0);
+               customer.setCustomerAddress(input);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(c);
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 112: // P
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Customer Gender: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               customer.setCustomerGender(input);
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x + 1, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(char(n));
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 111: // O
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Customer Birthday (yyyy-mm-dd): ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10 && input.length() == 10) // Must follow yyyy-mm-dd format
+            {
+               customer.setCustomerBirthday(input);
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x + 1, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(char(n));
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 114: // R
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Customer Email: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10 && input.find("@") != std::string::npos)
+            {
+               customer.setCustomerEmail(input);
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x + 1, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(char(n));
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      default:
+         do {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::handleMenu(sock, -1);
+            }
+            else if (n == 10) {
+               if(isUpdate) {
+                  ChatService::UpdateCustomer(sock, customer);
+               } else {
+                  ChatService::CreateCustomer(sock, customer);
+               }
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 26, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               while (getch() != 10) {}
+               refresh();
+               printf("\n");
+               return ChatView::CustomerConsole(sock, customer, isUpdate);
+            } 
+         } while (true);
+         break;
+      }
+          
+      if (n == 27)
+      {
+         clear();
+         endwin();
+         break;
+      }
+
       if (n == 10)
       {
          break;
@@ -1442,7 +2231,7 @@ void ChatView::findMobileMenu(int sock, map<int,int>& idMobileInventory) {
    else
    {
       int choice = stoi(input);
-      ChatView::MobileUI(sock, getKeyByValue(idMobileInventory, choice), currentWin);
+      ChatView::MobileUI(sock, getKeyByValue(idMobileInventory, choice));
    }
 }
 
@@ -1451,6 +2240,7 @@ void ChatView::handleMenu(int sock, int selection)
    bool isSuccess = false;
    vector<Mobile>mobileList;
    Mobile mobile;
+   Customer customer;
    do
    {
       if (selection < 0)
@@ -1459,6 +2249,71 @@ void ChatView::handleMenu(int sock, int selection)
       }
       switch (selection)
       {
+      case 97: //A
+      {
+         clear();
+         endwin();
+         currentView = MobileInventory;
+         initscr();
+         keypad(stdscr, TRUE);
+         cbreak();
+         refresh();
+         noecho();
+         curs_set(0);
+         if (has_colors() == FALSE)
+         {
+            clear();
+            endwin();
+            printf("Your terminal does not support color\n");
+            exit(1);
+         }
+         start_color();
+         init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+         init_pair(2, COLOR_RED, COLOR_BLACK);
+         init_pair(3, COLOR_GREEN, COLOR_BLACK);
+         init_pair(4, COLOR_CYAN, COLOR_BLACK);
+         init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+         init_pair(6, COLOR_WHITE, COLOR_BLACK);
+         init_pair(7, COLOR_BLUE, COLOR_WHITE);
+         string input;
+         WINDOW *updateWin = newwin(22, 60, 0, 0);
+         wattron(updateWin, COLOR_PAIR(3));
+         box(updateWin, 0, 0);
+         mvwprintw(updateWin, 4, 2, "--------------------------------------------------------");
+         mvwprintw(updateWin, 12, 2, "--------------------------------------------------------");
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 2, (updateWin->_maxx - 40), "*** Mobile Inventory ***");
+         mvwprintw(updateWin, 6, 3, "1. Create New Mobile Devices: ");
+         mvwprintw(updateWin, 8, 3, "2. Create New Customer: ");
+         mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
+         mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
+         mvwprintw(updateWin, 14, (updateWin->_maxx - 40) / 2, "Select an option that you want to add");
+         wattroff(updateWin, COLOR_PAIR(4));
+         wattron(updateWin, COLOR_PAIR(6));
+         int curs_x, curs_y;
+         wmove(updateWin, 43, 13);
+         int n;
+         char c = char(n);
+         do {
+            n = wgetch(updateWin);
+            if(n == 97) // A
+            {
+               refresh();
+               endwin();
+               system("clear");
+               // Create new mobile Inventory
+               ChatView::MobileConsole(sock, mobile, false);
+            }
+            else if (n == 103) { // G
+               refresh();
+               endwin();
+               system("clear");
+               // Create new Customer
+               ChatView::CustomerConsole(sock, customer, false);
+            }
+         } while(true);
+         break;
+      }
       case 110: //N
       {
          clear();
@@ -1598,6 +2453,9 @@ void ChatView::handleMenu(int sock, int selection)
                }
                else{
                   map<int,int> idInventory = ChatService::FindInventoryName(sock, mobileList, input, "FIND_INVENTORY_NAME");
+                  if (idInventory.size() == 0) {
+                     break;
+                  }
                   int spacePos = 0;
                   for (auto mb : mobileList) {
                      mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(idInventory[mb.getMobileId()])).c_str());
@@ -1714,6 +2572,9 @@ void ChatView::handleMenu(int sock, int selection)
                }
                else{
                   map<int,int> idInventory = ChatService::FindInventoryName(sock, mobileList, input, "FIND_INVENTORY_TYPE");
+                  if (idInventory.size() == 0) {
+                     break;
+                  }
                   int spacePos = 0;
                   for (auto mb : mobileList) {
                      mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(idInventory[mb.getMobileId()])).c_str());
@@ -1808,7 +2669,7 @@ void ChatView::handleMenu(int sock, int selection)
          clear();
          refresh();
          endwin();
-         currentView = Customer;
+         currentView = CustomerView;
          system("clear");
          string input;
          // Start regigter window design
@@ -2138,7 +2999,7 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
    }
 }
 
-void ChatView::MobileUI(int sock, int mobileId, WINDOW* mobileInformation) {
+void ChatView::MobileUI(int sock, int mobileId) {
    clear();
    refresh();
    endwin();
@@ -2182,7 +3043,9 @@ void ChatView::MobileUI(int sock, int mobileId, WINDOW* mobileInformation) {
    mvprintw(curs_y, 0, "------------Mobile Device Information------------");
    wattroff(currentWin, COLOR_PAIR(3));
    mvwprintw(currentWin, 3, 1, "1. Mobile Information");
-   mvwprintw(currentWin, 5, 1, "2. Exit");
+   mvwprintw(currentWin, 4, 1, "2. Update Mobile Information");
+   mvwprintw(currentWin, 5, 1, "3. Delete Mobile Device");
+   mvwprintw(currentWin, 6, 1, "4. Exit");
    wattroff(currentWin, COLOR_PAIR(4));
    mvwprintw(currentWin, 7, 1, "Select your option: ");
    wattroff(currentWin, COLOR_PAIR(4));
@@ -2234,19 +3097,58 @@ void ChatView::MobileUI(int sock, int mobileId, WINDOW* mobileInformation) {
       int sig;
 
       if (select == "1") {
-         ChatService::GetMobileInformation(sock, mobileId, currentWin);
+         Mobile mb = ChatService::GetMobileInformation(sock, mobileId, currentWin);
+         mvwprintw(currentWin, 9, 1, "%s: %s", "Mobile ID", to_string(mb.getMobileId()).c_str());
+         mvwprintw(currentWin, 10, 1, "%s: %s", "Mobile Name", mb.getMobileName().c_str());
+         mvwprintw(currentWin, 11, 1, "%s: %s", "Mobile Type", mb.getMobileType().c_str());
+         mvwprintw(currentWin, 12, 1, "%s: %s", "Mobile Model", mb.getMobileModel().c_str());
+         mvwprintw(currentWin, 13, 1, "%s: %s", "Mobile Quantity", to_string(mb.getMobileQuantity()).c_str());
+         mvwprintw(currentWin, 14, 1, "%s: %s", "Mobile Price", mb.getMobilePrice().c_str());
+         mvwprintw(currentWin, 15, 1, "%s: %s", "Mobile Description", mb.getMobileDescription().c_str());
          while (true) {
             wattron(currentWin, COLOR_PAIR(4));
             mvwprintw(currentWin, 18, 1, "Press Enter to continue");
             wattroff(currentWin, COLOR_PAIR(4));
             sig = wgetch(currentWin);
             if (sig == 10) {
-               ChatView::MobileUI(sock, mobileId, currentWin);
+               ChatView::MobileUI(sock, mobileId);
                break;
             }
          }
       }
       else if (select == "2") {
+         ChatService::RequestSend("MOBILE_INFORMATION|" + to_string(mobileId), sock);
+         string response = ChatService::GetValueFromServer(sock, "MOBILE_INFORMATION");
+         nlohmann::json j = nlohmann::json::parse(response);
+         Mobile mobile(
+            j.at("mobileID").get<int>(),
+            j.at("mobileName").get<string>(),
+            j.at("mobileModel").get<string>(),
+            j.at("mobileType").get<string>(),
+            j.at("mobileQuantity").get<int>(),
+            j.at("mobilePrice").get<string>(),
+            j.at("mobileDescription").get<string>()
+         );
+         ChatView::MobileConsole(sock, mobile, true);
+      }
+      else if (select == "3") {
+         bool isDeleted = ChatService::DeleteMobileDevice(sock, mobileId);
+         while (true) {
+            wattron(currentWin, COLOR_PAIR(3));
+            isDeleted ? mvwprintw(currentWin, 14, 1, "%s", "Mobile has been deleted successfully!!")
+                      : mvwprintw(currentWin, 14, 1, "%s", "Failed to created mobile device !!");;
+            wattroff(currentWin, COLOR_PAIR(3));
+            wattron(currentWin, COLOR_PAIR(4));
+            mvwprintw(currentWin, 18, 1, "Press Enter to continue");
+            wattroff(currentWin, COLOR_PAIR(4));
+            sig = wgetch(currentWin);
+            if (sig == 10) {
+               ChatView::handleMenu(sock, -1);
+               break;
+            }
+         }
+      }
+      else if (select == "4") {
          ChatView::handleMenu(sock, -1);
       }
    }

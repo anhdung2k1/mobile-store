@@ -32,6 +32,11 @@ string Customer::getCustomerGender() {
 Date Customer::getCustomerBirthday() {
     return customerBirthday;
 }
+
+void Customer::setCustomerId(int customerId) {
+    this->customerId = customerId;
+}
+
 void Customer::setCustomerName(string customerName) {
     this->customerName = customerName;
 }

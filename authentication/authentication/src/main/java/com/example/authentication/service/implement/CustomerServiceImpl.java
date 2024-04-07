@@ -20,10 +20,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     private Map<String, Object> customerMap(CustomerEntity customerEntity) {
         return new HashMap<>() {{
+            put("customerID", customerEntity.getCustomerID());
             put("customerName", customerEntity.getCustomerName());
             put("customerGender", customerEntity.getCustomerGender());
             put("customerAddress", customerEntity.getCustomerAddress());
             put("customerBirthday", customerEntity.getCustomerBirthDay());
+            put("customerEmail", customerEntity.getCustomerEmail());
         }};
     }
     @Override
@@ -84,6 +86,7 @@ public class CustomerServiceImpl implements CustomerService {
             customerEntity.setCustomerGender(customers.getCustomerGender());
             customerEntity.setCustomerAddress(customers.getCustomerAddress());
             customerEntity.setCustomerBirthDay(customers.getCustomerBirthDay());
+            customerEntity.setCustomerEmail(customers.getCustomerEmail());
             customerEntity.setUpdateAt(LocalDateTime.now());
             customerRepository.save(customerEntity);
             BeanUtils.copyProperties(customerEntity, customers);

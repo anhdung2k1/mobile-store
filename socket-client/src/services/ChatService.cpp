@@ -169,7 +169,6 @@ bool ChatService::ConvertToBool(string s)
     return b;
 }
 
-
 map<int, UserClient> ChatService::GetFoundUser(int sock, UserClient user, int &count, WINDOW *finduserWin)
 {
     map<int, UserClient> foundUser;
@@ -331,11 +330,11 @@ void ChatService::GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserP
     wrefresh(OrtherUserProfileWin);
 }
 
-void ChatService::GetMobileInformation(int sock, int mobileId, WINDOW *MobileInventoryWin)
+Mobile ChatService::GetMobileInformation(int sock, int mobileId, WINDOW *MobileInventoryWin)
 {
     string str = to_string(mobileId);
     ChatService::RequestSend("MOBILE_INFORMATION|" + str, sock);
-    string response = GetValueFromServer(sock, "MOBILE_INFORMATION");
+    string response = ChatService::GetValueFromServer(sock, "MOBILE_INFORMATION");
     nlohmann::json j = nlohmann::json::parse(response);
     Mobile mb(
         j.at("mobileID").get<int>(),
@@ -346,13 +345,7 @@ void ChatService::GetMobileInformation(int sock, int mobileId, WINDOW *MobileInv
         j.at("mobilePrice").get<string>(),
         j.at("mobileDescription").get<string>()
     );
-    mvwprintw(MobileInventoryWin, 9, 1, "%s: %s", "Mobile ID", to_string(mb.getMobileId()).c_str());
-    mvwprintw(MobileInventoryWin, 10, 1, "%s: %s", "Mobile Name", mb.getMobileName().c_str());
-    mvwprintw(MobileInventoryWin, 11, 1, "%s: %s", "Mobile Type", mb.getMobileType().c_str());
-    mvwprintw(MobileInventoryWin, 12, 1, "%s: %s", "Mobile Model", mb.getMobileModel().c_str());
-    mvwprintw(MobileInventoryWin, 13, 1, "%s: %s", "Mobile Quantity", to_string(mb.getMobileQuantity()).c_str());
-    mvwprintw(MobileInventoryWin, 14, 1, "%s: %s", "Mobile Price", mb.getMobilePrice().c_str());
-    mvwprintw(MobileInventoryWin, 15, 1, "%s: %s", "Mobile Description", mb.getMobileDescription().c_str());
+    return mb;
 }
 
 // Return two values [map<int, int> idMapping, vector<Mobile>mobile]
@@ -412,6 +405,120 @@ void ChatService::GetTransactionHistory(int sock, vector<Transaction> &transacti
     else {
         mvprintw(5, 20, "%s", "Could not found any transaction history!!");
     }    
+}
+
+//Create new Mobile Device
+void ChatService::CreateMobileDevice(int sock, Mobile& mobile) {
+    stringstream formData;
+    formData << "{\"mobileName\": "
+             << "\"" + mobile.getMobileName() + "\", " 
+             << "\"mobileType\": "
+             << "\"" + mobile.getMobileType() + "\", " 
+             << "\"mobileModel\": "
+             << "\"" + mobile.getMobileModel() + "\", "
+             << "\"mobileQuantity\": "
+             << "" + to_string(mobile.getMobileQuantity()) + ", "
+             << "\"mobilePrice\": "
+             << "\"" + mobile.getMobilePrice() + "\", "
+             << "\"mobileDescription\": "
+             << "\"" + mobile.getMobileDescription() + "\"}";
+
+    ChatService::RequestSend("CREATE_MOBILE_DEVICE|" + formData.str(), sock);
+    string response = ChatService::GetValueFromServer(sock, "CREATE_MOBILE_DEVICE");
+    if(ChatService::ConvertToBool(response)) {
+        mvprintw(24, 3, "%s", "Mobile has been created successfully!!");
+    } else {
+        mvprintw(24, 3, "%s", "Failed to created mobile device !!");
+    }
+}
+
+void ChatService::UpdateMobileDevice(int sock, Mobile& mobile) {
+    stringstream formData;
+    formData << "{\"mobileName\": "
+             << "\"" + mobile.getMobileName() + "\", " 
+             << "\"mobileType\": "
+             << "\"" + mobile.getMobileType() + "\", " 
+             << "\"mobileModel\": "
+             << "\"" + mobile.getMobileModel() + "\", "
+             << "\"mobileQuantity\": "
+             << "" + to_string(mobile.getMobileQuantity()) + ", "
+             << "\"mobilePrice\": "
+             << "\"" + mobile.getMobilePrice() + "\", "
+             << "\"mobileDescription\": "
+             << "\"" + mobile.getMobileDescription() + "\"}";
+
+    ChatService::RequestSend("UPDATE_MOBILE_DEVICE|" + formData.str(), sock);
+    string response = ChatService::GetValueFromServer(sock, "UPDATE_MOBILE_DEVICE");
+    if(ChatService::ConvertToBool(response)) {
+        mvprintw(24, 3, "%s", "Mobile has been updated successfully!!");
+    } else {
+        mvprintw(24, 3, "%s", "Failed to created mobile device !!");
+    }
+}
+
+bool ChatService::DeleteMobileDevice(int sock, int mobileId) {
+    ChatService::RequestSend("DELETE_MOBILE_DEVICE|" + to_string(mobileId), sock);
+    string response = ChatService::GetValueFromServer(sock, "DELETE_MOBILE_DEVICE");
+    bool isDeleted = ChatService::ConvertToBool(response) ? true : false;
+    return isDeleted;
+}
+
+Customer ChatService::GetCustomerInformation(int sock, int customerId) {
+    ChatService::RequestSend("GET_CUSTOMER_INFORMATION|" + to_string(customerId), sock);
+    string response = ChatService::GetValueFromServer(sock, "GET_CUSTOMER_INFORMATION");
+    nlohmann::json j = nlohmann::json::parse(response);
+    Customer customer(
+        j.at("customerID").get<int>(),
+        j.at("customerName").get<string>(),
+        j.at("customerAddress").get<string>(),
+        j.at("customerGender").get<string>(),
+        j.at("customerBirthday").get<string>(),
+        j.at("customerEmail").get<string>()
+    );
+    return customer;
+}
+
+void ChatService::CreateCustomer(int sock, Customer& customer) {
+    stringstream formData;
+    formData << "{\"customerName\": "
+             << "\"" + customer.getCustomerName() + "\", " 
+             << "\"customerAddress\": "
+             << "\"" + customer.getCustomerAddress() + "\", " 
+             << "\"customerGender\": "
+             << "\"" + customer.getCustomerGender() + "\" , "
+             << "\"customerBirthDay\": "
+             << "\"" + customer.getCustomerBirthday() + "\", "
+             << "\"customerEmail\": "
+             << "\"" + customer.getCustomerEmail() + "\"}";
+
+    ChatService::RequestSend("CREATE_CUSTOMER|" + formData.str(), sock);
+    string response = ChatService::GetValueFromServer(sock, "CREATE_CUSTOMER");
+    if(ChatService::ConvertToBool(response)) {
+        mvprintw(24, 3, "%s", "Customer has been created successfully!!");
+    } else {
+        mvprintw(24, 3, "%s", "Failed to created customer!!");
+    }
+}
+void ChatService::UpdateCustomer(int sock, Customer& customer) {
+    stringstream formData;
+    formData << "{\"customerName\": "
+             << "\"" + customer.getCustomerName() + "\", " 
+             << "\"customerAddress\": "
+             << "\"" + customer.getCustomerAddress() + "\", " 
+             << "\"customerGender\": "
+             << "\"" + customer.getCustomerGender() + "\" , "
+             << "\"customerBirthDay\": "
+             << "\"" + customer.getCustomerBirthday() + "\", "
+             << "\"customerEmail\": "
+             << "\"" + customer.getCustomerEmail() + "\"}";
+
+    ChatService::RequestSend("UPDATE_CUSTOMER|" + formData.str(), sock);
+    string response = ChatService::GetValueFromServer(sock, "UPDATE_CUSTOMER");
+    if(ChatService::ConvertToBool(response)) {
+        mvprintw(24, 3, "%s", "Customer has been updated successfully!!");
+    } else {
+        mvprintw(24, 3, "%s", "Failed to created customer!!");
+    }
 }
 
 bool ChatService::HandleName(string username)

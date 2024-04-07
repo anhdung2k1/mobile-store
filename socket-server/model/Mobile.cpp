@@ -37,6 +37,9 @@ string Mobile::getMobileDescription() {
     return mobileDescription;
 }
 
+void Mobile::setMobileId(int mobileId) {
+    this->mobileId = mobileId;
+}
 void Mobile::setMobileName(string mobileName) {
     this->mobileName = mobileName;
 }

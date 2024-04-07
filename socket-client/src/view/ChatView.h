@@ -17,6 +17,7 @@
 #include "../model/UserClient.h"
 #include "../model/Mobile.h"
 #include "../model/Transaction.h"
+#include "../model/Customer.h"
 #include "../view/StatusBar.h"
 
 using std::map;
@@ -37,11 +38,13 @@ public:
         RegisterInput = 7,
         MobileInventory = 8,
         Transactions = 9,
-        Customer = 10,
+        CustomerView = 10,
         MobileDetails = 11
     };
     static void handleLogin(int sock, int selection);
     static void UserConsole(int sock);
+    static void MobileConsole(int sock, Mobile& mobile, bool isUpdate);
+    static void CustomerConsole(int sock, Customer& customer, bool isUpdate);
     static void LoginMenu();
     static void UI();
     static void Menu();
@@ -50,7 +53,7 @@ public:
     static void interactUserMenu(int count, map<int, UserClient> foundUser, int sock);
     static void findMobileMenu(int sock, map<int, int>& idMobileInventory);
     static void UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin);
-    static void MobileUI(int sock, int mobileId, WINDOW *mobileInformation);
+    static void MobileUI(int sock, int mobileId);
     static UserClient getUser();
     static WINDOW *getCurrentWin();
 };

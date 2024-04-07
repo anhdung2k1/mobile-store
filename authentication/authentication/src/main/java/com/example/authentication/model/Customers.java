@@ -13,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Customers {
-    private Long customerId;
+    private Long customerID;
     private String customerName;
     private Set<PaymentEntity> pays;
     private String customerEmail;

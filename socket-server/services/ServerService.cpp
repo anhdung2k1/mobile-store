@@ -39,6 +39,8 @@ struct ServerService::Client
 {
     int sock;
     User user;
+    Mobile mobile;
+    Customer customer;
     CURL *curl;
     CURLcode res;
     struct curl_slist *slist;
@@ -202,12 +204,42 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
     }
     else if (pattern == "MOBILE_INFORMATION") // Get specific information of mobile device
     {
+        client.mobile.setMobileId(stoi(value));
         response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/" + value, flag);
         SendResponse(client.sock, "MOBILE_INFORMATION|" + response);
+    }
+    else if (pattern == "CREATE_MOBILE_DEVICE")
+    {
+        response = curlUtils.postUtil(client.curl, client.res, apiIp + "/mobiles", value, flag);
+        SendResponse(client.sock, "CREATE_MOBILE_DEVICE|" + to_string(flag));
+    }
+    else if (pattern == "UPDATE_MOBILE_DEVICE")
+    {
+        response = curlUtils.patchUtil(client.curl, client.res, apiIp + "/mobiles/" + ConvertIntToString(client.mobile.getMobileId()), value, flag);
+        SendResponse(client.sock, "UPDATE_MOBILE_DEVICE|" + to_string(flag));
+    }
+    else if (pattern == "DELETE_MOBILE_DEVICE")
+    {
+        response = curlUtils.deleteUtil(client.curl, client.res, apiIp + "/mobiles/" + value, flag);
+        SendResponse(client.sock, "DELETE_MOBILE_DEVICE|" + to_string(flag));
+    }
+    else if (pattern == "GET_CUSTOMER_INFORMATION")
+    {
+        client.customer.setCustomerId(stoi(value));
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/customers/" + value, flag);
+        SendResponse(client.sock, "GET_CUSTOMER_INFORMATION|" + response);
     }
     else if (pattern == "GET_CUSTOMERS") {
         response = curlUtils.getUtil(client.curl, client.res, apiIp + "/customers", flag);
         SendResponse(client.sock, "GET_CUSTOMERS|" + response);
+    }
+    else if (pattern == "CREATE_CUSTOMER") {
+        response = curlUtils.postUtil(client.curl, client.res, apiIp + "/customers", value, flag);
+        SendResponse(client.sock, "CREATE_CUSTOMER|" + to_string(flag));
+    }
+    else if (pattern == "UPDATE_CUSTOMER") {
+        response = curlUtils.patchUtil(client.curl, client.res, apiIp + "/customers/" + ConvertIntToString(client.customer.getCustomerId()), value, flag);
+        SendResponse(client.sock, "UPDATE_CUSTOMER|" + to_string(flag));
     }
     else if (pattern == "GET_PAYMENT_METHOD") {
         response = curlUtils.getUtil(client.curl, client.res, apiIp + "/payments", flag);

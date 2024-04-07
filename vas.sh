@@ -29,6 +29,11 @@ clean() {
     echo "Remove build directory..."
     rm -rf "$VAS_GIT/build"
     echo "Remove sucessfully"
+    echo "Remove <none> docker images build"
+    non_tag_build_images=$(docker images | grep -i "<none>" | awk '$3 {print $3}' | grep -v -w "IMAGE")
+    if [[ -n $non_tag_build_images ]]; then
+        docker rmi $(non_tag_build_images)
+    fi
 }
 
 die() {
@@ -126,20 +131,20 @@ build_repo() {
     echo "# Prepare the docker local build : #"
     echo "##################################"
 
-    mysql_container=$(docker ps -a --format "{{.Names}}" | grep -i mysql_container)
-    if [[ -n "$mysql_container" ]]; then
-        docker rm -f $mysql_con
-    fi
-    #Start docker mysql container
-    docker run -d --name $mysql_con \
-        -e MYSQL_ROOT_PASSWORD=root \
-        -e MYSQL_DATABASE=${COMMON_DB} \
-        -e MYSQL_USER=${COMMON_DB} \
-        -e MYSQL_PASSWORD=${COMMON_DB} \
-        -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
-        -p 3306:3306 \
-        mysql:latest \
-    || die "[ERROR]: Failed to run mysql docker"
+    # mysql_container=$(docker ps -a --format "{{.Names}}" | grep -i mysql_container)
+    # if [[ -n "$mysql_container" ]]; then
+    #     docker rm -f $mysql_con
+    # fi
+    # #Start docker mysql container
+    # docker run -d --name $mysql_con \
+    #     -e MYSQL_ROOT_PASSWORD=root \
+    #     -e MYSQL_DATABASE=${COMMON_DB} \
+    #     -e MYSQL_USER=${COMMON_DB} \
+    #     -e MYSQL_PASSWORD=${COMMON_DB} \
+    #     -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
+    #     -p 3306:3306 \
+    #     mysql:latest \
+    # || die "[ERROR]: Failed to run mysql docker"
     mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
     echo $mysql_IP
 

@@ -21,6 +21,7 @@ public class CustomerEntity {
         this.customerAddress = "";
         this.customerGender = "";
         this.customerBirthDay = new Date();
+        this.customerEmail = "";
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
     }
@@ -33,7 +34,7 @@ public class CustomerEntity {
             valueColumnName = "SEQ_COUNT",
             pkColumnValue = "CUS_SEQ_NEXT_VAL",
             allocationSize = 1)
-    private Long customerId;
+    private Long customerID;
 
     @Column(name = "CUS_NAME", nullable = false)
     @NotBlank(message = "Customer Name must not be blank")
@@ -52,6 +53,9 @@ public class CustomerEntity {
     @Column(name = "CUS_BIRTH_DAY")
     @Temporal(TemporalType.DATE)
     private Date customerBirthDay;
+
+    @Column(name = "CUS_EMAIL")
+    private String customerEmail;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_AT")

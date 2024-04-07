@@ -30,7 +30,7 @@ public class MobileEntity {
             valueColumnName = "SEQ_COUNT",
             pkColumnValue = "MOB_SEQ_NEXT_VAL",
             allocationSize = 1)
-    private Long mobileId;
+    private Long mobileID;
 
     @Column(name = "MOB_NAME", nullable = false) //For example: Iphone 15 Pro Max
     @NotBlank(message = "Mobile Name must not be blank")
@@ -45,7 +45,6 @@ public class MobileEntity {
     private String mobileType;
 
     @Column(name = "MOB_QUANT", nullable = false) // Quantity of the mobile
-    @NotBlank(message = "Must specify quantity")
     private Integer mobileQuantity;
 
     @Column(name = "MOB_PRICE", nullable = false) // Price of the mobile

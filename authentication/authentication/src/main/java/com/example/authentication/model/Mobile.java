@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Mobile {
-    private Long mobileId;
+    private Long mobileID;
     private String mobileName;
     private String mobileModel;
     private String mobileType;

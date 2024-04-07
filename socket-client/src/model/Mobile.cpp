@@ -3,7 +3,7 @@
 #include "Mobile.h"
 
 Mobile::Mobile()
-        : mobileName(""), mobileModel(""), mobileType(""), mobileDescription("") {}
+        : mobileName(""), mobileModel(""), mobileType(""), mobileQuantity(0), mobilePrice("0 VND"), mobileDescription("") {}
 
 Mobile::Mobile(string mobileName, string mobileModel, string mobileType, int mobileQuantity, string mobilePrice, string mobileDescription) 
     : mobileName(mobileName), mobileModel(mobileModel), mobileType(mobileType),

@@ -18,7 +18,6 @@ else
            model/Transaction.cpp \
            model/UserClient.cpp \
            view/StatusBar.cpp \
-           utils/Date.cpp \
            -pthread -lncurses
     ./client
 fi

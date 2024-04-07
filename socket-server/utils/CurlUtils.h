@@ -13,6 +13,6 @@ class CurlUtils{
         static std::string postUtil(CURL *curl, CURLcode res, std::string url, std::string formData, bool &flag);
         static std::string putUtil(CURL *curl, CURLcode res, std::string url, std::string formData, bool &flag);
         static std::string patchUtil(CURL *curl, CURLcode res, std::string url, std::string formData, bool &flag);
-        static bool deleteUtil(CURL *curl, CURLcode res, std::string url, std::string formData);
+        static std::string deleteUtil(CURL *curl, CURLcode res, std::string url, bool &flag);
         static void handleDestruct(CURL *curl, struct curl_slist *slist);
 };
