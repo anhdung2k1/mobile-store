@@ -27,7 +27,7 @@ public class PaymentServiceImpl implements PaymentService {
         }};
     }
     @Override
-    public Payment createPayment(Payment payment) throws Exception {
+    public Map<String, Object> createPayment(Payment payment) throws Exception {
         try {
             PaymentEntity paymentEntity;
             if (paymentRepository.findPaymentEntitiesByPaymentMethod(payment.getPaymentMethod()).isPresent()) {
@@ -40,7 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
                 BeanUtils.copyProperties(payment, paymentEntity);
                 paymentRepository.save(paymentEntity);
             }
-            return payment;
+            return paymentMap(paymentEntity);
         } catch (Exception e) {
             throw new Exception("Could not create new Payment " + e.getMessage());
         }

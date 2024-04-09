@@ -14,7 +14,6 @@ class Transaction {
     public:
         Transaction();
         Transaction(int transactionId, string transactionName, string transactionType, string paymentMethod);
-        Transaction(string transactionName, string transactionType, string paymentMethod);
         int getTransactionId();
         string getTransactionName();
         string getTransactionType();

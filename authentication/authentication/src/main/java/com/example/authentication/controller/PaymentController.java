@@ -18,7 +18,7 @@ public class PaymentController {
     }
     // Create new payment
     @PostMapping(value = "/payments")
-    public ResponseEntity<Payment> createPermission(@RequestBody Payment payment) throws Exception {
+    public ResponseEntity<Map<String, Object>> createPermission(@RequestBody Payment payment) throws Exception {
         return ResponseEntity.ok(paymentService.createPayment(payment));
     }
     // Get all Payments by customer ID

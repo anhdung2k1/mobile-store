@@ -18,9 +18,9 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
     // Create new transaction
-    @PostMapping(value="/transactions")
-    public ResponseEntity<Boolean> createTransaction(@RequestBody Transactions transactions) throws Exception {
-        return ResponseEntity.ok(transactionService.createTransaction(transactions));
+    @PostMapping(value="/transactions/{customerId}")
+    public ResponseEntity<Boolean> createTransaction(@RequestBody Transactions transactions, @PathVariable("customerId") Long customerId) throws Exception {
+        return ResponseEntity.ok(transactionService.createTransaction(transactions, customerId));
     }
     // Get all Transactions by PayID
     @GetMapping(value = "/transactions/query")

@@ -60,7 +60,7 @@ public:
     // Transaction
     static map<int,int> FindTransactionHistory(int sock, vector<Transaction> &transaction, string input);
     static Transaction GetTransactionInformation(int sock, int transactionId);
-    static void CreateTransaction(int sock, Transaction& transaction);
+    static void CreateTransaction(int sock, Transaction& transaction, int customerId);
     static void UpdateTransaction(int sock, Transaction& transaction);
     static bool DeleteTransaction(int sock, int transactionId);
     // Customer

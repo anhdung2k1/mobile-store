@@ -1994,6 +1994,264 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
    } while (true);
 }
 
+void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpdate, bool isCustomerUI, int customerId) {
+   clear();
+   endwin();
+   system("clear");
+   currentView = TransactionDetails;
+   initscr();
+   keypad(stdscr, TRUE);
+   cbreak();
+   refresh();
+   noecho();
+   curs_set(0);
+   if (has_colors() == FALSE)
+   {
+      clear();
+      endwin();
+      printf("Your terminal does not support color\n");
+      exit(1);
+   }
+   start_color();
+   init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+   init_pair(2, COLOR_RED, COLOR_BLACK);
+   init_pair(3, COLOR_GREEN, COLOR_BLACK);
+   init_pair(4, COLOR_CYAN, COLOR_BLACK);
+   init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+   init_pair(6, COLOR_WHITE, COLOR_BLACK);
+   init_pair(7, COLOR_BLUE, COLOR_WHITE);
+   string input;
+   WINDOW *updateWin = newwin(35, 100, 0, 0);
+   wattron(updateWin, COLOR_PAIR(3));
+   box(updateWin, 0, 0);
+   mvwprintw(updateWin, 4, 2, "--------------------------------------------------------");
+   mvwprintw(updateWin, 20, 2, "--------------------------------------------------------");
+   wattroff(updateWin, COLOR_PAIR(3));
+   refresh();
+   wattron(updateWin, COLOR_PAIR(4));
+   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + transaction.getTransactionName().length())) / 2, "*** Current Transaction: %s ***", transaction.getTransactionName().c_str());
+   mvwprintw(updateWin, 6, 3, "1. Transaction Name: ");
+   mvwprintw(updateWin, 8, 3, "2. Transaction Type: ");
+   mvwprintw(updateWin, 10, 3, "3. Payment Method: ");
+   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
+   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
+   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
+   mvwprintw(updateWin, 16, (updateWin->_maxx - 40) / 2, "Select an option that you want to fill");
+   wattroff(updateWin, COLOR_PAIR(4));
+   wattron(updateWin, COLOR_PAIR(6));
+   mvwprintw(updateWin, 6, 27, "%s", transaction.getTransactionName().c_str());
+   mvwprintw(updateWin, 8, 27, "%s", transaction.getTransactionType().c_str());
+   mvwprintw(updateWin, 10, 27, "%s", transaction.getPaymentMethod().c_str());
+   wattroff(updateWin, COLOR_PAIR(6));
+   wrefresh(updateWin);
+   int curs_x, curs_y;
+   wmove(updateWin, 63, 13);
+   int n;
+   char c = char(n);
+   char *ch = &c;
+   do
+   {
+      input = "";
+      n = wgetch(updateWin);
+      switch (n)
+      {
+      case 97: // A
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Transaction Name: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               transaction.setTransactionName(input);
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(c);
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 103: // G
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Transaction Type: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               curs_set(0);
+               transaction.setTransactionType(input);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(c);
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      case 112: // P
+      {
+         curs_set(1);
+         wattron(updateWin, COLOR_PAIR(4));
+         mvwprintw(updateWin, 24, 3, "New Payment Method: ");
+         wattroff(updateWin, COLOR_PAIR(4));
+         getyx(updateWin, curs_y, curs_x);
+         wrefresh(updateWin);
+         do
+         {
+            n = wgetch(updateWin);
+            if (n == 27)
+            {
+               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+            }
+            else if (n == 8 || n == 127)
+            {
+               if (input.length() != 0)
+               {
+                  input.pop_back();
+                  wprintw(updateWin, "\b \b");
+                  wrefresh(updateWin);
+                  curs_x--;
+               }
+            }
+            else if (n == 10)
+            {
+               transaction.setPaymentMethod(input);
+               curs_set(0);
+               wattron(updateWin, COLOR_PAIR(3));
+               mvwprintw(updateWin, 26, 3, "Update complete.");
+               wattron(updateWin, COLOR_PAIR(3));
+               wattron(updateWin, COLOR_PAIR(1));
+               mvwprintw(updateWin, 27, 3, "Press ENTER to refresh.");
+               wattroff(updateWin, COLOR_PAIR(1));
+               wrefresh(updateWin);
+               refresh();
+               printf("\n");
+               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+            }
+            else
+            {
+               c = char(n);
+               mvwprintw(updateWin, curs_y, curs_x + 1, "%c", c); // print the current key on screen and push it to input string
+               wrefresh(updateWin);
+               input.push_back(char(n));
+               curs_x++;
+            }
+         } while (true);
+         break;
+      }
+      default:
+      do {
+         n = wgetch(updateWin);
+         if (n == 27)
+         {
+            return ChatView::handleMenu(sock, -1);
+         }
+         else if (n == 10) {
+            if(isUpdate) {
+               ChatService::UpdateTransaction(sock, transaction);
+            } else {
+               ChatService::CreateTransaction(sock, transaction, customerId);
+            }
+            curs_set(0);
+            wattron(updateWin, COLOR_PAIR(3));
+            wattron(updateWin, COLOR_PAIR(1));
+            mvwprintw(updateWin, 26, 3, "Press ENTER to refresh.");
+            wattroff(updateWin, COLOR_PAIR(1));
+            wrefresh(updateWin);
+            while (getch() != 10) {}
+            refresh();
+            printf("\n");
+            return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+         } 
+      } while (true);
+      break;
+   }
+          
+      if (n == 27)
+      {
+         if (isCustomerUI) {
+            return ChatView::CustomerUI(sock, customerId);
+         } else {
+            return handleMenu(sock, -1);
+         }
+      }
+
+      if (n == 10)
+      {
+         break;
+      }
+   } while (true);
+}
+
 int ChatView::selectMenu()
 {
    int n;
@@ -2367,7 +2625,7 @@ void ChatView::findTransactionMenu(int sock, map<int, int>& idTransactionInvento
    wattroff(currentWin, COLOR_PAIR(4));
    wrefresh(currentWin);
    int curs_x, curs_y;
-   wmove(currentWin, 1, 34);
+   wmove(currentWin, 1, 40);
    // change int to char *
    int n;
    char c = char(n);
@@ -2440,6 +2698,7 @@ void ChatView::handleMenu(int sock, int selection)
    bool isSuccess = false;
    vector<Mobile>mobileList;
    vector<Customer>customerList;
+   vector<Transaction>transactionList;
    Mobile mobile;
    Customer customer;
    do
@@ -2562,7 +2821,9 @@ void ChatView::handleMenu(int sock, int selection)
          char c = char(n);
          do {
             n = wgetch(updateWin);
-            if(n == 97) // A
+            switch (n)
+            {
+            case 97: // A
             {
                clear();
                refresh();
@@ -2681,8 +2942,10 @@ void ChatView::handleMenu(int sock, int selection)
                   // Search information details for mobile ID
                   findMobileMenu(sock, idInventory);
                }
+               break;
             }
-            else if (n == 103) { // G
+            case 103: // G
+            {
                clear();
                refresh();
                endwin();
@@ -2800,13 +3063,14 @@ void ChatView::handleMenu(int sock, int selection)
                   // Search information details for mobile ID
                   findMobileMenu(sock, idInventory);
                }
+               break;
             }
+         }
          } while(true);
          break;
       }
       case 105: //I: Transaction History
       {
-         vector<Transaction>transaction;
          clear();
          refresh();
          endwin();
@@ -2837,26 +3101,78 @@ void ChatView::handleMenu(int sock, int selection)
          WINDOW *transactionWin = newwin(5, 61, 0, 0);
          currentWin = transactionWin;
          wattron(currentWin, COLOR_PAIR(3));
+         box(currentWin, 0, 0);
+         wattroff(currentWin, COLOR_PAIR(3));
+         refresh();
+         wattron(currentWin, COLOR_PAIR(4));
+         mvwprintw(currentWin, 2, 1, "Enter Transaction Name: ");
+         wattroff(currentWin, COLOR_PAIR(4));
+         wrefresh(currentWin);
          int curs_x, curs_y;
          getyx(currentWin, curs_y, curs_x);
          wmove(currentWin, curs_y, curs_x);
          // change int to char *
          int n;
          char c = char(n);
+         input = "";
+         do
+         {
+            // Get the key
+            n = wgetch(currentWin);
+            if(n == 27)
+            {
+               clear();
+               endwin();
+               break;
+            } else if (n == 8 || n == 127) {
+               if (input.length() != 0){
+                  input.pop_back();
+                  wprintw(currentWin, "\b \b");
+                  wrefresh(currentWin);
+                  curs_x--;
+               }
+            } else if (n == 10 && input.length() >= 0 ) {
+               break;
+            }
+            else if (n == 10) {
+               attroff(COLOR_PAIR(1));
+               refresh();
+               sleep(2);
+               move(16, 0);
+               clrtoeol();
+               refresh();
+               wmove(currentWin, curs_y, curs_x);
+               wrefresh(currentWin);
+               ChatView::handleMenu(sock, 110);
+            }
+            else  {
+               c = char(n);
+               mvwprintw(currentWin, curs_y, curs_x, "%c",c);
+               wrefresh(currentWin);
+               input.push_back(c);
+               curs_x++;
+            }
+            getyx(currentWin, curs_y, curs_x);
+         } while (true);
+         
          if (n == 27) {
             break;
          }
          else {
-            map<int,int> idTransactionMapping = ChatService::FindTransactionHistory(sock, transaction, input);
+            map<int,int> idTransactionMapping = ChatService::FindTransactionHistory(sock, transactionList, input);
+            if (idTransactionMapping.size() == 0) {
+               break;
+            }
             int spacePos = 0;
-            for(auto tr : transaction) {
-               mvprintw(6+spacePos, 0, "%s", to_string(idTransactionMapping[tr.getTransactionId()]).c_str());
-               mvprintw(6+spacePos, 20, "%s", tr.getTransactionName().c_str());
-               mvprintw(6+spacePos, 40, "%s", tr.getTransactionType().c_str());
-               mvprintw(6+spacePos, 60, "%s", tr.getPaymentMethod().c_str());
+            for(auto tr : transactionList) {
+               mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(idTransactionMapping[tr.getTransactionId()])).c_str());
+               mvprintw(6+spacePos, 5, "%s", ChatService::processString(tr.getTransactionName()).c_str());
+               mvprintw(6+spacePos, 40, "%s", ChatService::processString(tr.getTransactionType()).c_str());
+               mvprintw(6+spacePos, 80, "%s", ChatService::processString(tr.getPaymentMethod()).c_str());
                spacePos += 1;
             }
             
+            mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
             int back = getch();
             if (back == 27) {
                clear();
@@ -3408,6 +3724,7 @@ void ChatView::MobileUI(int sock, int mobileId) {
 }
 
 void ChatView::CustomerUI(int sock, int customerId) {
+   Transaction transaction;
    clear();
    refresh();
    endwin();
@@ -3453,9 +3770,10 @@ void ChatView::CustomerUI(int sock, int customerId) {
    mvwprintw(currentWin, 3, 1, "1. Customer Information");
    mvwprintw(currentWin, 4, 1, "2. Update Customer Information");
    mvwprintw(currentWin, 5, 1, "3. Delete Customer");
-   mvwprintw(currentWin, 6, 1, "4. Exit");
+   mvwprintw(currentWin, 6, 1, "4. Create New Transaction");
+   mvwprintw(currentWin, 7, 1, "5. Exit");
    wattroff(currentWin, COLOR_PAIR(4));
-   mvwprintw(currentWin, 7, 1, "Select your option: ");
+   mvwprintw(currentWin, 8, 1, "Select your option: ");
    wattroff(currentWin, COLOR_PAIR(4));
    wrefresh(currentWin);
    
@@ -3547,6 +3865,13 @@ void ChatView::CustomerUI(int sock, int customerId) {
          }
       }
       else if (select == "4") {
+         refresh();
+         endwin();
+         system("clear");
+         // Create new Transaction and in customer UI
+         ChatView::TransactionConsole(sock, transaction, false, true, customerId);
+      }
+      else if (select == "5") {
          ChatView::handleMenu(sock, -1);
       }
    }
@@ -3668,8 +3993,8 @@ void ChatView::TransactionUI(int sock, int transactionId) {
       }
       else if (select == "2") {
          Transaction transaction = ChatService::GetTransactionInformation(sock, transactionId);
-         // Update Customer Information
-         // ChatView::TransactionConsole(sock, transaction, true);
+         // Update Customer Information and didn't in Customer UI
+         ChatView::TransactionConsole(sock, transaction, true, false, -1);
       }
       else if (select == "3") {
          bool isDeleted = ChatService::DeleteTransaction(sock, transactionId);

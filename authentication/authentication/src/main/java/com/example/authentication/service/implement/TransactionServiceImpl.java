@@ -1,7 +1,9 @@
 package com.example.authentication.service.implement;
 
+import com.example.authentication.entity.PaymentEntity;
 import com.example.authentication.entity.TransactionEntity;
 import com.example.authentication.model.Transactions;
+import com.example.authentication.repository.PaymentRepository;
 import com.example.authentication.repository.TransactionRepository;
 import com.example.authentication.service.interfaces.TransactionService;
 import jakarta.transaction.Transactional;
@@ -17,6 +19,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
+    private final PaymentRepository paymentRepository;
 
     private Map<String, Object> transactionMap(TransactionEntity transactionEntity) {
         return new HashMap<>(){{
@@ -28,11 +31,20 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Boolean createTransaction(Transactions transactions) throws Exception {
+    public Boolean createTransaction(Transactions transactions, Long customerId) throws Exception {
         try {
             TransactionEntity transactionEntity = new TransactionEntity();
+            PaymentEntity paymentEntity = paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayments().getPaymentMethod()).isPresent()
+                    ? paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayments().getPaymentMethod()).get() : null;
+            assert paymentEntity != null;
             BeanUtils.copyProperties(transactions, transactionEntity);
+            transactionEntity.setPayments(paymentEntity);
             transactionRepository.save(transactionEntity);
+            Long paymentId = paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayments().getPaymentMethod()).isPresent()
+                    ? paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayments().getPaymentMethod()).get().getPaymentId() : null;
+            Long transactionId = transactionEntity.getTransactionId();
+            assert paymentId != null;
+            transactionRepository.insertTransactionWithCustomer(paymentId, customerId, transactionId);
             return true;
         } catch (Exception e) {
             throw new Exception("Could not create new transaction" + e.getMessage());

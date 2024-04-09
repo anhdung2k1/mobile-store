@@ -47,7 +47,7 @@ public:
     static void UserConsole(int sock);
     static void MobileConsole(int sock, Mobile& mobile, bool isUpdate);
     static void CustomerConsole(int sock, Customer& customer, bool isUpdate);
-    // static void TransactionConsole(int sock, Transaction& transaction, bool isUpdate);
+    static void TransactionConsole(int sock, Transaction& transaction, bool isUpdate, bool isCustomerUI, int customerId);
     static void LoginMenu();
     static void UI();
     static void Menu();

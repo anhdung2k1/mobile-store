@@ -395,16 +395,17 @@ map<int, int> ChatService::FindTransactionHistory(int sock, vector<Transaction> 
     int idx = 1;
     map<int, int> idTransMapping;
     ChatService::RequestSend("FIND_TRANSACTION_HISTORY|" + input, sock);
-    string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY");
+    string response = ChatService::GetValueFromServer(sock, "FIND_TRANSACTION_HISTORY");
     if(response.length() > 0) {
         nlohmann::json j = nlohmann::json::parse(response);
-        mvprintw(5, 20, "%s", "Transaction Name");
+        mvprintw(5, 5, "%s", "Transaction Name");
         mvprintw(5, 40, "%s", "Transaction Type");
-        mvprintw(5, 60, "%s", "Payment Method");
+        mvprintw(5, 80, "%s", "Payment Method");
         
         for(auto tr : j) {
             idTransMapping[tr.at("transactionID").get<int>()] = idx++;
             Transaction trans(
+                tr.at("transactionID").get<int>(),
                 tr.at("transactionName").get<string>(),
                 tr.at("transactionType").get<string>(),
                 tr.at("paymentMethod").get<string>()
@@ -431,19 +432,22 @@ Transaction ChatService::GetTransactionInformation(int sock, int transactionId) 
     return transaction;
 }
 
-void ChatService::CreateTransaction(int sock, Transaction& transaction) {
+void ChatService::CreateTransaction(int sock, Transaction& transaction, int customerId) {
     stringstream formData;
     formData << "{\"transactionName\": "
              << "\"" + transaction.getTransactionName() + "\", "
              << "\"transactionType\": "
              << "\"" + transaction.getTransactionType() + "\", "
              << "\"paymentMethod\": "
-             << "\"" + transaction.getPaymentMethod() + "\"}";
+             << "\"" + transaction.getPaymentMethod() + "\", "
+             << "\"customerId\": "
+             << "\"" + to_string(customerId) + "\"}";
     ChatService::RequestSend("CREATE_TRANSACTION|" + formData.str(), sock);
     string response = ChatService::GetValueFromServer(sock, "CREATE_TRANSACTION");
-    if(ChatService::ConvertToBool(response)) {
+    if (ConvertToBool(response)) {
         mvprintw(24, 3, "%s", "Transaction has been created successfully!!");
-    } else {
+    }
+    else {
         mvprintw(24, 3, "%s", "Failed to created Transaction !!");
     }
 }

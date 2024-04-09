@@ -5,9 +5,6 @@ Transaction::Transaction() : transactionName(""), transactionType("") {}
 Transaction::Transaction(int transactionId, string transactionName, string transactionType, string paymentMethod) 
     : transactionId(transactionId) ,transactionName(transactionName), transactionType(transactionType), paymentMethod(paymentMethod) {}
 
-Transaction::Transaction(string transactionName, string transactionType, string paymentMethod) 
-    : transactionName(transactionName), transactionType(transactionType), paymentMethod(paymentMethod) {}
-
 int Transaction::getTransactionId() {
     return transactionId;
 }

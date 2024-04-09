@@ -264,11 +264,18 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         formData << "{\"paymentMethod\": \"" + paymentMethod + "\"}";
         string responsePayment = curlUtils.postUtil(client.curl, client.res, apiIp + "/payments", formData.str(), flag);
         cout << responsePayment << endl;
+        // clear form data
+        formData.str("");
         formData << "{\"transactionName\": "
-                << "\"" + j.at("transactionName").get<string>() + "\", "
-                << "\"transactionType\": "
-                << "\"" + j.at("transactionType").get<string>() + "\"}";
-        response = curlUtils.postUtil(client.curl, client.res, apiIp + "/transactions", formData.str(), flag);
+                 << "\"" + j.at("transactionName").get<string>() + "\", "
+                 << "\"transactionType\": "
+                 << "\"" + j.at("transactionType").get<string>() + "\", "
+                 << "\"payments\": {"
+                 << "\"paymentMethod\": "
+                 << "\"" + j.at("paymentMethod").get<string>() + "\"}}";
+        cout << formData.str() << endl;
+        string customerId = j.at("customerId").get<string>();
+        response = curlUtils.postUtil(client.curl, client.res, apiIp + "/transactions/" + customerId, formData.str(), flag);
         SendResponse(client.sock, "CREATE_TRANSACTION|" + response);
     }
     else if (pattern == "UPDATE_TRANSACTION") {
