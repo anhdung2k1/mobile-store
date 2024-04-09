@@ -39,6 +39,9 @@ struct ServerService::Client
 {
     int sock;
     User user;
+    Mobile mobile;
+    Customer customer;
+    Transaction transaction;
     CURL *curl;
     CURLcode res;
     struct curl_slist *slist;
@@ -195,19 +198,96 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/types/query?query=" + value, flag);
         SendResponse(client.sock, "FIND_INVENTORY_TYPE|" + response);
     }
-    else if (pattern == "GET_TRANSACTION_HISTORY")
+    else if (pattern == "FIND_TRANSACTION_HISTORY")
     {
-        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/transactions", flag);
-        SendResponse(client.sock, "GET_TRANSACTION_HISTORY|" + response);
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/transactions/query?query=" + value, flag);
+        SendResponse(client.sock, "FIND_TRANSACTION_HISTORY|" + response);
     }
     else if (pattern == "MOBILE_INFORMATION") // Get specific information of mobile device
     {
+        client.mobile.setMobileId(stoi(value));
         response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/" + value, flag);
         SendResponse(client.sock, "MOBILE_INFORMATION|" + response);
     }
-    else if (pattern == "GET_CUSTOMERS") {
-        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/customers", flag);
-        SendResponse(client.sock, "GET_CUSTOMERS|" + response);
+    else if (pattern == "CREATE_MOBILE_DEVICE")
+    {
+        response = curlUtils.postUtil(client.curl, client.res, apiIp + "/mobiles", value, flag);
+        SendResponse(client.sock, "CREATE_MOBILE_DEVICE|" + response);
+    }
+    else if (pattern == "UPDATE_MOBILE_DEVICE")
+    {
+        response = curlUtils.patchUtil(client.curl, client.res, apiIp + "/mobiles/" + ConvertIntToString(client.mobile.getMobileId()), value, flag);
+        flag = (response.length() > 0) ? true : false;
+        SendResponse(client.sock, "UPDATE_MOBILE_DEVICE|" + to_string(flag));
+    }
+    else if (pattern == "DELETE_MOBILE_DEVICE")
+    {
+        response = curlUtils.deleteUtil(client.curl, client.res, apiIp + "/mobiles/" + value, flag);
+        nlohmann::json j = nlohmann::json::parse(response);
+        flag = j.at("deleted").get<bool>();
+        SendResponse(client.sock, "DELETE_MOBILE_DEVICE|" + to_string(flag));
+    }
+    else if (pattern == "GET_CUSTOMER_INFORMATION")
+    {
+        client.customer.setCustomerId(stoi(value));
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/customers/" + value, flag);
+        SendResponse(client.sock, "GET_CUSTOMER_INFORMATION|" + response);
+    }
+    else if (pattern == "FIND_CUSTOMER_NAME") {
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/customers/query?query=" + value, flag);
+        SendResponse(client.sock, "FIND_CUSTOMER_NAME|" + response);
+    }
+    else if (pattern == "CREATE_CUSTOMER") {
+        response = curlUtils.postUtil(client.curl, client.res, apiIp + "/customers", value, flag);
+        SendResponse(client.sock, "CREATE_CUSTOMER|" + response);
+    }
+    else if (pattern == "UPDATE_CUSTOMER") {
+        response = curlUtils.patchUtil(client.curl, client.res, apiIp + "/customers/" + ConvertIntToString(client.customer.getCustomerId()), value, flag);
+        flag = (response.length() > 0) ? true : false;
+        SendResponse(client.sock, "UPDATE_CUSTOMER|" + to_string(flag));
+    }
+    else if (pattern == "DELETE_CUSTOMER") {
+        response = curlUtils.deleteUtil(client.curl, client.res, apiIp + "/customers/" + value, flag);
+        nlohmann::json j = nlohmann::json::parse(response);
+        flag = j.at("deleted").get<bool>();
+        SendResponse(client.sock, "DELETE_CUSTOMER|" + to_string(flag));
+    }
+    else if (pattern == "GET_TRANSACTION_INFORMATION") {
+        client.transaction.setTransactionId(stoi(value));
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/transactions/" + value, flag);
+        SendResponse(client.sock, "GET_TRANSACTION_INFORMATION|" + response);
+    }
+    else if (pattern == "CREATE_TRANSACTION") {
+        nlohmann::json j = nlohmann::json::parse(value);
+        // Create payment Method if it not exists already
+        string paymentMethod = j.at("paymentMethod").get<string>();
+        formData << "{\"paymentMethod\": \"" + paymentMethod + "\"}";
+        string responsePayment = curlUtils.postUtil(client.curl, client.res, apiIp + "/payments", formData.str(), flag);
+        cout << responsePayment << endl;
+        // clear form data
+        formData.str("");
+        formData << "{\"transactionName\": "
+                 << "\"" + j.at("transactionName").get<string>() + "\", "
+                 << "\"transactionType\": "
+                 << "\"" + j.at("transactionType").get<string>() + "\", "
+                 << "\"payments\": {"
+                 << "\"paymentMethod\": "
+                 << "\"" + j.at("paymentMethod").get<string>() + "\"}}";
+        cout << formData.str() << endl;
+        string customerId = j.at("customerId").get<string>();
+        response = curlUtils.postUtil(client.curl, client.res, apiIp + "/transactions/" + customerId, formData.str(), flag);
+        SendResponse(client.sock, "CREATE_TRANSACTION|" + response);
+    }
+    else if (pattern == "UPDATE_TRANSACTION") {
+        response = curlUtils.patchUtil(client.curl, client.res, apiIp + "/transactions/" + ConvertIntToString(client.transaction.getTransactionId()), value, flag);
+        flag = (response.length() > 0) ? true : false;
+        SendResponse(client.sock, "UPDATE_TRANSACTION|" + to_string(flag));
+    }
+    else if (pattern == "DELETE_TRANSACTION") {
+        response = curlUtils.deleteUtil(client.curl, client.res, apiIp + "/transactions/" + value, flag);
+        nlohmann::json j = nlohmann::json::parse(response);
+        flag = j.at("deleted").get<bool>();
+        SendResponse(client.sock, "DELETE_TRANSACTION|" + to_string(flag));
     }
     else if (pattern == "GET_PAYMENT_METHOD") {
         response = curlUtils.getUtil(client.curl, client.res, apiIp + "/payments", flag);

@@ -18,13 +18,8 @@ public class CustomerController {
     }
     // Create new Customer
     @PostMapping(value = "/customers")
-    public ResponseEntity<Customers> createCustomer(@RequestBody Customers customers) throws Exception {
+    public ResponseEntity<Boolean> createCustomer(@RequestBody Customers customers) throws Exception {
         return ResponseEntity.ok(customerService.createCustomer(customers));
-    }
-    // Get all customers
-    @GetMapping(value = "/customers")
-    public ResponseEntity<List<Map<String, Object>>> getAllCustomers() {
-        return ResponseEntity.ok(customerService.getAllCustomers());
     }
     // Get all customers with customer Name
     @GetMapping(value = "/customers/query")

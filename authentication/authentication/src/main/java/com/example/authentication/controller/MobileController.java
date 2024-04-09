@@ -18,7 +18,7 @@ public class MobileController {
     }
     // Create new Mobile device
     @PostMapping(value = "/mobiles")
-    public ResponseEntity<Mobile> createMobileDevice(@RequestBody Mobile mobile) throws Exception {
+    public ResponseEntity<Boolean> createMobileDevice(@RequestBody Mobile mobile) throws Exception {
         return ResponseEntity.ok(mobileService.createMobile(mobile));
     }
     // Get all Mobiles by Mobile name

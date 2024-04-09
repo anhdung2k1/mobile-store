@@ -2,11 +2,8 @@
 
 Transaction::Transaction() : transactionName(""), transactionType("") {}
 
-Transaction::Transaction(int transactionId, string transactionName, string transactionType) 
-    : transactionId(transactionId) ,transactionName(transactionName), transactionType(transactionType) {}
-
-Transaction::Transaction(string transactionName, string transactionType, string paymentMethod) 
-    : transactionName(transactionName), transactionType(transactionType), paymentMethod(paymentMethod) {}
+Transaction::Transaction(int transactionId, string transactionName, string transactionType, string paymentMethod) 
+    : transactionId(transactionId) ,transactionName(transactionName), transactionType(transactionType), paymentMethod(paymentMethod) {}
 
 int Transaction::getTransactionId() {
     return transactionId;
@@ -22,6 +19,10 @@ string Transaction::getTransactionType() {
 
 string Transaction::getPaymentMethod() {
     return paymentMethod;
+}
+
+void Transaction::setTransactionId(int transactionId) {
+    this->transactionId = transactionId;
 }
 
 void Transaction::setTransactionName(string transactionName) {

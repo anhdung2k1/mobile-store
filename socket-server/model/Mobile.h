@@ -26,6 +26,7 @@ class Mobile {
         int getMobileQuantity();
         string getMobilePrice();
         string getMobileDescription();
+        void setMobileId(int mobileId);
         void setMobileName(string mobileName);
         void setMobileModel(string mobileModel);
         void setMobileType(string mobileType);

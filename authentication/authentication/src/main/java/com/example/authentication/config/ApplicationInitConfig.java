@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class ApplicationInitConfig {
     private final String DEFAULT_ADMIN = "admin";
+    private final String DEFAULT_PASSWORD = "Admin@123";
     private final AccountRepository accountRepository;
     @Bean
     ApplicationRunner applicationRunner(AccountService accountService) {
@@ -25,8 +26,8 @@ public class ApplicationInitConfig {
             if (accountRepository.findByUserName(DEFAULT_ADMIN).isPresent()) {
                 log.warn("ADMIN user has been created before");
             } else {
-                accountService.createAccount(new Accounts(DEFAULT_ADMIN, DEFAULT_ADMIN, new RoleEntity("ADMIN")));
-                log.warn("ADMIN user has been created with default password: admin, please change it");
+                accountService.createAccount(new Accounts(DEFAULT_ADMIN, DEFAULT_PASSWORD, new RoleEntity("ADMIN")));
+                log.warn("ADMIN user has been created with default password: {}, please change it", DEFAULT_PASSWORD);
             }
         };
     }

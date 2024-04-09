@@ -2,19 +2,15 @@
 #include "Customer.h"
 
 Customer::Customer() 
-    :mobile(Mobile()), customerName(""), customerEmail(""),
-    customerAddress(""), customerGender(""), customerBirthday(Date(1,1,2000)) {}
+    : customerName(""), customerEmail(""),
+    customerAddress(""), customerGender(""), customerBirthday("2000-1-1") {}
 
-Customer::Customer(string customerName)
-    :mobile(Mobile()), customerName(customerName), customerEmail(""), 
-    customerAddress(""), customerGender(""), customerBirthday(Date(1,1,2000)) {}
+Customer::Customer(int customerId, string customerName, string customerAddress, string customerGender, string customerBirthday, string customerEmail)
+    :customerId(customerId), customerName(customerName), customerAddress(customerAddress), 
+    customerGender(customerGender), customerBirthday(customerBirthday), customerEmail(customerEmail) {}
 
 int Customer::getCustomerId() {
     return customerId;
-}
-
-Mobile Customer::getMobile() {
-    return mobile;
 }
 
 string Customer::getCustomerName() {
@@ -33,12 +29,12 @@ string Customer::getCustomerGender() {
     return customerGender;
 }
 
-Date Customer::getCustomerBirthday() {
+string Customer::getCustomerBirthday() {
     return customerBirthday;
 }
 
-void Customer::setMobile(Mobile mobile) {
-    this->mobile = mobile;
+void Customer::setCustomerId(int customerId) {
+    this->customerId = customerId;
 }
 
 void Customer::setCustomerName(string customerName) {
@@ -57,6 +53,6 @@ void Customer::setCustomerGender(string customerGender) {
     this->customerGender = customerGender;
 }
 
-void Customer::setCustomerBirthday(Date customerBirthday) {
+void Customer::setCustomerBirthday(string customerBirthday) {
     this->customerBirthday = customerBirthday;
 }

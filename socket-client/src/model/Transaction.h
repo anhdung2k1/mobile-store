@@ -13,12 +13,12 @@ class Transaction {
         string paymentMethod;
     public:
         Transaction();
-        Transaction(int transactionId, string transactionName, string transactionType);
-        Transaction(string transactionName, string transactionType, string paymentMethod);
+        Transaction(int transactionId, string transactionName, string transactionType, string paymentMethod);
         int getTransactionId();
         string getTransactionName();
         string getTransactionType();
         string getPaymentMethod();
+        void setTransactionId(int transactionId);
         void setTransactionName(string transactionName);
         void setTransactionType(string transactionType);
         void setPaymentMethod(string paymentMethod);

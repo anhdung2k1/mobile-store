@@ -63,6 +63,9 @@ std::string CurlUtils::getUtil(CURL *curl, CURLcode res, std::string url, bool &
         std::cout << "Failed" << std::endl;
         flag = false;
     } //Return the CURL CODE
+    else {
+        flag = true;
+    }
     return response;
 
 }
@@ -80,6 +83,9 @@ std::string CurlUtils::postUtil(CURL *curl, CURLcode res, std::string url, std::
         std::cout << "Failed" << std::endl;
         flag = false;
     } //Return the CURL CODE
+    else {
+        flag = true;
+    }
     return response;
 }
 //Function to CURL PUT
@@ -92,10 +98,13 @@ std::string CurlUtils::putUtil(CURL *curl, CURLcode res, std::string url, std::s
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
 
     res = curl_easy_perform(curl);
-        if(res != CURLE_OK){
-            std::cout << "Failed" << std::endl;
-            flag = false;
-        } //Return the CURL CODE
+    if(res != CURLE_OK){
+        std::cout << "Failed" << std::endl;
+        flag = false;
+    } //Return the CURL CODE
+    else {
+        flag = true;
+    }
     return response;
 }
 //Function to CURL PATCH
@@ -115,22 +124,24 @@ std::string CurlUtils::patchUtil(CURL *curl, CURLcode res, std::string url, std:
     return response;
 }
 //Function to CURL Delete
-bool CurlUtils::deleteUtil(CURL *curl, CURLcode res, std::string url, std::string formData){
+std::string CurlUtils::deleteUtil(CURL *curl, CURLcode res, std::string url, bool &flag){
+    std::string response;
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, formData.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, getToken);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
 
     res = curl_easy_perform(curl);
     if(res != CURLE_OK){
         std::cout << "Failed" << std::endl;
-        return false;
+        flag = false;
     } //Return the CURL CODE
-    return true;
+    return response;
 }
 //Function to Destruct CURL unused 
 void CurlUtils::handleDestruct(CURL *curl, struct curl_slist *slist){
-        curl = NULL;
-        curl_easy_cleanup(curl);
-        slist = NULL;
-        curl_slist_free_all(slist);
+    curl = NULL;
+    curl_easy_cleanup(curl);
+    slist = NULL;
+    curl_slist_free_all(slist);
 }

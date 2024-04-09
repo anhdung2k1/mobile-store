@@ -6,20 +6,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Customers {
-    private Long customerId;
+    private Long customerID;
     private String customerName;
     private Set<PaymentEntity> pays;
     private String customerEmail;
     private String customerAddress;
     private String customerGender;
-    private Date customerBirthDay;
+    private String customerBirthDay;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
 }

@@ -8,26 +8,24 @@ using namespace std;
 class Customer {
     private:
         int customerId;
-        Mobile mobile;
         string customerName;
         string customerEmail;
         string customerAddress;
         string customerGender;
-        Date customerBirthday;
+        string customerBirthday;
     public:
         Customer();
-        Customer(string customerName);
+        Customer(int customerId, string customerName, string customerAddress, string customerGender, string customerBirthday, string customerEmail);
         int getCustomerId();
-        Mobile getMobile();
         string getCustomerName();
         string getCustomerEmail();
         string getCustomerAddress();
         string getCustomerGender();
-        Date getCustomerBirthday();
-        void setMobile(Mobile mobile);
+        string getCustomerBirthday();
+        void setCustomerId(int customerId);
         void setCustomerName(string customerName);
         void setCustomerEmail(string customerEmail);
         void setCustomerAddress(string customerAdress);
         void setCustomerGender(string customerGender);
-        void setCustomerBirthday(Date customerBirthday);
+        void setCustomerBirthday(string customerBirthday);
 };

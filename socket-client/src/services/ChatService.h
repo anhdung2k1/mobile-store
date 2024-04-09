@@ -33,24 +33,42 @@ public:
     static void pushStackDown(string message);
     static int GetPort();
     static string GetAddress();
+    // Socket and utils function handling processing
     static void clearStack();
     static bool RequestSend(string request, int sock);
     static bool ResponseReceive(int sock, char *buffer);
     static void HandleReceive(int sock, char *buffer);
     static bool ConvertToBool(string s);
-    static void GetCurrentProfile(int sock, UserClient &user);
-    static map<int,int> FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern);
-    static void GetTransactionHistory(int sock, vector<Transaction> &transaction);
-    static map<int, UserClient> GetFoundUser(int sock, UserClient user, int &count, WINDOW *finduserWin);
     static void HandleInput();
     static int handleConnect(const char *address, int port);
     static void processPattern(char *buffer, string &pattern, string &value);
     static string processString(string msg);
-    static void GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserProfileWin);
-    static void GetMobileInformation(int sock, int mobileId, WINDOW *MobileInventoryWin);
     static string GetValueFromServer(int sock, string pattern);
     static bool HandlePattern(char *buffer, int sock);
-    static void exitAppChat(int sock);
+    // User
+    static void GetCurrentProfile(int sock, UserClient &user);
+    static map<int, UserClient> GetFoundUser(int sock, UserClient user, int &count, WINDOW *finduserWin);
+    static void GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserProfileWin);
     static bool HandleName(string username);
     static bool HandlePassword(string password);
+    // Mobile Model
+    static map<int,int> FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern);
+    static Mobile GetMobileInformation(int sock, int mobileId);
+    static void CreateMobileDevice(int sock, Mobile& mobile);
+    static void UpdateMobileDevice(int sock, Mobile& mobile);
+    static bool DeleteMobileDevice(int sock, int mobileId);
+    // Transaction
+    static map<int,int> FindTransactionHistory(int sock, vector<Transaction> &transaction, string input);
+    static Transaction GetTransactionInformation(int sock, int transactionId);
+    static void CreateTransaction(int sock, Transaction& transaction, int customerId);
+    static void UpdateTransaction(int sock, Transaction& transaction);
+    static bool DeleteTransaction(int sock, int transactionId);
+    // Customer
+    static void CreateCustomer(int sock, Customer& customer);
+    static map<int,int> FindCustomerName(int sock, vector<Customer> &customers, string input); 
+    static Customer GetCustomerInformation(int sock, int customerId);
+    static void UpdateCustomer(int sock, Customer& customer);
+    static bool DeleteCustomer(int sock, int customerId);
+    static void exitAppChat(int sock);
+
 };

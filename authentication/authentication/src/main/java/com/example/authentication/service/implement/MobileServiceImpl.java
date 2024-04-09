@@ -21,7 +21,7 @@ public class MobileServiceImpl implements MobileService {
 
     private HashMap<String, Object> mobileMap(MobileEntity mobileEntity) {
         return new HashMap<>() {{
-            put("mobileID", mobileEntity.getMobileId());
+            put("mobileID", mobileEntity.getMobileID());
             put("mobileName", mobileEntity.getMobileName());
             put("mobileModel", mobileEntity.getMobileModel());
             put("mobileType", mobileEntity.getMobileType());
@@ -31,13 +31,15 @@ public class MobileServiceImpl implements MobileService {
         }};
     }
     @Override
-    public Mobile createMobile(Mobile mobile) throws Exception {
+    public Boolean createMobile(Mobile mobile) throws Exception {
         try {
             MobileEntity mobileEntity = new MobileEntity();
             // Copy all the properties into mobile Entity and save to repository
+            mobile.setCreateAt(LocalDateTime.now());
+            mobile.setUpdateAt(LocalDateTime.now());
             BeanUtils.copyProperties(mobile, mobileEntity);
             mobileRepository.save(mobileEntity);
-            return mobile;
+            return true;
         } catch(Exception e) {
             throw new Exception("Could not create Mobile" + e.getMessage());
         }

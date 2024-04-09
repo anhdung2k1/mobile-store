@@ -29,6 +29,11 @@ clean() {
     echo "Remove build directory..."
     rm -rf "$VAS_GIT/build"
     echo "Remove sucessfully"
+    echo "Remove <none> docker images build"
+    non_tag_build_images=$(docker images | grep -i "<none>" | awk '$3 {print $3}')
+    if [[ -n $non_tag_build_images ]]; then
+        docker rmi -f $non_tag_build_images
+    fi
 }
 
 die() {
@@ -53,7 +58,7 @@ dir_est() {
 get_version() {
     suffix=$(git rev-parse HEAD | sed 's/^0*//g' | cut -c1-7 | tr 'a-f' '1-6')
     suffix+=$(git diff --quiet && git diff --cached --quiet || echo '9999')
-    if [[ -n "$BUILD_DIR/var/.version)" ]]; then
+    if [[ -f "$BUILD_DIR/var/.version)" ]]; then
         suffix=$(cat $BUILD_DIR/var/.version)
     fi
     echo "$(<$VAS_GIT/VERSION_PREFIX)-${suffix}"

@@ -1,11 +1,6 @@
 #include "Transaction.h"
 
-Transaction::Transaction() : transactionName(""), transactionType("") {}
-
-Transaction::Transaction(string transactionName, string transactionType) : transactionName(transactionName), transactionType(transactionType) {}
-
-Transaction::Transaction(string transactionName, string transactionType, Payment payment) : transactionName(transactionName), transactionType(transactionType), payment(payment) {}
-
+Transaction::Transaction() : transactionName(""), transactionType(""), paymentMethod("Cash") {}
 int Transaction::getTransactionId() {
     return transactionId;
 }
@@ -18,8 +13,12 @@ string Transaction::getTransactionType() {
     return transactionType;
 }
 
-Payment Transaction::getPayment() {
-    return payment;
+string Transaction::getPaymentMethod() {
+    return paymentMethod;
+}
+
+void Transaction::setTransactionId(int transactionId) {
+    this->transactionId = transactionId;
 }
 
 void Transaction::setTransactionName(string transactionName) {
@@ -30,7 +29,7 @@ void Transaction::setTransactionType(string transactionType) {
     this->transactionType = transactionType;
 }
 
-void Transaction::setPayment(Payment payment) {
-    this->payment = payment;
+void Transaction::setPaymentMethod(string paymentMethod) {
+    this->paymentMethod = paymentMethod;
 }
 

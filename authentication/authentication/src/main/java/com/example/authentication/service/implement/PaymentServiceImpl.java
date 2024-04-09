@@ -6,6 +6,7 @@ import com.example.authentication.repository.PaymentRepository;
 import com.example.authentication.service.interfaces.PaymentService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.*;
 @Service
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
 
@@ -25,11 +27,20 @@ public class PaymentServiceImpl implements PaymentService {
         }};
     }
     @Override
-    public Payment createPayment(Payment payment) throws Exception {
+    public Map<String, Object> createPayment(Payment payment) throws Exception {
         try {
-            PaymentEntity paymentEntity = new PaymentEntity();
-            BeanUtils.copyProperties(payment, paymentEntity);
-            return payment;
+            PaymentEntity paymentEntity;
+            if (paymentRepository.findPaymentEntitiesByPaymentMethod(payment.getPaymentMethod()).isPresent()) {
+                paymentEntity = paymentRepository.findPaymentEntitiesByPaymentMethod(payment.getPaymentMethod()).get();
+                BeanUtils.copyProperties(paymentEntity, payment);
+                log.warn("The payment {} method already existed", payment.getPaymentMethod());
+            }
+            else {
+                paymentEntity = new PaymentEntity();
+                BeanUtils.copyProperties(payment, paymentEntity);
+                paymentRepository.save(paymentEntity);
+            }
+            return paymentMap(paymentEntity);
         } catch (Exception e) {
             throw new Exception("Could not create new Payment " + e.getMessage());
         }

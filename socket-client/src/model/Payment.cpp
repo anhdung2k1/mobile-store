@@ -1,12 +1,12 @@
 #include "Payment.h"
 
-Payment::Payment() : mobile(Mobile()), paymentDate(Date(1,1,2000)),
+Payment::Payment() : paymentDate("2000-1-1"),
                     paymentMethod("Cash"), paymentDescription("Cash method") {}
 
-Payment::Payment(string paymentMethod, string paymentDescription) : mobile(Mobile()), paymentDate(Date(1,1,2000)),
+Payment::Payment(string paymentMethod, string paymentDescription) : paymentDate("2000-1-1"),
                     paymentMethod(paymentMethod), paymentDescription(paymentDescription) {}
 
-Date Payment::getPaymentDate() { 
+string Payment::getPaymentDate() { 
     return paymentDate; 
 }
 
@@ -18,7 +18,7 @@ string Payment::getPaymentDescription() {
     return paymentDescription;
 }
 
-void Payment::setPaymentDate(Date paymentDate) {
+void Payment::setPaymentDate(string paymentDate) {
     this->paymentDate = paymentDate;
 }
 
