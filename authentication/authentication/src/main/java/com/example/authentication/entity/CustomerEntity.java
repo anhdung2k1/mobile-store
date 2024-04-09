@@ -51,7 +51,7 @@ public class CustomerEntity {
     private String customerGender;
 
     @Column(name = "CUS_BIRTH_DAY")
-    @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date customerBirthDay;
 
     @Column(name = "CUS_EMAIL")
@@ -62,6 +62,6 @@ public class CustomerEntity {
     private LocalDateTime createAt;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Column(name = "UPDATE_At")
+    @Column(name = "UPDATE_AT")
     private LocalDateTime updateAt;
 }

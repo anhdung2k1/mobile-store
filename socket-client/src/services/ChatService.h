@@ -53,16 +53,22 @@ public:
     static bool HandlePassword(string password);
     // Mobile Model
     static map<int,int> FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern);
-    static Mobile GetMobileInformation(int sock, int mobileId, WINDOW *MobileInventoryWin);
+    static Mobile GetMobileInformation(int sock, int mobileId);
     static void CreateMobileDevice(int sock, Mobile& mobile);
     static void UpdateMobileDevice(int sock, Mobile& mobile);
     static bool DeleteMobileDevice(int sock, int mobileId);
     // Transaction
-    static void GetTransactionHistory(int sock, vector<Transaction> &transaction);
+    static map<int,int> FindTransactionHistory(int sock, vector<Transaction> &transaction, string input);
+    static Transaction GetTransactionInformation(int sock, int transactionId);
+    static void CreateTransaction(int sock, Transaction& transaction);
+    static void UpdateTransaction(int sock, Transaction& transaction);
+    static bool DeleteTransaction(int sock, int transactionId);
     // Customer
+    static void CreateCustomer(int sock, Customer& customer);
+    static map<int,int> FindCustomerName(int sock, vector<Customer> &customers, string input); 
     static Customer GetCustomerInformation(int sock, int customerId);
     static void UpdateCustomer(int sock, Customer& customer);
-    static void CreateCustomer(int sock, Customer& customer);
+    static bool DeleteCustomer(int sock, int customerId);
     static void exitAppChat(int sock);
 
 };

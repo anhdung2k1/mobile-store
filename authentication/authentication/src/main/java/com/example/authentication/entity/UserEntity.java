@@ -47,7 +47,7 @@ public class UserEntity implements Serializable{
     @Column(name = "USER_NAME", nullable = false, length = 20)
     private String userName;
 
-    @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "BIRTH_DAY")
     private Date birth_day;
 

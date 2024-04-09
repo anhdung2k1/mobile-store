@@ -14,4 +14,6 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
             "SELECT pu.pay_id FROM customer_payment pu " +
             "WHERE pu.cus_id =:customerId)", nativeQuery = true)
     Optional<List<PaymentEntity>> findAllPaymentByCustomerId(Long customerId);
+
+    Optional<PaymentEntity> findPaymentEntitiesByPaymentMethod(String paymentMethod);
 }

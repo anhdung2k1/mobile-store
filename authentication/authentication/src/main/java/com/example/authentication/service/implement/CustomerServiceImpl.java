@@ -1,5 +1,6 @@
 package com.example.authentication.service.implement;
 
+import com.example.authentication.aspect.Utils;
 import com.example.authentication.entity.CustomerEntity;
 import com.example.authentication.model.Customers;
 import com.example.authentication.repository.CustomerRepository;
@@ -24,29 +25,20 @@ public class CustomerServiceImpl implements CustomerService {
             put("customerName", customerEntity.getCustomerName());
             put("customerGender", customerEntity.getCustomerGender());
             put("customerAddress", customerEntity.getCustomerAddress());
-            put("customerBirthday", customerEntity.getCustomerBirthDay());
+            put("customerBirthDay", Utils.dateToString(customerEntity.getCustomerBirthDay()));
             put("customerEmail", customerEntity.getCustomerEmail());
         }};
     }
     @Override
-    public Customers createCustomer(Customers customers) throws Exception {
+    public Boolean createCustomer(Customers customers) throws Exception {
         try {
             CustomerEntity customerEntity = new CustomerEntity();
             BeanUtils.copyProperties(customers, customerEntity);
             customerRepository.save(customerEntity);
-            return customers;
+            return true;
         } catch (Exception e) {
             throw new Exception("Could not create new Customer" + e.getMessage());
         }
-    }
-
-    @Override
-    public List<Map<String, Object>> getAllCustomers() {
-        List<Map<String, Object>> customersMapList = new ArrayList<>();
-        List<CustomerEntity> customerEntities = customerRepository.findAll();
-        customerEntities.forEach((customerEntity
-                -> customersMapList.add(customerMap(customerEntity))));
-        return customersMapList;
     }
 
     @Override
@@ -85,11 +77,11 @@ public class CustomerServiceImpl implements CustomerService {
             customerEntity.setCustomerName(customers.getCustomerName());
             customerEntity.setCustomerGender(customers.getCustomerGender());
             customerEntity.setCustomerAddress(customers.getCustomerAddress());
-            customerEntity.setCustomerBirthDay(customers.getCustomerBirthDay());
+            customerEntity.setCustomerBirthDay(Utils.stringToDate(customers.getCustomerBirthDay()));
             customerEntity.setCustomerEmail(customers.getCustomerEmail());
             customerEntity.setUpdateAt(LocalDateTime.now());
             customerRepository.save(customerEntity);
-            BeanUtils.copyProperties(customerEntity, customers);
+
             return customers;
         } catch (NoSuchElementException e) {
             throw new Exception("Could not get Customer with customer ID: " + customerId + e.getMessage());

@@ -39,12 +39,15 @@ public:
         MobileInventory = 8,
         Transactions = 9,
         CustomerView = 10,
-        MobileDetails = 11
+        MobileDetails = 11,
+        CustomerDetails = 12,
+        TransactionDetails = 13
     };
     static void handleLogin(int sock, int selection);
     static void UserConsole(int sock);
     static void MobileConsole(int sock, Mobile& mobile, bool isUpdate);
     static void CustomerConsole(int sock, Customer& customer, bool isUpdate);
+    // static void TransactionConsole(int sock, Transaction& transaction, bool isUpdate);
     static void LoginMenu();
     static void UI();
     static void Menu();
@@ -52,8 +55,12 @@ public:
     static void handleMenu(int sock, int selection);
     static void interactUserMenu(int count, map<int, UserClient> foundUser, int sock);
     static void findMobileMenu(int sock, map<int, int>& idMobileInventory);
+    static void findCustomerMenu(int sock, map<int, int>& idCustomerInventory);
+    static void findTransactionMenu(int sock, map<int, int>& idTransactionInventory);
     static void UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin);
     static void MobileUI(int sock, int mobileId);
+    static void TransactionUI(int sock, int transactionId);
+    static void CustomerUI(int sock, int customerId);
     static UserClient getUser();
     static WINDOW *getCurrentWin();
 };

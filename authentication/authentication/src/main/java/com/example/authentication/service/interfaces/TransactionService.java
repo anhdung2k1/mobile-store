@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 public interface TransactionService {
-    Transactions createTransaction(Transactions transactions) throws Exception;
-    List<Map<String, Object>> getAllTransactions() throws Exception;
+    Boolean createTransaction(Transactions transactions) throws Exception;
+    List<Map<String, Object>> getAllTransactionsByName(String transactionName) throws Exception;
     List<Map<String, Object>> getAllTransactionByCustomerId(Long customerId) throws Exception;
+    Map<String, Object> getTransactionByTransactionId(Long transactionId) throws Exception;
+    Transactions updateTransaction(Long transactionId, Transactions transactions) throws Exception;
     Boolean deleteTransaction(Long transactionId) throws Exception;
 }

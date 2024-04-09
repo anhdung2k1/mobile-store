@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -19,7 +18,7 @@ public class Customers {
     private String customerEmail;
     private String customerAddress;
     private String customerGender;
-    private Date customerBirthDay;
+    private String customerBirthDay;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
 }

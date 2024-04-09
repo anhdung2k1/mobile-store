@@ -54,7 +54,6 @@ public class MobileEntity {
     @Column(name = "MOB_DESC")
     private String mobileDescription; // The description for individual mobile
 
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_AT")
     private LocalDateTime createAt;

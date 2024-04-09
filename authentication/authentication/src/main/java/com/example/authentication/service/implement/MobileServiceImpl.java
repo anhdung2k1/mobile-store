@@ -31,7 +31,7 @@ public class MobileServiceImpl implements MobileService {
         }};
     }
     @Override
-    public Mobile createMobile(Mobile mobile) throws Exception {
+    public Boolean createMobile(Mobile mobile) throws Exception {
         try {
             MobileEntity mobileEntity = new MobileEntity();
             // Copy all the properties into mobile Entity and save to repository
@@ -39,7 +39,7 @@ public class MobileServiceImpl implements MobileService {
             mobile.setUpdateAt(LocalDateTime.now());
             BeanUtils.copyProperties(mobile, mobileEntity);
             mobileRepository.save(mobileEntity);
-            return mobile;
+            return true;
         } catch(Exception e) {
             throw new Exception("Could not create Mobile" + e.getMessage());
         }
