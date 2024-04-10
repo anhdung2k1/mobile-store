@@ -109,15 +109,15 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public boolean deleteAccount(Long id) throws Exception {
+    public boolean deleteAccount(Long userId) throws Exception {
         try{
-            if (accountRepository.findById(id).isPresent()) {
-                accountRepository.delete(accountRepository.findById(id).get());
+            if (accountRepository.findByUserId(userId).isPresent()) {
+                accountRepository.delete(accountRepository.findByUserId(userId).get());
                 return true;
             }
             return false;
         }catch(NoSuchElementException e){
-            throw new Exception(String.format("Could not find any account within id: %s", id));
+            throw new Exception(String.format("Could not find any account within userId: %s", userId));
         }
     }
 
@@ -155,6 +155,17 @@ public class AccountServiceImpl implements AccountService{
             return accountEntity.getAcc_id();
         }
         catch (NoSuchElementException e){
+            throw new Exception("User is not found");
+        }
+    }
+
+    @Override
+    public Boolean checkAdminAccount(String userName) throws Exception {
+        try {
+            AccountEntity accountEntity = accountRepository.findByUserName(userName).isPresent() ? accountRepository.findByUserName(userName).get() : null;
+            assert accountEntity != null;
+            return accountEntity.getRoles().getRoleName().equalsIgnoreCase("ADMIN");
+        } catch (NoSuchElementException e) {
             throw new Exception("User is not found");
         }
     }

@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long>{
     @Query(value = "SELECT u.* FROM users u " +
+            "INNER JOIN accounts ac ON ac.user_name = u.user_name " +
             "WHERE u.user_name LIKE %:userName% " +
             "LIMIT 26", nativeQuery = true)
     List<UserEntity> findByUserNameContains(String userName);

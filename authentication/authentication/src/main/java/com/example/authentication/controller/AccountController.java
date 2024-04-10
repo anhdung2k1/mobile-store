@@ -47,16 +47,22 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getAccIdByUserName(userName));
     }
 
+    // Check the account is Admin
+    @GetMapping(value = "/accounts/admin")
+    public ResponseEntity<Boolean> checkAdminAccount(@RequestParam("userName") String userName) throws Exception {
+        return ResponseEntity.ok(accountService.checkAdminAccount(userName));
+    }
+
     //Put Account Change Password
     @PutMapping(value = "/accounts/{id}")
     public ResponseEntity<Accounts> updateAccountPassword(@PathVariable Long id, @RequestBody Accounts account) throws Exception{
         return ResponseEntity.ok(accountService.updatePasswordAccount(id, account));
     }
     //Delete Account
-    @DeleteMapping(value = "/accounts/{id}")
-    public ResponseEntity<Map<String,Boolean>> deleteAccount(@PathVariable Long id) throws Exception{
+    @DeleteMapping(value = "/accounts/{userId}")
+    public ResponseEntity<Map<String,Boolean>> deleteAccount(@PathVariable Long userId) throws Exception{
         return ResponseEntity.ok(new HashMap<>() {{
-            put("deleted", accountService.deleteAccount(id));
+            put("deleted", accountService.deleteAccount(userId));
         }});
     }
 }

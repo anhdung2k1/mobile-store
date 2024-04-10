@@ -190,6 +190,14 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         string url = apiIp + "/accounts/" + accountId;
         response = curlUtils.putUtil(client.curl, client.res, url, formData.str(), flag);
     }
+    else if (pattern == "DELETE_ACCOUNT")
+    {
+        // Delete account with userId
+        response = curlUtils.deleteUtil(client.curl, client.res, apiIp + "/accounts/" + value, flag);
+        nlohmann::json j = nlohmann::json::parse(response);
+        flag = j.at("deleted").get<bool>();
+        SendResponse(client.sock, "DELETE_ACCOUNT|" + to_string(flag));
+    }
     else if (pattern == "FIND_INVENTORY_NAME") {
         response = curlUtils.getUtil(client.curl, client.res, apiIp + "/mobiles/products/query?query=" + value, flag);
         SendResponse(client.sock, "FIND_INVENTORY_NAME|" + response);
@@ -257,6 +265,10 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         response = curlUtils.getUtil(client.curl, client.res, apiIp + "/transactions/" + value, flag);
         SendResponse(client.sock, "GET_TRANSACTION_INFORMATION|" + response);
     }
+    else if (pattern == "GET_TRANSACTION_HISTORY_WITH_CUSTOMER_ID") {
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/transactions/customers/" + value, flag);
+        SendResponse(client.sock, "GET_TRANSACTION_HISTORY_WITH_CUSTOMER_ID|" + response);
+    }
     else if (pattern == "CREATE_TRANSACTION") {
         nlohmann::json j = nlohmann::json::parse(value);
         // Create payment Method if it not exists already
@@ -292,6 +304,10 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
     else if (pattern == "GET_PAYMENT_METHOD") {
         response = curlUtils.getUtil(client.curl, client.res, apiIp + "/payments", flag);
         SendResponse(client.sock, "GET_PAYMENT_METHOD|" + response);
+    }
+    else if (pattern == "ADMIN_ACCOUNT") {
+        response = curlUtils.getUtil(client.curl, client.res, apiIp + "/accounts/admin?userName=" + client.user.getName(), flag);
+        SendResponse(client.sock, "ADMIN_ACCOUNT|" + response);
     }
     else if (pattern == "USER_EXIT_APP")
     {

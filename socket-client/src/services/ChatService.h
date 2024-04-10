@@ -51,6 +51,8 @@ public:
     static void GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserProfileWin);
     static bool HandleName(string username);
     static bool HandlePassword(string password);
+    static bool IsAdminAuthenticated(int sock);
+    static bool DeleteAccountUser(int sock, int userId);
     // Mobile Model
     static map<int,int> FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern);
     static Mobile GetMobileInformation(int sock, int mobileId);
@@ -59,6 +61,7 @@ public:
     static bool DeleteMobileDevice(int sock, int mobileId);
     // Transaction
     static map<int,int> FindTransactionHistory(int sock, vector<Transaction> &transaction, string input);
+    static map<int,int> GetTransactionHistoryWithCustomerId(int sock, vector<Transaction> &transaction, int customerId);
     static Transaction GetTransactionInformation(int sock, int transactionId);
     static void CreateTransaction(int sock, Transaction& transaction, int customerId);
     static void UpdateTransaction(int sock, Transaction& transaction);

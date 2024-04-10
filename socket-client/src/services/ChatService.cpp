@@ -314,22 +314,10 @@ void ChatService::GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserP
     ChatService::RequestSend("USER_PROFILE|" + str, sock);
     string response = GetValueFromServer(sock, "USER_PROFILE");
     nlohmann::json j = nlohmann::json::parse(response);
-    if (j.at("userName").is_null())
-    {
-        j.at("userName") = to_string(j.at("userName"));
-    }
-    if (j.at("address").is_null())
-    {
-        j.at("address") = to_string(j.at("address"));
-    }
-    if (j.at("gender").is_null())
-    {
-        j.at("gender") = to_string(j.at("gender"));
-    }
-    user.setName(j.at("userName"));
-    user.setAddress(j.at("address"));
-    user.setGender(j.at("gender"));
-    // mvwprintw(OrtherUserProfileWin, 15, 1,"hello");
+    user.setName(j.at("userName").get<string>());
+    user.setAddress(j.at("address").get<string>());
+    user.setGender(j.at("gender").get<string>());
+ 
     mvwprintw(OrtherUserProfileWin, 8, 1, "%s: %s", "Name", user.getName().c_str());
     mvwprintw(OrtherUserProfileWin, 9, 1, "%s: %s", "Address", user.getAddress().c_str());
     mvwprintw(OrtherUserProfileWin, 10, 1, "%s: %s", "Gender", user.getGender().c_str());
@@ -417,6 +405,31 @@ map<int, int> ChatService::FindTransactionHistory(int sock, vector<Transaction> 
         mvprintw(5, 20, "%s", "Could not found any transaction history!!");
     }
     return idTransMapping; 
+}
+
+map<int, int> ChatService::GetTransactionHistoryWithCustomerId(int sock, vector<Transaction> &transaction, int customerId) {
+    transaction.clear();
+    int idx = 1;
+    map<int, int> idTransMapping;
+    ChatService::RequestSend("GET_TRANSACTION_HISTORY_WITH_CUSTOMER_ID|" + to_string(customerId), sock);
+    string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY_WITH_CUSTOMER_ID");
+    if (response.length() > 0) {
+        nlohmann::json j = nlohmann::json::parse(response);
+        for(auto tr : j) {
+            idTransMapping[tr.at("transactionID").get<int>()] = idx++;
+            Transaction trans(
+                tr.at("transactionID").get<int>(),
+                tr.at("transactionName").get<string>(),
+                tr.at("transactionType").get<string>(),
+                tr.at("paymentMethod").get<string>()
+            ); 
+            transaction.push_back(trans);
+        }
+    }
+    else {
+        mvprintw(5, 20, "%s", "Could not found any transaction history!!");
+    }
+    return idTransMapping;
 }
 
 Transaction ChatService::GetTransactionInformation(int sock, int transactionId) {
@@ -686,3 +699,15 @@ bool ChatService::HandlePassword(string password)
     return false;
 }
 
+// Check the account logged in is administrator
+bool ChatService::IsAdminAuthenticated(int sock) {
+    ChatService::RequestSend("ADMIN_ACCOUNT|", sock);
+    string response = ChatService::GetValueFromServer(sock, "ADMIN_ACCOUNT");
+    return ConvertToBool(response);
+}
+
+bool ChatService::DeleteAccountUser(int sock, int userId) {
+    ChatService::RequestSend("DELETE_ACCOUNT|" + to_string(userId), sock);
+    string response = ChatService::GetValueFromServer(sock, "DELETE_ACCOUNT");
+    return ChatService::ConvertToBool(response);
+}
