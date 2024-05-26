@@ -2,14 +2,31 @@ package com.kanyideveloper.joomia.feature_profile.presentation.account
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -40,7 +57,7 @@ import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
-import java.util.*
+import java.util.Locale
 
 @Destination
 @Composable
@@ -224,13 +241,13 @@ fun UserItem(
             ) {
                 Text(
                     text = "${
-                        user.name?.firstname?.replaceFirstChar {
+                        user.userName?.replaceFirstChar {
                             if (it.isLowerCase()) it.titlecase(
                                 Locale.getDefault()
                             ) else it.toString()
                         }
                     }  ${
-                        user.name?.lastname?.replaceFirstChar {
+                        user.userName?.replaceFirstChar {
                             if (it.isLowerCase()) it.titlecase(
                                 Locale.getDefault()
                             ) else it.toString()
@@ -243,7 +260,7 @@ fun UserItem(
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(
-                    text = "@${user.username}",
+                    text = "@${user.userName}",
                     color = Color.Black,
                     fontSize = 16.sp,
                     maxLines = 3,

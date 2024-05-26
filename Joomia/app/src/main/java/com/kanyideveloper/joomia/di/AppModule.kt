@@ -36,4 +36,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideGson() = Gson()
+
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(authPreferences: AuthPreferences) : AuthInterceptor {
+        return AuthInterceptor(authPreferences)
+    }
 }
