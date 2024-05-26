@@ -1,41 +1,41 @@
 package com.kanyideveloper.joomia.feature_auth.domain.use_case
 
-import com.kanyideveloper.joomia.feature_auth.data.remote.request.LoginRequest
-import com.kanyideveloper.joomia.feature_auth.domain.model.LoginResult
-import com.kanyideveloper.joomia.feature_auth.domain.repository.LoginRepository
+import com.kanyideveloper.joomia.feature_auth.data.remote.request.AuthRequest
+import com.kanyideveloper.joomia.feature_auth.domain.model.AuthResult
+import com.kanyideveloper.joomia.feature_auth.domain.repository.AuthRepository
 
 class LoginUseCase(
-    private val loginRepository: LoginRepository
+    private val authRepository: AuthRepository
 ) {
     suspend operator fun invoke(
-        username: String,
+        userName: String,
         password: String,
         rememberMe: Boolean
-    ): LoginResult {
-        val usernameError = if (username.isBlank()) "User name cannot be blank" else null
+    ): AuthResult {
+        val userNameError = if (userName.isBlank()) "User name cannot be blank" else null
         val passwordError = if (password.isBlank()) "Password cannot be blank" else null
 
 
-        if (usernameError != null) {
-            return LoginResult(
-                usernameError = usernameError
+        if (userNameError != null) {
+            return AuthResult(
+                userNameError = userNameError
             )
         }
 
         if (passwordError != null) {
-            return LoginResult(
+            return AuthResult(
                 passwordError = passwordError
             )
         }
 
 
-        val loginRequest = LoginRequest(
-            username = username.trim(),
+        val authRequest = AuthRequest(
+            userName = userName.trim(),
             password = password.trim()
         )
 
-        return LoginResult(
-            result = loginRepository.login(loginRequest, rememberMe)
+        return AuthResult(
+            result = authRepository.login(authRequest, rememberMe)
         )
     }
 }

@@ -18,13 +18,13 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase) : ViewModel() {
 
-    private val _usernameState = mutableStateOf(TextFieldState(text = "johnd"))
+    private val _usernameState = mutableStateOf(TextFieldState(text = ""))
     val usernameState: State<TextFieldState> = _usernameState
     fun setUsername(value: String) {
         _usernameState.value = usernameState.value.copy(text = value)
     }
 
-    private val _passwordState = mutableStateOf(TextFieldState(text = "m38rmF$"))
+    private val _passwordState = mutableStateOf(TextFieldState(text = ""))
     val passwordState: State<TextFieldState> = _passwordState
     fun setPassword(value: String) {
         _passwordState.value = _passwordState.value.copy(text = value)
@@ -47,15 +47,15 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
             _loginState.value = loginState.value.copy(isLoading = true)
 
             val loginResult = loginUseCase(
-                username = usernameState.value.text,
+                userName = usernameState.value.text,
                 password = passwordState.value.text,
                 rememberMe = rememberMeState.value
             )
 
             _loginState.value = loginState.value.copy(isLoading = false)
 
-            if (loginResult.usernameError != null) {
-                _usernameState.value = usernameState.value.copy(error = loginResult.usernameError)
+            if (loginResult.userNameError != null) {
+                _usernameState.value = usernameState.value.copy(error = loginResult.userNameError)
             }
 
             if (loginResult.passwordError != null) {
@@ -71,11 +71,17 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
                 is Resource.Error -> {
                     _eventFlow.emit(
                         UiEvents.SnackbarEvent(
-                            loginResult.result.message ?: "Unknown error occurred!"
+                            loginResult.result.message ?: "LoginViewModel(): Unknown error occurred!"
                         )
                     )
                 }
-                else -> {}
+                else -> {
+                    _eventFlow.emit(
+                        UiEvents.SnackbarEvent(
+                            loginResult.result?.message ?: "LoginViewModel(): Unexpected behaviour"
+                        )
+                    )
+                }
             }
         }
     }

@@ -19,6 +19,16 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
 
+    private Map<String, Object> userMap(UserEntity userEntity) {
+        return new HashMap<>() {{
+            put("id", userEntity.getUser_id());
+            put("userName", userEntity.getUserName());
+            put("adddress", userEntity.getAddress());
+            put("birthDay", userEntity.getBirth_day());
+            put("gender", userEntity.getGender());
+        }};
+    }
+
     @Override
     public Users createUsers(Users user) throws Exception{
         try{
@@ -48,28 +58,20 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<Dictionary<String, String>> getAllUsers() {
+    public List<Map<String, Object>> getAllUsers() {
         List<UserEntity> userEntities = userRepository.findAll();
-        List<Dictionary<String, String>> output = new ArrayList<>();
-        for (UserEntity userEntity: userEntities) {
-            Dictionary<String, String> user = new Hashtable<>();
-            user.put("name", userEntity.getUserName());
-            output.add(user);
-        }
+        List<Map<String, Object>> output = new ArrayList<>();
+        userEntities.forEach((userEntity -> output.add(userMap(userEntity))));
         return output;
     }
 
     @Override
-    public Dictionary<String, String> getUserById(Long id) throws Exception {
+    public Map<String, Object> getUserById(Long id) throws Exception {
         try {
             UserEntity userEntity = userRepository.findById(id).isPresent() ? userRepository.findById(id).get() : null;
             // Assign all the properties USER Properties to users
             assert userEntity != null;
-            Dictionary<String, String> output = new Hashtable<>();
-            output.put("userName", userEntity.getUserName());
-            output.put("address", userEntity.getAddress());
-            output.put("gender", userEntity.getGender());
-            return output;
+            return userMap(userEntity);
         }
         catch (NoSuchElementException e){
             throw new Exception("User is not found :" + id.toString());
@@ -77,17 +79,11 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<Dictionary<String, Object>> getUserByName(String userName) throws Exception {
+    public List<Map<String, Object>> getUserByName(String userName) throws Exception {
         try {
             List<UserEntity> userEntities = userRepository.findByUserNameContains(userName);
-            List<Dictionary<String, Object>> output = new ArrayList<>();
-            for (UserEntity userEntity : userEntities) {
-                Dictionary<String, Object> user = new Hashtable<>();
-
-                user.put("userId", userEntity.getUser_id());
-                user.put("userName", userEntity.getUserName());
-                output.add(user);
-            }
+            List<Map<String, Object>> output = new ArrayList<>();
+            userEntities.forEach((userEntity -> output.add(userMap(userEntity))));
             return output;
         } catch (NoSuchElementException e) {
             throw new Exception(String.format("Couldn't get user %s by name", userName));
@@ -95,12 +91,12 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Dictionary<String, Long> getUserIdByUserName(String userName) throws Exception {
+    public Map<String, Long> getUserIdByUserName(String userName) throws Exception {
         try {
             UserEntity userEntity = userRepository.findByUserName(userName).isPresent() ? userRepository.findByUserName(userName).get() : null;
-            Dictionary<String, Long> output = new Hashtable<>();
+            Map<String, Long> output = new Hashtable<>();
             assert userEntity != null;
-            output.put("user_id", userEntity.getUser_id());
+            output.put("id", userEntity.getUser_id());
             return output;
         }
         catch (NoSuchElementException e){
