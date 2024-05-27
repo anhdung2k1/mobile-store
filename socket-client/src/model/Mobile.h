@@ -12,25 +12,25 @@ class Mobile {
         string mobileModel;
         string mobileType;
         int mobileQuantity;
-        string mobilePrice;
+        double mobilePrice;
         string mobileDescription;
     public:
         Mobile();
         Mobile(string mobileName, string mobileModel, string mobileType,
-                int mobileQuantity, string mobilePrice,string setMobileDescription);
+                int mobileQuantity, double mobilePrice,string setMobileDescription);
         Mobile(int mobileId, string mobileName, string mobileModel, string mobileType,
-                int mobileQuantity, string mobilePrice,string setMobileDescription);
+                int mobileQuantity, double mobilePrice,string setMobileDescription);
         int getMobileId();
         string getMobileName();
         string getMobileModel();
         string getMobileType();
         int getMobileQuantity();
-        string getMobilePrice();
+        double getMobilePrice();
         string getMobileDescription();
         void setMobileName(string mobileName);
         void setMobileModel(string mobileModel);
         void setMobileType(string mobileType);
         void setMobileQuantity(int mobileQuantity);
-        void setMobilePrice(string mobilePrice);
+        void setMobilePrice(double mobilePrice);
         void setMobileDescription(string mobileDescription);
 };

@@ -28,6 +28,7 @@ public class MobileServiceImpl implements MobileService {
             put("mobileQuantity", mobileEntity.getMobileQuantity());
             put("mobilePrice", mobileEntity.getMobilePrice());
             put("mobileDescription", mobileEntity.getMobileDescription());
+            put("imageUrl", mobileEntity.getImageUrl());
         }};
     }
     @Override
@@ -72,6 +73,15 @@ public class MobileServiceImpl implements MobileService {
             return mobilesMapList;
         } catch (NoSuchElementException e) {
             throw new Exception("Could not retrieve all mobiles by mobile Type: " + mobileType + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<String> getMobileCategories() throws Exception {
+        try {
+            return mobileRepository.findMobileCategories().isPresent() ? mobileRepository.findMobileCategories().get() : null;
+        } catch (NoSuchElementException e) {
+            throw new Exception("Could not retrieve any categories");
         }
     }
 

@@ -6,13 +6,13 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface CartApiService {
-    @GET("/carts/user/{id}")
+    @GET("api/carts/user/{id}")
     suspend fun cartItems(
         @Path("id") id: Int
     ): List<UserCartResponseDto>
 
-    @GET("/products/{id}")
-    suspend fun product(
+    @GET("api/mobiles/{id}")
+    suspend fun mobile(
         @Path("id") id: Int
     ): ProductDto
 }

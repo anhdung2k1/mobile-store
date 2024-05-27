@@ -31,6 +31,10 @@ public class MobileController {
     public ResponseEntity<List<Map<String, Object>>> getAllMobilesByMobileType(@RequestParam("query") String mobileType) throws Exception {
         return ResponseEntity.ok(mobileService.getAllMobilesByType(mobileType));
     }
+    @GetMapping(value = "/mobiles/categories")
+    public ResponseEntity<List<String>> getMobileCategories() throws Exception {
+        return ResponseEntity.ok(mobileService.getMobileCategories());
+    }
     // Get Mobile by Mobile ID
     @GetMapping(value = "/mobiles/{mobileId}")
     public ResponseEntity<Map<String, Object>> getMobileByMobileId(@PathVariable("mobileId") Long mobileId) throws Exception {

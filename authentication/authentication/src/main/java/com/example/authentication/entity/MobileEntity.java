@@ -1,6 +1,7 @@
 package com.example.authentication.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
@@ -53,6 +54,14 @@ public class MobileEntity {
 
     @Column(name = "MOB_DESC")
     private String mobileDescription; // The description for individual mobile
+
+    @Column(name = "IMAGE_URL")
+    private String imageUrl;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CART_ID")
+    private CartEntity cart;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_AT")
