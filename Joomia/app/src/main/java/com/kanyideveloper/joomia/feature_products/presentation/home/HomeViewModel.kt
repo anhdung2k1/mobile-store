@@ -4,10 +4,16 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.core.util.UiEvents
+import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
+import com.kanyideveloper.joomia.feature_products.domain.use_case.FindProductsUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetCategoriesUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetProductsUseCase
+import com.kanyideveloper.joomia.feature_profile.data.repository.ProfileRepository
+import com.kanyideveloper.joomia.feature_profile.data.toDomain
+import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -20,8 +26,14 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val findProductsUseCase: FindProductsUseCase,
+    private val profileRepository: ProfileRepository,
+    private val gson: Gson
 ) :
     ViewModel() {
+
+    private val _profileState = mutableStateOf(User())
+    val profileState: State<User> = _profileState
 
     private val _selectedCategory = mutableStateOf("All")
     val selectedCategory: State<String> = _selectedCategory
@@ -52,7 +64,16 @@ class HomeViewModel @Inject constructor(
     init {
         getProducts(selectedCategory.value)
         getCategories()
+        getProfile()
+    }
 
+    private fun getProfile() {
+        viewModelScope.launch {
+            profileRepository.getUserProfile().collectLatest { data ->
+                val user = gson.fromJson(data, UserResponseDto::class.java)
+                _profileState.value = user.toDomain()
+            }
+        }
     }
 
     private fun getCategories() {
@@ -87,6 +108,37 @@ class HomeViewModel @Inject constructor(
                                 isLoading = false
                             )
                         }
+                    }
+                    is Resource.Loading -> {
+                        _productsState.value = productsState.value.copy(
+                            isLoading = true
+                        )
+                    }
+                    is Resource.Error -> {
+                        _productsState.value = productsState.value.copy(
+                            isLoading = false,
+                            error = result.message
+                        )
+                        _eventFlow.emit(
+                            UiEvents.SnackbarEvent(
+                                message = result.message ?: "Unknown error occurred!"
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun findProducts(searchTerm: String = "") {
+        viewModelScope.launch {
+            findProductsUseCase(searchTerm).collectLatest { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        _productsState.value = productsState.value.copy(
+                            mobiles = result.data ?: emptyList(),
+                            isLoading = false
+                        )
                     }
                     is Resource.Loading -> {
                         _productsState.value = productsState.value.copy(

@@ -4,6 +4,7 @@ import com.kanyideveloper.joomia.core.util.Constants
 import com.kanyideveloper.joomia.feature_products.data.remote.ProductsApiService
 import com.kanyideveloper.joomia.feature_products.data.repository.ProductsRepositoryImpl
 import com.kanyideveloper.joomia.feature_products.domain.repository.ProductsRepository
+import com.kanyideveloper.joomia.feature_products.domain.use_case.FindProductsUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetCategoriesUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetProductsUseCase
 import dagger.Module
@@ -50,5 +51,11 @@ object ProductsModule {
     @Singleton
     fun provideGetCategoriesUseCase(productsRepository: ProductsRepository): GetCategoriesUseCase {
         return GetCategoriesUseCase(productsRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFindProductsUseCase(productsRepository: ProductsRepository) : FindProductsUseCase {
+        return FindProductsUseCase(productsRepository)
     }
 }

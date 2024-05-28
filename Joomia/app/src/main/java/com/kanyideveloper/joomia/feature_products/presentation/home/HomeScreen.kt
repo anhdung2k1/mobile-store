@@ -11,7 +11,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.material.icons.filled.AddToHomeScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,6 +54,7 @@ import com.kanyideveloper.joomia.core.util.LoadingAnimation
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.ProductDetailsScreenDestination
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
+import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
@@ -68,6 +71,7 @@ fun HomeScreen(
     val context = LocalContext.current
     val productsState = viewModel.productsState.value
     val categories = viewModel.categoriesState.value
+    val user = viewModel.profileState.value
 
     Scaffold(
         topBar = {
@@ -78,13 +82,14 @@ fun HomeScreen(
                 },
                 onSearch = {
                     keyboardController?.hide()
-                    viewModel.getProducts(
+                    viewModel.findProducts(
                         searchTerm = viewModel.searchTerm.value
                     )
                 },
                 onToggleExpand = {
                     filtersExpanded = !filtersExpanded
                 },
+                user = user
             )
         },
     ) {
@@ -110,16 +115,16 @@ fun HomeScreen(
             }
         ) {
             DropdownMenuItem(
-                content = { Text("Clothes") },
-                onClick = { Toast.makeText(context, "Clothes", Toast.LENGTH_SHORT).show() }
+                content = { Text("Iphone") },
+                onClick = { viewModel.findProducts("Iphone") }
             )
             DropdownMenuItem(
-                content = { Text("Shoes") },
-                onClick = { Toast.makeText(context, "Shoes", Toast.LENGTH_SHORT).show() }
+                content = { Text("Samsung") },
+                onClick = { viewModel.findProducts("Samsung") }
             )
             DropdownMenuItem(
-                content = { Text("Electronics") },
-                onClick = { Toast.makeText(context, "Electronics", Toast.LENGTH_SHORT).show() }
+                content = { Text("ROG Phone") },
+                onClick = { viewModel.findProducts("ROG") }
             )
         }
 
@@ -336,6 +341,7 @@ private fun ProductItem(
 @Composable
 fun MyTopAppBar(
     currentSearchText: String,
+    user: User,
     onSearchTextChange: (String) -> Unit,
     onSearch: () -> Unit,
     onToggleExpand: () -> Unit,
@@ -358,7 +364,7 @@ fun MyTopAppBar(
                 Image(
                     painter = rememberAsyncImagePainter(
                         ImageRequest.Builder(LocalContext.current)
-                            .data(data = "https://firebasestorage.googleapis.com/v0/b/mealtime-7a501.appspot.com/o/tinywow_Joomia%20Black%20Friday_16608968%20(1).png?alt=media&token=8b874def-e543-482e-80f7-c8cbe9d9f206")
+                            .data(data = "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg")
                             .apply(block = fun ImageRequest.Builder.() {
                                 crossfade(true)
                             }).build()
@@ -370,7 +376,7 @@ fun MyTopAppBar(
                     contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Hi, John", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Hi, ${user.userName}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
 
             Icon(
