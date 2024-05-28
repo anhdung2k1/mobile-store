@@ -1,19 +1,19 @@
 package com.kanyideveloper.joomia.feature_products.data.remote.mappers
 
-import com.kanyideveloper.joomia.feature_products.data.remote.dto.ProductDto
+import com.kanyideveloper.joomia.feature_products.data.remote.dto.MobileDto
 import com.kanyideveloper.joomia.feature_products.data.remote.dto.RatingDto
-import com.kanyideveloper.joomia.feature_products.domain.model.Product
+import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import com.kanyideveloper.joomia.feature_products.domain.model.Rating
 
-internal fun ProductDto.toDomain(): Product {
-    return Product(
-        category = category,
-        description = description,
-        id = id,
-        image = image,
-        price = price,
+internal fun MobileDto.toDomain(): Mobile {
+    return Mobile(
+        mobileType = mobileType,
+        mobileDescription = mobileDescription,
+        mobileID = mobileID,
+        imageUrl = imageUrl,
+        mobilePrice = mobilePrice,
         rating = ratingDto.toDomain(),
-        title = title
+        mobileName = mobileName
     )
 }
 

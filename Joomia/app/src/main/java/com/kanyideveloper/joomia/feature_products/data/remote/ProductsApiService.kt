@@ -1,13 +1,13 @@
 package com.kanyideveloper.joomia.feature_products.data.remote
 
-import com.kanyideveloper.joomia.feature_products.data.remote.dto.ProductDto
+import com.kanyideveloper.joomia.feature_products.data.remote.dto.MobileDto
 import retrofit2.http.GET
 
 interface ProductsApiService {
 
-    @GET("products")
-    suspend fun getProducts(): List<ProductDto>
+    @GET("api/mobiles")
+    suspend fun getMobiles(): List<MobileDto>
 
-    @GET("products/categories")
-    suspend fun getProductCategories(): List<String>
+    @GET("api/mobiles/categories")
+    suspend fun getMobilesCategories(): List<String>
 }

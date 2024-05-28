@@ -1,8 +1,10 @@
 package com.example.authentication.service.implement;
 
 import com.example.authentication.entity.MobileEntity;
+import com.example.authentication.entity.RatingEntity;
 import com.example.authentication.model.Mobile;
 import com.example.authentication.repository.MobileRepository;
+import com.example.authentication.repository.RatingRepository;
 import com.example.authentication.service.interfaces.MobileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.*;
 public class MobileServiceImpl implements MobileService {
 
     private final MobileRepository mobileRepository;
+    private final RatingRepository ratingRepository;
 
     private HashMap<String, Object> mobileMap(MobileEntity mobileEntity) {
         return new HashMap<>() {{
@@ -29,6 +32,7 @@ public class MobileServiceImpl implements MobileService {
             put("mobilePrice", mobileEntity.getMobilePrice());
             put("mobileDescription", mobileEntity.getMobileDescription());
             put("imageUrl", mobileEntity.getImageUrl());
+            put("rating", mobileEntity.getRate());
         }};
     }
     @Override
@@ -38,11 +42,26 @@ public class MobileServiceImpl implements MobileService {
             // Copy all the properties into mobile Entity and save to repository
             mobile.setCreateAt(LocalDateTime.now());
             mobile.setUpdateAt(LocalDateTime.now());
+            RatingEntity ratingEntity = new RatingEntity();
+            ratingRepository.save(ratingEntity);
+            mobile.setRate(ratingEntity);
             BeanUtils.copyProperties(mobile, mobileEntity);
             mobileRepository.save(mobileEntity);
             return true;
         } catch(Exception e) {
             throw new Exception("Could not create Mobile" + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllMobiles() throws Exception {
+        try {
+            List<MobileEntity> mobilesEntities = mobileRepository.findAll();
+            List<Map<String, Object>> listMobiles = new ArrayList<>();
+            mobilesEntities.forEach((mobileEntity -> listMobiles.add(mobileMap(mobileEntity))));
+            return listMobiles;
+        } catch (NoSuchElementException e) {
+            throw new Exception("No such devices found", e);
         }
     }
 

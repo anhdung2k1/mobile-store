@@ -21,6 +21,10 @@ public class MobileController {
     public ResponseEntity<Boolean> createMobileDevice(@RequestBody Mobile mobile) throws Exception {
         return ResponseEntity.ok(mobileService.createMobile(mobile));
     }
+    @GetMapping(value = "/mobiles")
+    public ResponseEntity<List<Map<String, Object>>> getAllMobiles() throws Exception {
+        return ResponseEntity.ok(mobileService.getAllMobiles());
+    }
     // Get all Mobiles by Mobile name
     @GetMapping(value = "/mobiles/products/query")
     public ResponseEntity<List<Map<String, Object>>> getAllMobilesByMobileName(@RequestParam("query") String mobileName) throws Exception {

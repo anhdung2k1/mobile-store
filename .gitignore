@@ -13,6 +13,7 @@
 /authentication/.idea
 /authentication/authentication/target/
 /socket-client/src/client
+/authentication/authentication/src/main/resources/application.properties
 
 # Precompiled Headers
 *.gch

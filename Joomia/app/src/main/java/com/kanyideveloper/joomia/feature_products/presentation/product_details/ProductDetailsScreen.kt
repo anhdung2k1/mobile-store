@@ -6,7 +6,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -20,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.gowtham.ratingbar.RatingBar
@@ -31,21 +29,16 @@ import com.kanyideveloper.joomia.R
 import com.kanyideveloper.joomia.core.presentation.ui.theme.GrayColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.YellowMain
-import com.kanyideveloper.joomia.feature_products.domain.model.Product
-import com.kanyideveloper.joomia.feature_wish_list.data.mapper.toWishlistRating
-import com.kanyideveloper.joomia.feature_wish_list.domain.model.Wishlist
-import com.kanyideveloper.joomia.feature_wish_list.presentation.wishlist.WishlistViewModel
+import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Destination
 @Composable
 fun ProductDetailsScreen(
-    product: Product,
-    navigator: DestinationsNavigator,
-    viewModel: WishlistViewModel = hiltViewModel(),
+    mobile: Mobile,
+    navigator: DestinationsNavigator
 ) {
-    val inWishlist = viewModel.inWishlist(product.id).observeAsState().value != null
 
     Scaffold(
         backgroundColor = Color.White,
@@ -69,47 +62,11 @@ fun ProductDetailsScreen(
                     )
                 }
                 IconButton(
-                    onClick = {
-                        if (inWishlist) {
-                            viewModel.deleteFromWishlist(
-                                Wishlist(
-                                    image = product.image,
-                                    title = product.title,
-                                    id = product.id,
-                                    liked = true,
-                                    price = product.price,
-                                    description = product.description,
-                                    category = product.category,
-                                    rating = product.rating.toWishlistRating()
-                                )
-                            )
-                        } else {
-                            viewModel.insertFavorite(
-                                Wishlist(
-                                    image = product.image,
-                                    title = product.title,
-                                    id = product.id,
-                                    liked = true,
-                                    price = product.price,
-                                    description = product.description,
-                                    category = product.category,
-                                    rating = product.rating.toWishlistRating()
-                                )
-                            )
-                        }
-                    },
+                    onClick = {},
                 ) {
                     Icon(
-                        painter = if (inWishlist) {
-                            painterResource(id = R.drawable.ic_heart_fill)
-                        } else {
-                            painterResource(id = R.drawable.ic_heart)
-                        },
-                        tint = if (inWishlist) {
-                            YellowMain
-                        } else {
-                            GrayColor
-                        },
+                        painterResource(id = R.drawable.ic_heart),
+                        tint = GrayColor,
                         contentDescription = null,
                         modifier = Modifier.size(32.dp)
                     )
@@ -118,7 +75,7 @@ fun ProductDetailsScreen(
         }
     ) {
         DetailsScreenContent(
-            product = product,
+            mobile = mobile,
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -126,7 +83,7 @@ fun ProductDetailsScreen(
 
 @Composable
 fun DetailsScreenContent(
-    product: Product,
+    mobile: Mobile,
     modifier: Modifier = Modifier,
 ) {
     Column {
@@ -134,7 +91,7 @@ fun DetailsScreenContent(
             Image(
                 painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current)
-                        .data(data = product.image)
+                        .data(data = mobile.imageUrl)
                         .apply(block = fun ImageRequest.Builder.() {
                             crossfade(true)
                             placeholder(R.drawable.ic_placeholder)
@@ -168,7 +125,7 @@ fun DetailsScreenContent(
                     verticalArrangement = Arrangement.Top
                 ) {
                     Text(
-                        text = product.title,
+                        text = mobile.mobileName,
                         color = Color.Black,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 18.sp,
@@ -176,7 +133,7 @@ fun DetailsScreenContent(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    val rating: Float by remember { mutableStateOf(product.rating.rate.toFloat()) }
+                    val rating: Float by remember { mutableStateOf(mobile.rating.rate.toFloat()) }
 
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
@@ -198,7 +155,7 @@ fun DetailsScreenContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "(${product.rating.count})",
+                            text = "(${mobile.rating.count})",
                             color = Color.Black,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Light
@@ -208,7 +165,7 @@ fun DetailsScreenContent(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = product.description,
+                        text = mobile.mobileDescription,
                         color = Color.Black,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Light
@@ -223,7 +180,7 @@ fun DetailsScreenContent(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
-                        text = "$${product.price}",
+                        text = "$${mobile.mobilePrice}",
                         color = Color.Black,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold

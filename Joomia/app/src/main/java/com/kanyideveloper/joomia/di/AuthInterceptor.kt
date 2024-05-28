@@ -5,20 +5,20 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
+import javax.inject.Inject
 
-class AuthInterceptor(private val authPreferences: AuthPreferences) : Interceptor{
+class AuthInterceptor @Inject constructor(private val authPreferences: AuthPreferences) : Interceptor{
     override fun intercept(chain: Interceptor.Chain): Response {
-        val requestBuilder = chain.request().newBuilder()
+        val originRequest = chain.request()
+        val token = runBlocking { authPreferences.getAccessToken.firstOrNull() }
 
-        val token = runBlocking {
-            authPreferences.getAccessToken.firstOrNull()
+        return if (token != null) {
+            val newRequest = originRequest.newBuilder()
+                .header("Authorization", "Bearer $token")
+                .build()
+            chain.proceed(newRequest)
+        } else {
+            chain.proceed(originRequest)
         }
-
-        if (!token.isNullOrEmpty()) {
-            requestBuilder.addHeader("Authorization", "Bearer $token")
-        }
-
-        return chain.proceed(requestBuilder.build())
     }
-
 }

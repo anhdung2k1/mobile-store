@@ -25,17 +25,10 @@ object AuthModule {
 
     @Provides
     @Singleton
-    fun provideAuthApiService(authInterceptor: AuthInterceptor): AuthApiService {
-        val logging = HttpLoggingInterceptor()
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY)
-
-        val httpClient = OkHttpClient.Builder()
-        httpClient.addInterceptor(logging)
-        httpClient.addInterceptor(authInterceptor)
-
+    fun provideAuthApiService(okHttpClient: OkHttpClient): AuthApiService {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(httpClient.build())
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(AuthApiService::class.java)

@@ -11,6 +11,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -21,9 +22,10 @@ object CartModule {
 
     @Provides
     @Singleton
-    fun provideCartApiService(): CartApiService {
+    fun provideCartApiService(okHttpClient: OkHttpClient): CartApiService {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(CartApiService::class.java)

@@ -59,9 +59,14 @@ public class MobileEntity {
     private String imageUrl;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CART_ID")
     private CartEntity cart;
+
+    @JsonIgnore
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "RATING_ID")
+    private RatingEntity rate;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_AT")

@@ -19,18 +19,17 @@ class CartRepositoryImpl(
         try {
             val response = cartApiService.cartItems(id)
             val cartItems = ArrayList<CartMobile>()
-            response.forEach { it1 ->
-                it1.cartMobileDtos.forEach {
-                    val productResponse = cartApiService.mobile(it.mobileID)
-                    val cartMobile =
-                        CartMobile(
-                            productResponse.title,
-                            productResponse.price,
-                            it.mobileQuantity,
-                            productResponse.image
-                        )
-                    cartItems.add(cartMobile)
-                }
+            response.cartMobileDtos.forEach {
+                val productResponse = cartApiService.mobile(it.mobileID)
+                val cartMobile =
+                    CartMobile(
+                        productResponse.mobileName,
+                        productResponse.mobilePrice,
+                        it.mobileQuantity,
+                        productResponse.imageUrl
+                    )
+                cartItems.add(cartMobile)
+
             }
             emit(Resource.Success(cartItems.toList().distinctBy { it.mobileName }))
         } catch (e: IOException) {

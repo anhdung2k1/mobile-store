@@ -51,7 +51,6 @@ import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.AccountScreenDestination
 import com.kanyideveloper.joomia.destinations.CartScreenDestination
 import com.kanyideveloper.joomia.destinations.HomeScreenDestination
-import com.kanyideveloper.joomia.destinations.WishlistScreenDestination
 import com.kanyideveloper.joomia.feature_profile.domain.model.Account
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import com.ramcosta.composedestinations.annotation.Destination
@@ -89,9 +88,6 @@ fun AccountScreen(
                             inclusive = false
                         }
                         popUpTo(HomeScreenDestination.route) {
-                            inclusive = false
-                        }
-                        popUpTo(WishlistScreenDestination.route) {
                             inclusive = false
                         }
                         popUpTo(CartScreenDestination.route) {
@@ -217,7 +213,7 @@ fun UserItem(
             Image(
                 painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current)
-                        .data(data = "https://firebasestorage.googleapis.com/v0/b/savingszetu.appspot.com/o/50293753.jpeg?alt=media&token=a7174053-5253-49ed-b885-08f428df0287")
+                        .data(data = "https://firebasestorage.googleapis.com/v0/b/mealtime-7a501.appspot.com/o/tinywow_Joomia%20Black%20Friday_16608968%20(1).png?alt=media&token=8b874def-e543-482e-80f7-c8cbe9d9f206")
                         .apply(block = fun ImageRequest.Builder.() {
                             placeholder(R.drawable.ic_placeholder)
                             crossfade(true)
