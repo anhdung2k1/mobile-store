@@ -30,6 +30,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -105,13 +106,6 @@ fun RegisterScreen(
             onPasswordTextChange = {
                 viewModel.setPassword(it)
             },
-            onClickForgotPassword = {
-                navigator.navigate(ForgotPasswordScreenDestination)
-            },
-            onClickAlreadyHaveAccount = {
-                navigator.popBackStack()
-                navigator.navigate(LoginScreenDestination)
-            },
             onClickSignUp = {
                 keyboardController?.hide()
                 viewModel.registerUser()
@@ -127,8 +121,6 @@ private fun RegisterScreenContent(
     registerState: RegisterState,
     onUserNameTextChange: (String) -> Unit,
     onPasswordTextChange: (String) -> Unit,
-    onClickForgotPassword: () -> Unit,
-    onClickAlreadyHaveAccount: () -> Unit,
     onClickSignUp: () -> Unit,
 ) {
     LazyColumn(
@@ -176,6 +168,7 @@ private fun RegisterScreenContent(
                 label = {
                     Text(text = "Password")
                 },
+                visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     autoCorrect = true,
                     keyboardType = KeyboardType.Password,

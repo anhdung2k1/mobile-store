@@ -35,7 +35,7 @@ class LoginUseCase(
         )
 
         return AuthResult(
-            result = authRepository.login(authRequest, rememberMe)
+            result = authRepository.login(authRequest)
         )
     }
 }

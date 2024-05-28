@@ -25,9 +25,8 @@ import coil.request.ImageRequest
 import com.kanyideveloper.joomia.R
 import com.kanyideveloper.joomia.core.util.LoadingAnimation
 import com.kanyideveloper.joomia.core.util.UiEvents
-import com.kanyideveloper.joomia.feature_cart.domain.model.CartProduct
+import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
 
 @Destination
@@ -149,7 +148,7 @@ private fun CheckoutComponent(state: CartItemsState) {
         ) {
             Text(text = "${state.cartItems.size} items")
             Text(
-                text = "${state.cartItems.sumOf { (it.price * it.quantity) }}",
+                text = "${state.cartItems.sumOf { (it.mobilePrice * it.mobileQuantity) }}",
                 color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
@@ -176,7 +175,7 @@ private fun CheckoutComponent(state: CartItemsState) {
             Text(text = "Total")
             Text(
                 text = "$${
-                    state.cartItems.sumOf { (it.price * it.quantity) } + 60.00
+                    state.cartItems.sumOf { (it.mobilePrice * it.mobileQuantity) } + 60.00
                 }", color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
@@ -200,7 +199,7 @@ private fun CheckoutComponent(state: CartItemsState) {
 
 @Composable
 fun CartItem(
-    cartItem: CartProduct,
+    cartItem: CartMobile,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -232,7 +231,7 @@ fun CartItem(
                     .padding(5.dp)
             ) {
                 Text(
-                    text = cartItem.name,
+                    text = cartItem.mobileName,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 14.sp,
@@ -240,7 +239,7 @@ fun CartItem(
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(
-                    text = "$${cartItem.price}",
+                    text = "$${cartItem.mobilePrice}",
                     color = Color.Black,
                     fontSize = 18.sp,
                     maxLines = 3,
@@ -251,7 +250,7 @@ fun CartItem(
                     modifier = Modifier
                         .fillMaxWidth(),
                     textAlign = TextAlign.End,
-                    text = "${cartItem.quantity} Pc",
+                    text = "${cartItem.mobileQuantity} Pc",
                     color = Color.Black,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold

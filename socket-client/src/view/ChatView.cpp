@@ -1262,7 +1262,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
    } else {
       mvwprintw(updateWin, 12, 27, "%s", "0");
    }
-   mvwprintw(updateWin, 14, 27, "%s", mobile.getMobilePrice().c_str());
+   mvwprintw(updateWin, 14, 27, "%s", to_string(mobile.getMobilePrice()).c_str());
    mvwprintw(updateWin, 16, 27, "%s", mobile.getMobileDescription().c_str());
    wattroff(updateWin, COLOR_PAIR(6));
    wrefresh(updateWin);
@@ -1512,7 +1512,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
             }
             else if (n == 10)
             {
-               mobile.setMobilePrice(input + " VND");
+               mobile.setMobilePrice(stod(input));
                curs_set(0);
                wattron(updateWin, COLOR_PAIR(3));
                mvwprintw(updateWin, 26, 3, "Update complete.");
@@ -2935,7 +2935,7 @@ void ChatView::handleMenu(int sock, int selection)
                      mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
                      mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
                      mvprintw(6+spacePos, 80, "%s", ChatService::processString(to_string(mb.getMobileQuantity())).c_str());
-                     mvprintw(6+spacePos, 100, "%s", ChatService::processString(mb.getMobilePrice()).c_str());
+                     mvprintw(6+spacePos, 100, "%s", ChatService::processString(to_string(mb.getMobilePrice())).c_str());
                      mvprintw(6+spacePos, 120, "%s", ChatService::processString(mb.getMobileDescription()).c_str());
                      spacePos += 1;
                   }
@@ -3052,7 +3052,7 @@ void ChatView::handleMenu(int sock, int selection)
                      mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
                      mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
                      mvprintw(6+spacePos, 80, "%s", ChatService::processString(to_string(mb.getMobileQuantity())).c_str());
-                     mvprintw(6+spacePos, 100, "%s", ChatService::processString(mb.getMobilePrice()).c_str());
+                     mvprintw(6+spacePos, 100, "%s", ChatService::processString(to_string(mb.getMobilePrice())).c_str());
                      mvprintw(6+spacePos, 120, "%s", ChatService::processString(mb.getMobileDescription()).c_str());
                      spacePos += 1;
                   }
@@ -3739,7 +3739,7 @@ void ChatView::MobileUI(int sock, int mobileId) {
          mvwprintw(currentWin, 11, 1, "%s: %s", "Mobile Type", mb.getMobileType().c_str());
          mvwprintw(currentWin, 12, 1, "%s: %s", "Mobile Model", mb.getMobileModel().c_str());
          mvwprintw(currentWin, 13, 1, "%s: %s", "Mobile Quantity", to_string(mb.getMobileQuantity()).c_str());
-         mvwprintw(currentWin, 14, 1, "%s: %s", "Mobile Price", mb.getMobilePrice().c_str());
+         mvwprintw(currentWin, 14, 1, "%s: %s", "Mobile Price", to_string(mb.getMobilePrice()).c_str());
          mvwprintw(currentWin, 15, 1, "%s: %s", "Mobile Description", mb.getMobileDescription().c_str());
          while (true) {
             wattron(currentWin, COLOR_PAIR(4));

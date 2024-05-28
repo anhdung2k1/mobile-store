@@ -11,6 +11,9 @@
 /docker/client-server/requirements.txt
 /docker/authentication/*.jar
 /authentication/.idea
+/authentication/authentication/target/
+/socket-client/src/client
+/authentication/authentication/src/main/resources/application.properties
 
 # Precompiled Headers
 *.gch

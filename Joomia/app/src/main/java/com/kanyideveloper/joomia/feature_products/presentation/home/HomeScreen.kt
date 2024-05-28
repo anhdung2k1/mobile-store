@@ -1,6 +1,5 @@
 package com.kanyideveloper.joomia.feature_products.presentation.home
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -52,7 +51,7 @@ import com.kanyideveloper.joomia.core.presentation.ui.theme.YellowMain
 import com.kanyideveloper.joomia.core.util.LoadingAnimation
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.ProductDetailsScreenDestination
-import com.kanyideveloper.joomia.feature_products.domain.model.Product
+import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
@@ -196,9 +195,9 @@ private fun HomeScreenContent(
             }
 
             // Actual product items list
-            items(productsState.products) { product ->
+            items(productsState.mobiles) { product ->
                 ProductItem(
-                    product = product,
+                    mobile = product,
                     navigator = navigator,
                     modifier = Modifier
                         .width(150.dp)
@@ -226,7 +225,7 @@ private fun HomeScreenContent(
 
 @Composable
 private fun ProductItem(
-    product: Product,
+    mobile: Mobile,
     navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
 ) {
@@ -234,7 +233,7 @@ private fun ProductItem(
         modifier = modifier
             .padding(4.dp)
             .clickable {
-                navigator.navigate(ProductDetailsScreenDestination(product))
+                navigator.navigate(ProductDetailsScreenDestination(mobile))
             },
         elevation = 2.dp,
         backgroundColor = Color.White,
@@ -248,7 +247,7 @@ private fun ProductItem(
             Image(
                 painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current)
-                        .data(data = product.image)
+                        .data(data = mobile.imageUrl)
                         .apply(block = fun ImageRequest.Builder.() {
                             placeholder(R.drawable.ic_placeholder)
                             crossfade(true)
@@ -263,7 +262,7 @@ private fun ProductItem(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = product.title,
+                text = mobile.mobileName,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 14.sp,
@@ -271,7 +270,7 @@ private fun ProductItem(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = product.category,
+                text = mobile.mobileType,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 12.sp,
@@ -293,14 +292,14 @@ private fun ProductItem(
                 )
                 Text(
                     modifier = Modifier.align(CenterVertically),
-                    text = "${product.rating.rate} (${product.rating.count})",
+                    text = "${mobile.rating.rate} (${mobile.rating.count})",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Light
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "$${product.price}",
+                text = "$${mobile.mobilePrice}",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 16.sp,

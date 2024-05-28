@@ -336,7 +336,7 @@ Mobile ChatService::GetMobileInformation(int sock, int mobileId)
         j.at("mobileModel").get<string>(),
         j.at("mobileType").get<string>(),
         j.at("mobileQuantity").get<int>(),
-        j.at("mobilePrice").get<string>(),
+        j.at("mobilePrice").get<double>(),
         j.at("mobileDescription").get<string>()
     );
     return mb;
@@ -367,7 +367,7 @@ map<int, int> ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, s
                 it.at("mobileModel").get<string>(),
                 it.at("mobileType").get<string>(),
                 it.at("mobileQuantity").get<int>(),
-                it.at("mobilePrice").get<string>(),
+                it.at("mobilePrice").get<double>(),
                 it.at("mobileDescription").get<string>()
             );
             mobile.push_back(mb);
@@ -501,7 +501,7 @@ void ChatService::CreateMobileDevice(int sock, Mobile& mobile) {
              << "\"mobileQuantity\": "
              << "" + to_string(mobile.getMobileQuantity()) + ", "
              << "\"mobilePrice\": "
-             << "\"" + mobile.getMobilePrice() + "\", "
+             << "\"" + to_string(mobile.getMobilePrice()) + "\", "
              << "\"mobileDescription\": "
              << "\"" + mobile.getMobileDescription() + "\"}";
 
@@ -525,7 +525,7 @@ void ChatService::UpdateMobileDevice(int sock, Mobile& mobile) {
              << "\"mobileQuantity\": "
              << "" + to_string(mobile.getMobileQuantity()) + ", "
              << "\"mobilePrice\": "
-             << "\"" + mobile.getMobilePrice() + "\", "
+             << "\"" + to_string(mobile.getMobilePrice()) + "\", "
              << "\"mobileDescription\": "
              << "\"" + mobile.getMobileDescription() + "\"}";
 

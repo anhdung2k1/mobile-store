@@ -20,4 +20,7 @@ public interface MobileRepository extends JpaRepository<MobileEntity, Long> {
             "WHERE m.mob_type LIKE %:mobileType% " +
             "LIMIT 28", nativeQuery = true)
     Optional<List<MobileEntity>> findAllByMobileTypeContains(@Param("mobileType") String mobileType);
+
+    @Query(value = "SELECT distinct m.mob_type FROM mobile m", nativeQuery = true)
+    Optional<List<String>> findMobileCategories();
 }

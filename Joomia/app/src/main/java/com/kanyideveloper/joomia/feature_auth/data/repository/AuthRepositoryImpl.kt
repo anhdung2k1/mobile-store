@@ -15,7 +15,7 @@ class AuthRepositoryImpl(
     private val authApiService: AuthApiService,
     private val authPreferences: AuthPreferences
 ) : AuthRepository {
-    override suspend fun login(authRequest: AuthRequest, rememberMe: Boolean): Resource<Unit> {
+    override suspend fun login(authRequest: AuthRequest): Resource<Unit> {
         Timber.d("Login called")
         return try {
             val response = authApiService.loginUser(authRequest)
@@ -23,9 +23,7 @@ class AuthRepositoryImpl(
 
             getUser(authRequest.userName)?.let { authPreferences.saveUserdata(it) }
 
-            if (rememberMe) {
-                authPreferences.saveAccessToken(response.token)
-            }
+            authPreferences.saveAccessToken(response.token)
             Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error(message = "Could not reach the server, please check your internet connection!")

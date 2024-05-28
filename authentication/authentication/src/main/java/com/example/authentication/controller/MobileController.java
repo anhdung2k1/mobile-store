@@ -21,6 +21,10 @@ public class MobileController {
     public ResponseEntity<Boolean> createMobileDevice(@RequestBody Mobile mobile) throws Exception {
         return ResponseEntity.ok(mobileService.createMobile(mobile));
     }
+    @GetMapping(value = "/mobiles")
+    public ResponseEntity<List<Map<String, Object>>> getAllMobiles() throws Exception {
+        return ResponseEntity.ok(mobileService.getAllMobiles());
+    }
     // Get all Mobiles by Mobile name
     @GetMapping(value = "/mobiles/products/query")
     public ResponseEntity<List<Map<String, Object>>> getAllMobilesByMobileName(@RequestParam("query") String mobileName) throws Exception {
@@ -30,6 +34,10 @@ public class MobileController {
     @GetMapping(value = "/mobiles/types/query")
     public ResponseEntity<List<Map<String, Object>>> getAllMobilesByMobileType(@RequestParam("query") String mobileType) throws Exception {
         return ResponseEntity.ok(mobileService.getAllMobilesByType(mobileType));
+    }
+    @GetMapping(value = "/mobiles/categories")
+    public ResponseEntity<List<String>> getMobileCategories() throws Exception {
+        return ResponseEntity.ok(mobileService.getMobileCategories());
     }
     // Get Mobile by Mobile ID
     @GetMapping(value = "/mobiles/{mobileId}")

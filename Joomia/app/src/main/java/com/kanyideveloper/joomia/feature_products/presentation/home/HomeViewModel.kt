@@ -68,11 +68,11 @@ class HomeViewModel @Inject constructor(
                     is Resource.Success -> {
                         if (category == "All") {
                             _productsState.value = productsState.value.copy(
-                                products = if (searchTerm.isEmpty()) {
+                                mobiles = if (searchTerm.isEmpty()) {
                                     result.data ?: emptyList()
                                 } else {
                                     result.data?.filter {
-                                        it.title.contains(
+                                        it.mobileName.contains(
                                             searchTerm,
                                             ignoreCase = true
                                         )
@@ -82,7 +82,7 @@ class HomeViewModel @Inject constructor(
                             )
                         } else {
                             _productsState.value = productsState.value.copy(
-                                products = result.data?.filter { it.category == category }
+                                mobiles = result.data?.filter { it.mobileType == category }
                                     ?: emptyList(),
                                 isLoading = false
                             )

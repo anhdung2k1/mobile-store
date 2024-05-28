@@ -17,7 +17,6 @@ import com.kanyideveloper.joomia.core.presentation.ui.theme.JoomiaTheme
 import com.kanyideveloper.joomia.destinations.AccountScreenDestination
 import com.kanyideveloper.joomia.destinations.CartScreenDestination
 import com.kanyideveloper.joomia.destinations.HomeScreenDestination
-import com.kanyideveloper.joomia.destinations.WishlistScreenDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.rememberNavHostEngine
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +39,6 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         showBottomBar = route in listOf(
                             HomeScreenDestination.route,
-                            WishlistScreenDestination.route,
                             CartScreenDestination.route,
                             AccountScreenDestination.route
                         )

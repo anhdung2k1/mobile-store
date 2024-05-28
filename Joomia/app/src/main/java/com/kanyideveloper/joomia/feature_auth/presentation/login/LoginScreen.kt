@@ -15,6 +15,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -39,7 +40,6 @@ fun LoginScreen(
 ) {
     val usernameState = viewModel.usernameState.value
     val passwordState = viewModel.passwordState.value
-    val rememberMeState = viewModel.rememberMeState.value
 
     val loginState = viewModel.loginState.value
     val scaffoldState = rememberScaffoldState()
@@ -86,16 +86,12 @@ fun LoginScreen(
         LoginScreenContent(
             usernameState = usernameState,
             passwordState = passwordState,
-            rememberMeState = rememberMeState,
             loginState = loginState,
             onUserNameTextChange = {
                 viewModel.setUsername(it)
             },
             onPasswordTextChange = {
                 viewModel.setPassword(it)
-            },
-            onRememberMeClicked = {
-                viewModel.setRememberMe(it)
             },
             onClickForgotPassword = {
                 navigator.navigate(ForgotPasswordScreenDestination)
@@ -116,11 +112,9 @@ fun LoginScreen(
 private fun LoginScreenContent(
     usernameState: TextFieldState,
     passwordState: TextFieldState,
-    rememberMeState: Boolean,
     loginState: LoginState,
     onUserNameTextChange: (String) -> Unit,
     onPasswordTextChange: (String) -> Unit,
-    onRememberMeClicked: (Boolean) -> Unit,
     onClickForgotPassword: () -> Unit,
     onClickDontHaveAccount: () -> Unit,
     onClickSignIn: () -> Unit,
@@ -173,6 +167,7 @@ private fun LoginScreenContent(
                     label = {
                         Text(text = "Password")
                     },
+                    visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
                     ),
@@ -201,15 +196,6 @@ private fun LoginScreenContent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(checked = rememberMeState, onCheckedChange = {
-                        onRememberMeClicked(it)
-                    })
-                    Text(text = "Remember me", fontSize = 12.sp)
-                }
                 TextButton(onClick = onClickForgotPassword) {
                     Text(text = "Forgot password?")
                 }

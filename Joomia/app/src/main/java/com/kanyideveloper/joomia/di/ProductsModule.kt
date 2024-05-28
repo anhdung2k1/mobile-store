@@ -10,6 +10,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -20,9 +21,10 @@ object ProductsModule {
 
     @Provides
     @Singleton
-    fun provideProductsApiService(): ProductsApiService {
+    fun provideProductsApiService(okHttpClient: OkHttpClient): ProductsApiService {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ProductsApiService::class.java)
