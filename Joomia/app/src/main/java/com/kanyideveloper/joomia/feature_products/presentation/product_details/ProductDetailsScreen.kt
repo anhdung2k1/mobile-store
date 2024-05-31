@@ -131,6 +131,20 @@ fun DetailsScreenContent(
                         fontSize = 18.sp,
                     )
 
+                    Text(
+                        text = mobile.mobileType,
+                        color = Color.Black,
+                        fontWeight = FontWeight.Light,
+                        fontSize = 12.sp,
+                    )
+
+                    Text(
+                        text = mobile.mobileModel,
+                        color = Color.Black,
+                        fontWeight = FontWeight.Light,
+                        fontSize = 12.sp,
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
 
                     val rating: Float by remember { mutableStateOf(mobile.rating.rate.toFloat()) }

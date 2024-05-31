@@ -49,8 +49,8 @@ fun CustomScaffold(
                             selected = currentDestination?.route?.contains(item.destination.route) == true,
                             onClick = {
                                 navController.navigate(item.destination.route) {
-                                    navController.graph.startDestinationRoute?.let { screen_route ->
-                                        popUpTo(screen_route) {
+                                    navController.graph.startDestinationRoute?.let { screenRoute ->
+                                        popUpTo(screenRoute) {
                                             saveState = true
                                         }
                                     }

@@ -98,6 +98,9 @@ dependencies {
     // Coil for loading images
     implementation("io.coil-kt:coil-compose:2.1.0")
 
+    // JWT
+    implementation "com.auth0:java-jwt:4.0.0"
+
     // System UI Controller for Jetpack Compose
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.24.10-beta"
 

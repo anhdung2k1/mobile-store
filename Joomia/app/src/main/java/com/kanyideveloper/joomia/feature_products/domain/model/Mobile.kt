@@ -5,11 +5,13 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Mobile(
+    val mobileID: Int,
     val mobileType: String,
     val mobileDescription: String,
-    val mobileID: Int,
     val imageUrl: String,
     val mobilePrice: Double,
+    val mobileQuantity: Int,
     val rating: Rating,
-    val mobileName: String
+    val mobileName: String,
+    val mobileModel: String
 ) : Parcelable

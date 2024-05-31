@@ -56,7 +56,7 @@ public class MobileServiceImpl implements MobileService {
     @Override
     public List<Map<String, Object>> getAllMobiles() throws Exception {
         try {
-            List<MobileEntity> mobilesEntities = mobileRepository.findAll();
+            List<MobileEntity> mobilesEntities = mobileRepository.findAllMobiles();
             List<Map<String, Object>> listMobiles = new ArrayList<>();
             mobilesEntities.forEach((mobileEntity -> listMobiles.add(mobileMap(mobileEntity))));
             return listMobiles;

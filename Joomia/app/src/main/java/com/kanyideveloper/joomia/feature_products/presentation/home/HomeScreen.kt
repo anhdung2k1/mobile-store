@@ -1,17 +1,48 @@
 package com.kanyideveloper.joomia.feature_products.presentation.home
 
-import android.widget.Toast
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.GridItemSpan
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme.typography
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,8 +81,10 @@ import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.YellowMain
 import com.kanyideveloper.joomia.core.util.LoadingAnimation
 import com.kanyideveloper.joomia.core.util.UiEvents
+import com.kanyideveloper.joomia.destinations.ProductAddingScreenDestination
 import com.kanyideveloper.joomia.destinations.ProductDetailsScreenDestination
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
+import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
@@ -65,9 +98,11 @@ fun HomeScreen(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var filtersExpanded by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
     val productsState = viewModel.productsState.value
     val categories = viewModel.categoriesState.value
+    val user = viewModel.profileState.value
+    val isAdminAccount = viewModel.isAdminState.value
 
     Scaffold(
         topBar = {
@@ -78,15 +113,29 @@ fun HomeScreen(
                 },
                 onSearch = {
                     keyboardController?.hide()
-                    viewModel.getProducts(
+                    viewModel.findProducts(
                         searchTerm = viewModel.searchTerm.value
                     )
                 },
                 onToggleExpand = {
                     filtersExpanded = !filtersExpanded
                 },
+                user = user
             )
         },
+        floatingActionButton = {
+            if (isAdminAccount) {
+                FloatingActionButton(onClick = {
+                    navigator.navigate(ProductAddingScreenDestination())
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "",
+                        tint = Color.White
+                    )
+                }
+            }
+        }
     ) {
         val scaffoldState = rememberScaffoldState()
         LaunchedEffect(key1 = true) {
@@ -110,16 +159,16 @@ fun HomeScreen(
             }
         ) {
             DropdownMenuItem(
-                content = { Text("Clothes") },
-                onClick = { Toast.makeText(context, "Clothes", Toast.LENGTH_SHORT).show() }
+                content = { Text("Iphone") },
+                onClick = { viewModel.findProducts("Iphone") }
             )
             DropdownMenuItem(
-                content = { Text("Shoes") },
-                onClick = { Toast.makeText(context, "Shoes", Toast.LENGTH_SHORT).show() }
+                content = { Text("Samsung") },
+                onClick = { viewModel.findProducts("Samsung") }
             )
             DropdownMenuItem(
-                content = { Text("Electronics") },
-                onClick = { Toast.makeText(context, "Electronics", Toast.LENGTH_SHORT).show() }
+                content = { Text("ROG Phone") },
+                onClick = { viewModel.findProducts("ROG") }
             )
         }
 
@@ -336,6 +385,7 @@ private fun ProductItem(
 @Composable
 fun MyTopAppBar(
     currentSearchText: String,
+    user: User,
     onSearchTextChange: (String) -> Unit,
     onSearch: () -> Unit,
     onToggleExpand: () -> Unit,
@@ -358,7 +408,7 @@ fun MyTopAppBar(
                 Image(
                     painter = rememberAsyncImagePainter(
                         ImageRequest.Builder(LocalContext.current)
-                            .data(data = "https://firebasestorage.googleapis.com/v0/b/mealtime-7a501.appspot.com/o/tinywow_Joomia%20Black%20Friday_16608968%20(1).png?alt=media&token=8b874def-e543-482e-80f7-c8cbe9d9f206")
+                            .data(data = "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg")
                             .apply(block = fun ImageRequest.Builder.() {
                                 crossfade(true)
                             }).build()
@@ -370,7 +420,7 @@ fun MyTopAppBar(
                     contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Hi, John", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Hi, ${user.userName}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
 
             Icon(

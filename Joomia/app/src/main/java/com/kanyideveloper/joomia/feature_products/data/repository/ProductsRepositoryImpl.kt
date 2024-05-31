@@ -27,4 +27,20 @@ class ProductsRepositoryImpl(private val productsApiService: ProductsApiService)
     override suspend fun getMobileCategories(): List<String> {
         return productsApiService.getMobilesCategories()
     }
+
+    override suspend fun findMobileDeviceName(mobileName: String) : Flow<Resource<List<Mobile>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val response = productsApiService.findMobileDeviceName(mobileName)
+            emit(Resource.Success(response.map { it.toDomain() }))
+        } catch (e: IOException) {
+            emit(Resource.Error(message = "Could not reach the server, please check your internet connection!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = "Oops, something went wrong!"))
+        }
+    }
+
+    override suspend fun createMobileDevice(mobile: Mobile): Boolean {
+        return productsApiService.createMobile(mobile)
+    }
 }

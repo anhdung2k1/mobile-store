@@ -213,7 +213,7 @@ fun UserItem(
             Image(
                 painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current)
-                        .data(data = "https://firebasestorage.googleapis.com/v0/b/mealtime-7a501.appspot.com/o/tinywow_Joomia%20Black%20Friday_16608968%20(1).png?alt=media&token=8b874def-e543-482e-80f7-c8cbe9d9f206")
+                        .data(data = "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg")
                         .apply(block = fun ImageRequest.Builder.() {
                             placeholder(R.drawable.ic_placeholder)
                             crossfade(true)
@@ -237,12 +237,6 @@ fun UserItem(
             ) {
                 Text(
                     text = "${
-                        user.userName?.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(
-                                Locale.getDefault()
-                            ) else it.toString()
-                        }
-                    }  ${
                         user.userName?.replaceFirstChar {
                             if (it.isLowerCase()) it.titlecase(
                                 Locale.getDefault()

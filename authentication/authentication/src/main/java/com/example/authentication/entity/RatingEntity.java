@@ -1,6 +1,7 @@
 package com.example.authentication.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "RATING")
 @Transactional(rollbackOn = Exception.class)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class RatingEntity {
     public RatingEntity() {
         this.count = 0;
@@ -35,7 +37,7 @@ public class RatingEntity {
     private Double rate;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "rate", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "rate", fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
     private MobileEntity mobile;
 }

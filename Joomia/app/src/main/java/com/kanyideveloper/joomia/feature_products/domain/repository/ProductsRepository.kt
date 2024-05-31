@@ -7,4 +7,6 @@ import kotlinx.coroutines.flow.Flow
 interface ProductsRepository {
     suspend fun getMobiles(): Flow<Resource<List<Mobile>>>
     suspend fun getMobileCategories(): List<String>
+    suspend fun findMobileDeviceName(mobileName: String) : Flow<Resource<List<Mobile>>>
+    suspend fun createMobileDevice(mobile: Mobile) : Boolean
 }
