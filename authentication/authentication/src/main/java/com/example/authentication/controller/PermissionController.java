@@ -28,8 +28,8 @@ public class PermissionController {
     }
     // Get Permission By Permission Name
     @GetMapping(value = "/permissions/query")
-    public ResponseEntity<Map<String, Object>> getPermissionByName(@RequestParam("query") String roleName) throws  Exception {
-        return ResponseEntity.ok(permissionService.getPermissionByName(roleName));
+    public ResponseEntity<Map<String, Object>> getPermissionByName(@RequestParam("query") String perName) throws  Exception {
+        return ResponseEntity.ok(permissionService.getPermissionByName(perName));
     }
     //Update Permission
     @PatchMapping(value = "/permissions/{permissionId}")

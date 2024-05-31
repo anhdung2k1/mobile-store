@@ -41,7 +41,7 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getAccountsById(accountId));
     }
 
-    // Get account id by user id
+    // Get account id by user name
     @GetMapping(value = "/accounts/find")
     public ResponseEntity<Long> getAccIdByUserName (@RequestParam("userName") String userName) throws Exception {
         return ResponseEntity.ok(accountService.getAccIdByUserName(userName));
