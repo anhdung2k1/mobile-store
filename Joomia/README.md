@@ -1,7 +1,7 @@
 <p align="center"><img src="screenshots/joomia.png" alt="Joomia" height="100px"></p>
 
 # Joomia 🛒
-A fake shopping app built with Jetpack Compose consuming [MOBILE STORE API](https://github.com/anhdung2k1/mobile-store/tree/main/authentication)
+A Mobile Shopping App built with Jetpack Compose consuming [MOBILE STORE API](https://github.com/anhdung2k1/mobile-store/tree/main/authentication)
 
 ## Note:
 - The API has endpoints available in the listed [MOBILE STORE API](https://github.com/anhdung2k1/mobile-store/tree/main/authentication)
