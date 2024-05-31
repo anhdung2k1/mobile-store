@@ -24,17 +24,7 @@ cat /etc/hosts
 It will show the host address IPv4 mysql is running --> In this point, we are going to use 172.21.0.3 IP address <br/>
 2. Configure in docker-compose.yml file and ChatServerService.cpp file located in socket-server and change the IP communication to 172.21.0.3 <br/>
 3. Checking the pwd directory path in each context in docker-compose.yml file and make a change point to right directory <br/>
-4. Start a docker-compose.yml Java API by
-```
-docker-compose up authentication
-```
-- It will start the <strong>localhost:8080</strong> API
-
-If you change your java code, you must "build" it before "up" it by
-```
-docker-compose build authentication
-```
-
+4. 
 # How to make an API Requests from terminal (CURL Command)
 ---
 <a>Prerequisites</a>
@@ -76,87 +66,82 @@ $ curl -X PUT http://localhost:8080/api/users/1 -H "Content-Type: application/js
 $ curl -X DELETE http://localhost:80808/api/user/1
 ```
 
-<a href = "JAVA_SPRING">Documentation for JAVA SPRING BOOT RESTful API</a>
----
-<a>Documentation Overview</a>
-1. The "Spring Web MVC Framework"
-2. Spring Security
-
-<a>1/ The "Spring Web MVC Framework"</a>
----
-- The <a>Spring Web MVC framework</a> (often referred to as "Spring MVC") is a rich "model view controller" web framework <br/> 
-- Spring MVC lets you create special ```@RestController``` beans to handle incoming HTTP requests. Methods in your controller are mapped to HTTP by using ```@RequestMapping``` annotations.<br/>
-
-- If you want to take complete control of ```Spring MVC```, you can add your own ```@Configuration``` annotated. You can set your own ```@Bean``` Configuration putting on ```IOC``` container.
-- To use it by <strong>Dependency Injection (DI)</strong> just use annotation ```@Autowired``` --> This will load the <strong>Bean</strong> that you have already defined.
-- In the ```Services``` layer --> Will incharge on handle logic API 
-- In the ```Repository``` layer --> Handling and Interacting connect with Database
-- Define new model and entity --> Start application --> Auto generate with specific properties. <br/>
----
-<a>2/ Spring Security</a>
----
-- When added the Spring Security Framework to application, it automatically registers a filter chain that intercept all incoming requests. This chain consists of various filters, and each of them handles a particular use case
-- Check if the requested URL is publicly accessible, based on configuration
-- In case of session-based authentication, check if the user is already authenticated in the current session
-- Check if the user is authorized to perform the requested action, and so on <br/>
-
-<a><h4>AuthenticationManager</h4></a>
-- ```AuthenticationManager``` as a coordinator where you can register multiple providers, and based on request type, it will deliver an authentication request to the correct provider
-
-<a><h4>AuthenticationProvider</h4></a>
-- ```AuthenticationProvider``` process specific types of authentication.
-    -  ```authenticate```performs authentication with the request
-    - ```DaoAuthenticationProvider``` retrieves user details from ```UserDetailsService```
-
-<a><h4>UserDetailsService</h4></a>
-- ```UserDetailService``` is described as a core interface that loads user-specific data.
-- Extracting user identity information based on credentials from a database and then perform validation
-- ```loadUserByUsername``` accepts username as a parameter and returns the user identity object
-
-<a><h4>Authentication Using JWT with Spring Security</h4></a>
-- To customize Spring Security for JWT use, we need a configuration class annotated with ```@EnableWebSecurity``` annotation in our classpath.
-1. Configure the authentication manager with the correct provider
-2. Configure web security (public URLs, private URLs, authorization, etc)
-
-```
-@Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
-public class SecurityConfiguration {
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final AuthenticationProvider authenticationProvider;
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        //Code
-    }
-}
-```
-- Add JwtFilterToken filter before each HTTP Request
-- Hashing password when user are registered a new account
-- Token will valid in setting duration, if token is running out of time --> the application will need to reauthenticate to continue use
-
----
 <a><strong>API Requests</strong></a>
 
-|.No | Path | Status | Notes | Description | Method | Authorization | User Required | Param | RequestBody | Response |  
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+|.No | Path | Methods | Description |  
+| --- | --- | --- |
 | User |
-| 1 | /api/users | Done | - | - | Get | Bearer | client | - | - | userName |
-| 2 | /api/users | Done | - | When Account is register user is create too | POST | Bearer | client | - | userName [type] |  User |
-| 3 | /api/users/:id | Done | - | | GET | Bearer | client | id | - | userName, address, gender |
-| 4 | /api/users/search | Done | - | Search By Name | GET | Bearer | client | - | keyword | userId, userName |
-| 5 | /api/users/block | To-Do | - | Type: 0 is unblock, 1 is block | POST | Bearer | room-admin | - | user_id [type] | - | 
-| 6 | /api/users/:id | Done | Update User Information | - | PUT | Bearer | client | - | user_id [type] | User |
-| 7 | /api/users/:id | Done | Delete User | - | DELETE | Bearer | admin | id | user_id [type] | boolean |
+| 1 | /api/users | GET | GET All Users |
+| 2 | /api/users | POST | CREATE new User |
+| 3 | /api/users/:id | GET | GET User by UserID |
+| 4 | /api/users/search?userName= | GET | GET User by Name |
+| 5 | /api/users/:id | PATCH | UPDATE User |
+| 6 | /api/users/:id | DELETE | Delete User |
+| 7 | /api/users/find?user_name= | GET | GET User ID With UserName |
 | |
 | Account |
-| 1 | /api/accounts/signin | Done | - | - | POST | no-auth | client | - | userName, password | token | 
-| 2 | /api/accounts/signup | Done | - | - | POST | no-auth | client | - | userName, password | token |
-| 3 | /api/accounts | Done | - | - | GET | Bearer | admin | - | - | Accounts |
-| 4 | /api/account/:id | Done | - | - | GET | Bearer | admin | id | - | Account |
-| 5 | /api/account/:userName | Done | - | Get Account ID | GET | Bearer | client | - | - | acc_id |
-| 6 | /api/accounts/:id | Done | - | Update Account Password | PUT | Bearer | admin | id | attributes | Account | 
-| 7 | /api/accounts/:id | Done | Delete Account need delete User respective with that account | Delete Account | DELETE | Bearer | admin | id | - | boolean |
+| 1 | /api/accounts/signin | POST |  LOGIN Account |
+| 2 | /api/accounts/signup | POST | REGISTER Account |
+| 3 | /api/accounts | GET | GET All Accounts |
+| 4 | /api/account/:id | GET | Get Accounts by ID
+| 5 | /api/account/find?userName= | GET | GET Account by userName |
+| 6 | /api/accounts/admin?userName= | GET | Check if Account is admin |
+| 7 | /api/accounts/:id | PUT | UPDATE account password |
+| 8 | /api/accounts/:userId | DELETE | DELETE Account |
 | |
-
+| Cart |
+| 1 | /api/carts/user/:userId | GET | GET Current User Carts |
+| |
+| Customer |
+| 1 | /api/customers | POST | Create new Customer |
+| 2 | /api/customers/query?query= | GET | FIND Customer by Name |
+| 3 | /api/customers/:id | GET | GET one customer by ID |
+| 4 | /api/customers/:id | PATCH | UPDATE customer information |
+| 5 | /api/customers/:id | DELETE | DELETE customer information |
+| 6 | /api/customers/:id | DELETE | DELETE customer information |
+| |
+| Mobile |
+| 1 | /api/mobiles | POST | Create new Mobile |
+| 2 | /api/mobiles | GET | GET all Mobiles |
+| 3 | /api/mobiles/products/query?query= | GET | GET all Mobiles by Name |
+| 4 | /api/mobiles/types/query?query= | GET | GET all Mobiles by Categories |
+| 5 | /api/mobiles/categories | GET | GET all Mobiles Categories |
+| 6 | /api/mobiles/:id | GET | GET Mobile by Id |
+| 7 | /api/mobiles/:id | PATCH | UPDATE Mobile by Id |
+| 8 | /api/mobiles/:id | DELETE | DELETE Mobile by Id |
+| |
+| Payment |
+| 1 | /api/payments | POST | Create new Payment Method |
+| 2 | /api/payments/customers/:customerId | GET | GET All Payments by Customer ID |
+| 3 | /api/payments/ | GET | GET All Payments |
+| 4 | /api/payments/:id | GET | GET Payment By ID |
+| 5 | /api/payments/:id | PATCH | UPDATE Payment By ID |
+| 6 | /api/payments/:id | DELETE | DELETE Payment By ID |
+| |
+| Permission |
+| 1 | /api/permissions | POST | Create new Permission |
+| 2 | /api/permissions | GET | GET ALL Permissions |
+| 3 | /api/permissions/query?query= | GET | GET Permission By Name |
+| 4 | /api/permissions/:id | PATCH | UPDATE Permission |
+| 5 | /api/permissions/:id | DELETE | DELET Permission |
+| |
+| Rating |
+| 1 | /api/ratings | POST | Create new Rating |
+| 2 | /api/ratings/mobiles/:id | GET | GET mobile Rating |
+| 3 | /api/ratings/mobiles/:id | UPDATE | UPDATE mobile Rating |
+| |
+| Role |
+| 1 | /api/roles | POST | Create new Role |
+| 2 | /api/roles | GET | GET All Roles |
+| 3 | /api/roles/query?query= | GET | GET Role By Name |
+| 4 | /api/roles/:id | PATCH | UPDATE Role |
+| 5 | /api/roles/:id | DELETE | DELETE Role |
+| |
+| Transaction |
+| 1 | /api/transactions/:customerID | POST | Create new Transaction |
+| 2 | /api/transactions/query?query= | GET | GET All Transactions By Name |
+| 3 | /api/transactions/customer/:customerId | GET | GET All Transactions By Customer ID |
+| 4 | /api/transactions/:id | PATCH | UPDATE Transactions |
+| 5 | /api/transactions/:id | GET | GET Transaction |
+| 6 | /api/transactions/:id | DELETE | DELETE Transaction |
+| |

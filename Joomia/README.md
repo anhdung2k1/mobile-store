@@ -1,15 +1,18 @@
 <p align="center"><img src="screenshots/joomia.png" alt="Joomia" height="100px"></p>
 
 # Joomia 🛒
-A fake shopping app built with Jetpack Compose consuming [FAKE STORE API](https://fakestoreapi.com/)
+A fake shopping app built with Jetpack Compose consuming [MOBILE STORE API](https://github.com/anhdung2k1/mobile-store/tree/main/authentication)
 
 ## Note:
-- The API has some endpoints that does nothing i.e adding item to cart, registering a user and many more. So some screens have UI implementation but no logic
-- Contributions are welcomed, because the app is far away from being good 😂
+- The API has endpoints available in the listed [MOBILE STORE API](https://github.com/anhdung2k1/mobile-store/tree/main/authentication)
 
 ## To Login - use :
-    - Username: johnd
-    - Password: m38rmF$
+# USER ROLE ACCOUNT
+    - Username: anhdung1109
+    - Password: Test@123
+# ADMIN ROLE ACCOUNT
+    - Username: admin
+    - Password: Admin@123
 
 ## Demo
 <img src="screenshots/splash.png" width="250"/> <img src="screenshots/auth.png" width="250"/>
@@ -43,9 +46,6 @@ A fake shopping app built with Jetpack Compose consuming [FAKE STORE API](https:
 - [Logging Interceptor](https://github.com/square/okhttp/blob/master/okhttp-logging-interceptor/README.md) -  logs HTTP request and response data.
 - [Coil](https://coil-kt.github.io/coil/compose/)- An image loading library for Android backed by Kotlin Coroutines.
 - [Timber](https://github.com/JakeWharton/timber)- A logger with a small, extensible API which provides utility on top of Android's normal Log class.
-
-- CI/CD:
-    - [GitHub Actions](https://github.com/features/actions) - GitHub Actions makes it easy to automate all your software workflows, now with world-class CI/CD. Build, test, and deploy your code right from GitHub. Make code reviews, branch management, and issue triaging work the way you want.
     
 
 # License
