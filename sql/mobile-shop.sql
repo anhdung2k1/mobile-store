@@ -64,7 +64,7 @@ CREATE TABLE rating(
 CREATE TABLE mobile(
     mob_id BIGINT NOT NULL AUTO_INCREMENT,
     mob_name VARCHAR(255) NOT NULL,
-    mob_model VARCHAR(255),
+    mob_model VARCHAR(255) NOT NULL,
     mob_type VARCHAR(255) NOT NULL,
     mob_quant INT NOT NULL,
     mob_price DOUBLE(10, 2) NOT NULL,

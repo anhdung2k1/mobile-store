@@ -4,7 +4,10 @@
 ---
 - Technical:
     - Docker MySQL database installed in Docker Container
-    - Set up account for using database: messager/messager
+    - Set up account for using database: 
+    ```
+    $ docker exec -it mysql_container mysql -u mobile -pmobile
+    ```
     - Spring Boot
     - Spring Security
     - JWT
@@ -16,19 +19,15 @@
 
 1. Cat the host in mysql_container by
 ```
-docker exec -it mysql_container bash
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mysql_container
 ```
-```
-cat /etc/hosts
-```
+
 It will show the host address IPv4 mysql is running --> In this point, we are going to use 172.21.0.3 IP address <br/>
-2. Configure in docker-compose.yml file and ChatServerService.cpp file located in socket-server and change the IP communication to 172.21.0.3 <br/>
-3. Checking the pwd directory path in each context in docker-compose.yml file and make a change point to right directory <br/>
-4. 
+1. Configure in docker-compose.yml file and ChatServerService.cpp file located in socket-server and change the IP communication to `172.21.0.3` <br/>
+2. Checking the pwd directory path in each context in docker-csompose.yml file and make a change point to right directory <br/>
+3. 
 # How to make an API Requests from terminal (CURL Command)
----
 <a>Prerequisites</a>
----
 - Environment:
     - Linux
     - Curl
@@ -68,9 +67,9 @@ $ curl -X DELETE http://localhost:80808/api/user/1
 
 <a><strong>API Requests</strong></a>
 
-|.No | Path | Methods | Description |  
-| --- | --- | --- |
-| User |
+| .No | Path | Methods | Description |
+| --- | --- | --- | --- |
+| **User** | | | |
 | 1 | /api/users | GET | GET All Users |
 | 2 | /api/users | POST | CREATE new User |
 | 3 | /api/users/:id | GET | GET User by UserID |
@@ -78,29 +77,24 @@ $ curl -X DELETE http://localhost:80808/api/user/1
 | 5 | /api/users/:id | PATCH | UPDATE User |
 | 6 | /api/users/:id | DELETE | Delete User |
 | 7 | /api/users/find?user_name= | GET | GET User ID With UserName |
-| |
-| Account |
-| 1 | /api/accounts/signin | POST |  LOGIN Account |
+| **Account** | | | |
+| 1 | /api/accounts/signin | POST | LOGIN Account |
 | 2 | /api/accounts/signup | POST | REGISTER Account |
 | 3 | /api/accounts | GET | GET All Accounts |
-| 4 | /api/account/:id | GET | Get Accounts by ID
-| 5 | /api/account/find?userName= | GET | GET Account by userName |
+| 4 | /api/accounts/:id | GET | Get Accounts by ID |
+| 5 | /api/accounts/find?userName= | GET | GET Account by userName |
 | 6 | /api/accounts/admin?userName= | GET | Check if Account is admin |
 | 7 | /api/accounts/:id | PUT | UPDATE account password |
 | 8 | /api/accounts/:userId | DELETE | DELETE Account |
-| |
-| Cart |
+| **Cart** | | | |
 | 1 | /api/carts/user/:userId | GET | GET Current User Carts |
-| |
-| Customer |
+| **Customer** | | | |
 | 1 | /api/customers | POST | Create new Customer |
 | 2 | /api/customers/query?query= | GET | FIND Customer by Name |
 | 3 | /api/customers/:id | GET | GET one customer by ID |
 | 4 | /api/customers/:id | PATCH | UPDATE customer information |
 | 5 | /api/customers/:id | DELETE | DELETE customer information |
-| 6 | /api/customers/:id | DELETE | DELETE customer information |
-| |
-| Mobile |
+| **Mobile** | | | |
 | 1 | /api/mobiles | POST | Create new Mobile |
 | 2 | /api/mobiles | GET | GET all Mobiles |
 | 3 | /api/mobiles/products/query?query= | GET | GET all Mobiles by Name |
@@ -109,39 +103,33 @@ $ curl -X DELETE http://localhost:80808/api/user/1
 | 6 | /api/mobiles/:id | GET | GET Mobile by Id |
 | 7 | /api/mobiles/:id | PATCH | UPDATE Mobile by Id |
 | 8 | /api/mobiles/:id | DELETE | DELETE Mobile by Id |
-| |
-| Payment |
+| **Payment** | | | |
 | 1 | /api/payments | POST | Create new Payment Method |
 | 2 | /api/payments/customers/:customerId | GET | GET All Payments by Customer ID |
 | 3 | /api/payments/ | GET | GET All Payments |
 | 4 | /api/payments/:id | GET | GET Payment By ID |
 | 5 | /api/payments/:id | PATCH | UPDATE Payment By ID |
 | 6 | /api/payments/:id | DELETE | DELETE Payment By ID |
-| |
-| Permission |
+| **Permission** | | | |
 | 1 | /api/permissions | POST | Create new Permission |
 | 2 | /api/permissions | GET | GET ALL Permissions |
 | 3 | /api/permissions/query?query= | GET | GET Permission By Name |
 | 4 | /api/permissions/:id | PATCH | UPDATE Permission |
-| 5 | /api/permissions/:id | DELETE | DELET Permission |
-| |
-| Rating |
+| 5 | /api/permissions/:id | DELETE | DELETE Permission |
+| **Rating** | | | |
 | 1 | /api/ratings | POST | Create new Rating |
-| 2 | /api/ratings/mobiles/:id | GET | GET mobile Rating |
-| 3 | /api/ratings/mobiles/:id | UPDATE | UPDATE mobile Rating |
-| |
-| Role |
+| 2 | /api/ratings/mobiles/:id | GET | GET Mobile Rating |
+| 3 | /api/ratings/mobiles/:id | PATCH | UPDATE Mobile Rating |
+| **Role** | | | |
 | 1 | /api/roles | POST | Create new Role |
 | 2 | /api/roles | GET | GET All Roles |
 | 3 | /api/roles/query?query= | GET | GET Role By Name |
 | 4 | /api/roles/:id | PATCH | UPDATE Role |
 | 5 | /api/roles/:id | DELETE | DELETE Role |
-| |
-| Transaction |
+| **Transaction** | | | |
 | 1 | /api/transactions/:customerID | POST | Create new Transaction |
 | 2 | /api/transactions/query?query= | GET | GET All Transactions By Name |
 | 3 | /api/transactions/customer/:customerId | GET | GET All Transactions By Customer ID |
-| 4 | /api/transactions/:id | PATCH | UPDATE Transactions |
+| 4 | /api/transactions/:id | PATCH | UPDATE Transaction |
 | 5 | /api/transactions/:id | GET | GET Transaction |
 | 6 | /api/transactions/:id | DELETE | DELETE Transaction |
-| |
