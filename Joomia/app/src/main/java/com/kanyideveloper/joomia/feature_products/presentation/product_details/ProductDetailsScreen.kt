@@ -1,10 +1,16 @@
 package com.kanyideveloper.joomia.feature_products.presentation.product_details
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.gowtham.ratingbar.RatingBar
@@ -29,17 +36,19 @@ import com.kanyideveloper.joomia.R
 import com.kanyideveloper.joomia.core.presentation.ui.theme.GrayColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.YellowMain
+import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.collectLatest
 
 @Destination
 @Composable
 fun ProductDetailsScreen(
     mobile: Mobile,
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: ProductDetailsViewModel = hiltViewModel()
 ) {
-
     Scaffold(
         backgroundColor = Color.White,
         topBar = {
@@ -74,9 +83,33 @@ fun ProductDetailsScreen(
             }
         }
     ) {
+        val scaffoldState = rememberScaffoldState()
+        LaunchedEffect(key1 = true) {
+            viewModel.eventFlow.collectLatest { event ->
+                when (event) {
+                    is UiEvents.SnackbarEvent -> {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = event.message,
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                    is UiEvents.NavigateEvent -> {
+                        navigator.navigate(
+                            event.route
+                        )
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = "Delete Product Successful",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            }
+        }
+
         DetailsScreenContent(
             mobile = mobile,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            onProductDeleteClick = { viewModel.deleteProduct(mobile.mobileID) }
         )
     }
 }
@@ -85,6 +118,7 @@ fun ProductDetailsScreen(
 fun DetailsScreenContent(
     mobile: Mobile,
     modifier: Modifier = Modifier,
+    onProductDeleteClick: () -> Unit
 ) {
     Column {
         Box(modifier = modifier.weight(1f), contentAlignment = Alignment.Center) {
@@ -124,12 +158,37 @@ fun DetailsScreenContent(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.Top
                 ) {
-                    Text(
-                        text = mobile.mobileName,
-                        color = Color.Black,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp,
-                    )
+                    Row(modifier = Modifier
+                        .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = mobile.mobileName,
+                            color = Color.Black,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        OutlinedButton(
+                            onClick = { onProductDeleteClick() },
+                            modifier = Modifier.size(40.dp),
+                            shape = CircleShape,
+                            border = BorderStroke(0.dp, Color.Transparent),
+                            contentPadding = PaddingValues(0.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color.White,
+                                backgroundColor = Color.Red
+                            )
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(20.dp),
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete Product",
+                                tint = MainWhiteColor
+                            )
+                        }
+                    }
 
                     Text(
                         text = mobile.mobileType,

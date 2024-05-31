@@ -42,6 +42,7 @@ import com.kanyideveloper.joomia.core.presentation.ui.theme.poppins
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.ForgotPasswordScreenDestination
 import com.kanyideveloper.joomia.destinations.LoginScreenDestination
+import com.kanyideveloper.joomia.destinations.RegisterScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
@@ -109,6 +110,10 @@ fun RegisterScreen(
             onClickSignUp = {
                 keyboardController?.hide()
                 viewModel.registerUser()
+            },
+            onClickSignIn = {
+                navigator.popBackStack()
+                navigator.navigate(LoginScreenDestination)
             }
         )
     }
@@ -122,6 +127,7 @@ private fun RegisterScreenContent(
     onUserNameTextChange: (String) -> Unit,
     onPasswordTextChange: (String) -> Unit,
     onClickSignUp: () -> Unit,
+    onClickSignIn: () -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp)
@@ -206,7 +212,7 @@ private fun RegisterScreenContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             TextButton(
-                onClick = onClickSignUp,
+                onClick = onClickSignIn,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(

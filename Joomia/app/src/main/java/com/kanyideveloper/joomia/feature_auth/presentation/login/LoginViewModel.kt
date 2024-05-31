@@ -30,12 +30,6 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
         _passwordState.value = _passwordState.value.copy(text = value)
     }
 
-    private val _rememberMeState = mutableStateOf(false)
-    val rememberMeState: State<Boolean> = _rememberMeState
-    fun setRememberMe(value: Boolean) {
-        _rememberMeState.value = value
-    }
-
     private val _loginState = mutableStateOf(LoginState())
     val loginState: State<LoginState> = _loginState
 

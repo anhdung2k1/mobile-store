@@ -64,6 +64,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -101,6 +102,8 @@ fun ProductAddingScreen(
     var modelExpanded by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
+    val context = LocalContext.current
+
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             selectedImageUri = it
@@ -108,36 +111,6 @@ fun ProductAddingScreen(
     }
 
     val types = viewModel.categoriesState.value
-
-    val scaffoldState = rememberScaffoldState()
-
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when (event) {
-                is UiEvents.SnackbarEvent -> {
-                    event.message.let {
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            message = it,
-                            duration = SnackbarDuration.Short
-                        )
-                    }
-                }
-                is UiEvents.NavigateEvent -> {
-                    navigator.navigate(event.route) {
-                        popUpTo(AccountScreenDestination.route) {
-                            inclusive = false
-                        }
-                        popUpTo(HomeScreenDestination.route) {
-                            inclusive = false
-                        }
-                        popUpTo(CartScreenDestination.route) {
-                            inclusive = false
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -162,6 +135,36 @@ fun ProductAddingScreen(
             )
         }
     ) {
+        val scaffoldState = rememberScaffoldState()
+
+        LaunchedEffect(key1 = true) {
+            viewModel.eventFlow.collectLatest { event ->
+                when (event) {
+                    is UiEvents.SnackbarEvent -> {
+                        event.message.let {
+                            scaffoldState.snackbarHostState.showSnackbar(
+                                message = it,
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    }
+                    is UiEvents.NavigateEvent -> {
+                        navigator.navigate(event.route) {
+                            popUpTo(AccountScreenDestination.route) {
+                                inclusive = false
+                            }
+                            popUpTo(HomeScreenDestination.route) {
+                                inclusive = false
+                            }
+                            popUpTo(CartScreenDestination.route) {
+                                inclusive = false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         Box(modifier = Modifier.fillMaxSize()) {
             LazyVerticalGrid(
                 cells = GridCells.Fixed(2),
@@ -193,6 +196,7 @@ fun ProductAddingScreen(
                         onSelectImageClick = { imagePickerLauncher.launch("image/*") },
                         onClickSaveProduct = {
                             viewModel.createProduct(
+                                context,
                                 productID,
                                 productName,
                                 productModel,

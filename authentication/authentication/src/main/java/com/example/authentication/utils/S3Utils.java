@@ -2,6 +2,7 @@ package com.example.authentication.utils;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.example.authentication.builder.Base64DecodedMultipartFile;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -27,10 +29,13 @@ public class S3Utils {
     @Autowired
     private AmazonS3 s3Client;
 
-    public URL getS3URL(MultipartFile file) throws IOException {
+    public URL getS3URL(String fileBase64) throws IOException {
+        byte[] fileBytes = Base64.getDecoder().decode(fileBase64);
+        MultipartFile file = new Base64DecodedMultipartFile(fileBytes);
         File fileObj = convertMultiPartFileToFile(file);
-        String fileName = UUID.randomUUID() + "__" + file.getOriginalFilename() + ".jpg";
-        s3Client.putObject(new PutObjectRequest(bucketName, "/mobile_images/" + fileName, fileObj));
+        String filePath = "mobile_images/";
+        String fileName = filePath + UUID.randomUUID() + "__" + file.getOriginalFilename() + ".jpg";
+        s3Client.putObject(new PutObjectRequest(bucketName, fileName, fileObj));
         return s3Client.getUrl(bucketName, fileName);
     }
 
