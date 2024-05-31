@@ -8,4 +8,5 @@ interface AuthRepository {
     suspend fun register(authRequest: AuthRequest) : Resource<Unit>
     suspend fun autoLogin(): Resource<Unit>
     suspend fun logout(): Resource<Unit>
+    suspend fun checkAdminAccount(userName: String): Boolean
 }

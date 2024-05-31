@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
+import com.kanyideveloper.joomia.feature_auth.domain.repository.AuthRepository
 import com.kanyideveloper.joomia.feature_products.domain.use_case.FindProductsUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetCategoriesUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetProductsUseCase
@@ -28,9 +29,13 @@ class HomeViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val findProductsUseCase: FindProductsUseCase,
     private val profileRepository: ProfileRepository,
+    private val authRepository: AuthRepository,
     private val gson: Gson
 ) :
     ViewModel() {
+
+    private val _isAdminState = mutableStateOf(false)
+    val isAdminState: State<Boolean> = _isAdminState
 
     private val _profileState = mutableStateOf(User())
     val profileState: State<User> = _profileState
@@ -65,6 +70,15 @@ class HomeViewModel @Inject constructor(
         getProducts(selectedCategory.value)
         getCategories()
         getProfile()
+        checkAdminAccount()
+    }
+
+    private fun checkAdminAccount() {
+        viewModelScope.launch {
+            _isAdminState.value = _profileState.value.userName?.let {
+                authRepository.checkAdminAccount(it)
+            } == true
+        }
     }
 
     private fun getProfile() {

@@ -39,4 +39,8 @@ class ProductsRepositoryImpl(private val productsApiService: ProductsApiService)
             emit(Resource.Error(message = "Oops, something went wrong!"))
         }
     }
+
+    override suspend fun createMobileDevice(mobile: Mobile): Boolean {
+        return productsApiService.createMobile(mobile)
+    }
 }

@@ -1,19 +1,48 @@
 package com.kanyideveloper.joomia.feature_products.presentation.home
 
-import android.widget.Toast
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.GridItemSpan
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme.typography
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddShoppingCart
-import androidx.compose.material.icons.filled.AddToHomeScreen
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,6 +81,7 @@ import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.YellowMain
 import com.kanyideveloper.joomia.core.util.LoadingAnimation
 import com.kanyideveloper.joomia.core.util.UiEvents
+import com.kanyideveloper.joomia.destinations.ProductAddingScreenDestination
 import com.kanyideveloper.joomia.destinations.ProductDetailsScreenDestination
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
@@ -68,10 +98,11 @@ fun HomeScreen(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var filtersExpanded by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
     val productsState = viewModel.productsState.value
     val categories = viewModel.categoriesState.value
     val user = viewModel.profileState.value
+    val isAdminAccount = viewModel.isAdminState.value
 
     Scaffold(
         topBar = {
@@ -92,6 +123,19 @@ fun HomeScreen(
                 user = user
             )
         },
+        floatingActionButton = {
+            if (isAdminAccount) {
+                FloatingActionButton(onClick = {
+                    navigator.navigate(ProductAddingScreenDestination())
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "",
+                        tint = Color.White
+                    )
+                }
+            }
+        }
     ) {
         val scaffoldState = rememberScaffoldState()
         LaunchedEffect(key1 = true) {

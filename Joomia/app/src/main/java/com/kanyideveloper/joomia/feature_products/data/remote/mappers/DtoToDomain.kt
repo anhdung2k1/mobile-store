@@ -7,13 +7,15 @@ import com.kanyideveloper.joomia.feature_products.domain.model.Rating
 
 internal fun MobileDto.toDomain(): Mobile {
     return Mobile(
+        mobileID = mobileID,
         mobileType = mobileType,
         mobileDescription = mobileDescription,
-        mobileID = mobileID,
         imageUrl = imageUrl,
         mobilePrice = mobilePrice,
+        mobileQuantity = mobileQuantity,
         rating = ratingDto.toDomain(),
-        mobileName = mobileName
+        mobileName = mobileName,
+        mobileModel = mobileModel
     )
 }
 

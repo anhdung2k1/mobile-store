@@ -9,8 +9,7 @@ class LoginUseCase(
 ) {
     suspend operator fun invoke(
         userName: String,
-        password: String,
-        rememberMe: Boolean
+        password: String
     ): AuthResult {
         val userNameError = if (userName.isBlank()) "User name cannot be blank" else null
         val passwordError = if (password.isBlank()) "Password cannot be blank" else null

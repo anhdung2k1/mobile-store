@@ -37,8 +37,7 @@ public class MobileEntity {
     @NotBlank(message = "Mobile Name must not be blank")
     private String mobileName;
 
-    @Column(name = "MOB_MODEL", nullable = false) // This will determine what OS phone run. For example: OS, Android
-    @NotBlank(message = "Mobile Model Name must not be blank")
+    @Column(name = "MOB_MODEL") // This will determine what OS phone run. For example: OS, Android
     private String mobileModel;
 
     @Column(name = "MOB_TYPE", nullable = false) // Identify the mobile type. Iphone, Samsung, ROG, etc

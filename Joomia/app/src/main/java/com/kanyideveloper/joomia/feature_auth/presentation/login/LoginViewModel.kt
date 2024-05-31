@@ -48,8 +48,7 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
 
             val loginResult = loginUseCase(
                 userName = usernameState.value.text,
-                password = passwordState.value.text,
-                rememberMe = rememberMeState.value
+                password = passwordState.value.text
             )
 
             _loginState.value = loginState.value.copy(isLoading = false)
