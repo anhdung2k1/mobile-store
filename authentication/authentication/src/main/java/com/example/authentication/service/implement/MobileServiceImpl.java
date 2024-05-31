@@ -1,26 +1,40 @@
 package com.example.authentication.service.implement;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.example.authentication.entity.MobileEntity;
 import com.example.authentication.entity.RatingEntity;
 import com.example.authentication.model.Mobile;
 import com.example.authentication.repository.MobileRepository;
 import com.example.authentication.repository.RatingRepository;
 import com.example.authentication.service.interfaces.MobileService;
+import com.example.authentication.utils.S3Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
+@Slf4j
 public class MobileServiceImpl implements MobileService {
 
     private final MobileRepository mobileRepository;
     private final RatingRepository ratingRepository;
+
+    private final S3Utils s3Utils;
+
+    @Value("${bucket.name}")
+    public String bucketName;
+    @Autowired
+    public AmazonS3 s3Client;
 
     private HashMap<String, Object> mobileMap(MobileEntity mobileEntity) {
         return new HashMap<>() {{
@@ -45,6 +59,12 @@ public class MobileServiceImpl implements MobileService {
             RatingEntity ratingEntity = new RatingEntity();
             ratingRepository.save(ratingEntity);
             mobile.setRate(ratingEntity);
+            if (!mobile.getImageUrl().isEmpty()) {
+                // Save to S3 Bucket
+                URL objectURL = s3Utils.getS3URL(mobile.getImageUrl());
+                mobile.setImageUrl(objectURL.toString());
+            }
+
             BeanUtils.copyProperties(mobile, mobileEntity);
             mobileRepository.save(mobileEntity);
             return true;
@@ -129,6 +149,10 @@ public class MobileServiceImpl implements MobileService {
             mobileEntity.setMobilePrice(mobile.getMobilePrice());
             mobileEntity.setMobileDescription(mobile.getMobileDescription());
             mobileEntity.setUpdateAt(LocalDateTime.now());
+            if (!mobile.getImageUrl().isEmpty()) {
+                URL objectURL = s3Utils.getS3URL(mobile.getImageUrl());
+                mobileEntity.setImageUrl(objectURL.toString());
+            }
             mobileRepository.save(mobileEntity);
             BeanUtils.copyProperties(mobileEntity, mobile);
             return mobile;
@@ -141,6 +165,15 @@ public class MobileServiceImpl implements MobileService {
     public Boolean deleteMobile(Long mobileId) throws Exception {
         try {
             if (mobileRepository.findById(mobileId).isPresent()) {
+                // Delete image in S3 Bucket
+                String fileURI = mobileRepository.findById(mobileId).get().getImageUrl();
+                String [] fileURISplitted = fileURI.split("/");
+                log.info("fileURISplitted: {}", (Object) fileURISplitted);
+                String fileName = fileURISplitted[fileURISplitted.length-1];
+                log.info("FileName: {}", fileName);
+                s3Client.deleteObject(bucketName, fileName);
+                log.info("FileName: {} removed", fileName);
+
                 mobileRepository.delete(mobileRepository.findById(mobileId).get());
                 return true;
             }
