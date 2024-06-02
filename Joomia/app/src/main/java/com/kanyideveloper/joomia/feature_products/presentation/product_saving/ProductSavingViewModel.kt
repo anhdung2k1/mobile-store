@@ -1,4 +1,4 @@
-package com.kanyideveloper.joomia.feature_products.presentation.product_adding
+package com.kanyideveloper.joomia.feature_products.presentation.product_saving
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,7 +7,6 @@ import android.net.Uri
 import android.util.Base64
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kanyideveloper.joomia.core.util.UiEvents
@@ -17,19 +16,17 @@ import com.kanyideveloper.joomia.feature_products.domain.model.Rating
 import com.kanyideveloper.joomia.feature_products.domain.repository.ProductsRepository
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetCategoriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductAddingViewModel @Inject constructor(
+class ProductSavingViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val productsRepository: ProductsRepository
 ) : ViewModel() {
@@ -37,7 +34,7 @@ class ProductAddingViewModel @Inject constructor(
     private val _categoriesState = mutableStateOf(emptyList<String>())
     val categoriesState: State<List<String>> = _categoriesState
 
-    private val _isProductCreatedState = mutableStateOf(false)
+    private val _isProductSavedState = mutableStateOf(false)
 
     private val _eventFlow = MutableSharedFlow<UiEvents>()
     val eventFlow: SharedFlow<UiEvents> = _eventFlow.asSharedFlow()
@@ -80,20 +77,21 @@ class ProductAddingViewModel @Inject constructor(
     }
 
 
-    fun createProduct(
+    fun saveProduct(
         context: Context,
-        productID: String,
+        productID: Int,
         productName: String,
         productModel: String,
         productType: String,
         productDescription: String,
         productPrice: String,
         productQuantity: String,
-        selectedImageUri: Uri?
+        selectedImageUri: Uri?,
+        isUpdate: Boolean
     ) {
         // Create a Mobile object with the provided details
         val mobile = Mobile(
-            mobileID = productID.toIntOrNull() ?: 0,
+            mobileID = productID,
             mobileName = productName,
             mobileType = productType,
             mobileDescription = productDescription,
@@ -107,11 +105,17 @@ class ProductAddingViewModel @Inject constructor(
         // Call the repository method to create the product
         viewModelScope.launch {
             try {
-                Timber.d("createProduct(): Called")
+                Timber.d("savingProduct(): Called")
                 Timber.d("Mobile model: $mobile")
-                _isProductCreatedState.value = productsRepository.createMobileDevice(mobile)
-                Timber.d("Check product created: ${_isProductCreatedState.value}")
-                if (_isProductCreatedState.value) {
+                if (isUpdate) {
+                    Timber.d("Update product(): Called")
+                    _isProductSavedState.value = productsRepository.updateMobileDevice(mobile.mobileID, mobile)
+                } else {
+                    Timber.d("Create product(): Called")
+                    _isProductSavedState.value = productsRepository.createMobileDevice(mobile)
+                }
+                Timber.d("Check product saved: ${_isProductSavedState.value}")
+                if (_isProductSavedState.value) {
                     _eventFlow.emit(
                         UiEvents.NavigateEvent(
                             HomeScreenDestination.route

@@ -1,12 +1,16 @@
 package com.example.authentication.service.implement;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.example.authentication.entity.UserEntity;
 import com.example.authentication.model.Users;
 import com.example.authentication.repository.UserRepository;
 import com.example.authentication.service.interfaces.UserService;
+import com.example.authentication.utils.S3Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +21,13 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
+    private final S3Utils s3Utils;
+
+    @Value("${bucket.name}")
+    public String bucketName;
+    @Autowired
+    public AmazonS3 s3Client;
+
     private final UserRepository userRepository;
 
     private Map<String, Object> userMap(UserEntity userEntity) {
@@ -26,6 +37,7 @@ public class UserServiceImpl implements UserService{
             put("adddress", userEntity.getAddress());
             put("birthDay", userEntity.getBirth_day());
             put("gender", userEntity.getGender());
+            put("imageUrl", userEntity.getImageUrl());
         }};
     }
 

@@ -1,13 +1,18 @@
 package com.kanyideveloper.joomia.feature_cart.presentation.cart
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,11 +28,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.kanyideveloper.joomia.R
+import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.core.util.LoadingAnimation
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Destination
 @Composable
@@ -69,17 +76,31 @@ fun CartScreen(
             )
         }
     ) {
-        CartScreenContent(state = state)
+        CartScreenContent(
+            state = state,
+            viewModel = viewModel
+        )
     }
 }
 
 @Composable
-private fun CartScreenContent(state: CartItemsState) {
+private fun CartScreenContent(
+    state: CartItemsState,
+    viewModel: CartViewModel = hiltViewModel(),
+) {
+
+    val coroutineScope = rememberCoroutineScope()
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn {
             items(state.cartItems) { cartItem ->
                 CartItem(
                     cartItem = cartItem,
+                    onCartRemoveItem = {
+                        coroutineScope.launch {
+                            viewModel.updateCartItem(cartItem)
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(130.dp)
@@ -122,7 +143,7 @@ private fun CartScreenContent(state: CartItemsState) {
             }
         }
 
-        if (state.cartItems.isEmpty() && state.cartItems == null) {
+        if (state.cartItems.isEmpty()) {
             Column(
                 Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -200,6 +221,7 @@ private fun CheckoutComponent(state: CartItemsState) {
 @Composable
 fun CartItem(
     cartItem: CartMobile,
+    onCartRemoveItem: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -230,13 +252,38 @@ fun CartItem(
                     .weight(2f)
                     .padding(5.dp)
             ) {
-                Text(
-                    text = cartItem.mobileName,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Row (
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = cartItem.mobileName,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    OutlinedButton(
+                        onClick = { onCartRemoveItem() },
+                        modifier = Modifier.size(40.dp),
+                        shape = CircleShape,
+                        border = BorderStroke(0.dp, Color.Transparent),
+                        contentPadding = PaddingValues(0.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.White,
+                            backgroundColor = Color.Red
+                        )
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(20.dp),
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Delete Product Item in Cart",
+                            tint = MainWhiteColor
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(
                     text = "$${cartItem.mobilePrice}",

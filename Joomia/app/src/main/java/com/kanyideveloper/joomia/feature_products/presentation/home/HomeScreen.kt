@@ -1,3 +1,5 @@
+@file:Suppress("OPT_IN_IS_NOT_ENABLED")
+
 package com.kanyideveloper.joomia.feature_products.presentation.home
 
 import androidx.compose.foundation.BorderStroke
@@ -48,6 +50,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -81,13 +84,15 @@ import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.YellowMain
 import com.kanyideveloper.joomia.core.util.LoadingAnimation
 import com.kanyideveloper.joomia.core.util.UiEvents
-import com.kanyideveloper.joomia.destinations.ProductAddingScreenDestination
 import com.kanyideveloper.joomia.destinations.ProductDetailsScreenDestination
+import com.kanyideveloper.joomia.destinations.ProductSavingScreenDestination
+import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Destination
@@ -126,7 +131,8 @@ fun HomeScreen(
         floatingActionButton = {
             if (isAdminAccount) {
                 FloatingActionButton(onClick = {
-                    navigator.navigate(ProductAddingScreenDestination())
+                    // Navigate to ProductSavingScreen: isUpdate = false -> create new product
+                    navigator.navigate(ProductSavingScreenDestination(isUpdate = false))
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Add,
@@ -153,7 +159,7 @@ fun HomeScreen(
 
         DropdownMenu(
             expanded = filtersExpanded,
-            offset = DpOffset(x = 200.dp, y = -600.dp),
+            offset = DpOffset(x = 200.dp, y = (-600).dp),
             onDismissRequest = {
                 filtersExpanded = !filtersExpanded
             }
@@ -181,7 +187,8 @@ fun HomeScreen(
             onSelectCategory = { category ->
                 viewModel.setCategory(category)
                 viewModel.getProducts(viewModel.selectedCategory.value)
-            }
+            },
+            viewModel = viewModel
         )
     }
 }
@@ -195,7 +202,11 @@ private fun HomeScreenContent(
     bannerImageUrl: String,
     selectedCategory: String,
     onSelectCategory: (String) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
+
+    val coroutineScope = rememberCoroutineScope()
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             cells = GridCells.Fixed(2),
@@ -248,6 +259,17 @@ private fun HomeScreenContent(
                 ProductItem(
                     mobile = product,
                     navigator = navigator,
+                    onClickAddToCart = {
+                        coroutineScope.launch {
+                            viewModel.createCartItem(CartMobile(
+                                mobileID = product.mobileID,
+                                mobileName = product.mobileName,
+                                mobilePrice = product.mobilePrice,
+                                mobileQuantity = product.mobileQuantity,
+                                imageUrl = product.imageUrl
+                            ))
+                        }
+                    },
                     modifier = Modifier
                         .width(150.dp)
                 )
@@ -275,6 +297,7 @@ private fun HomeScreenContent(
 @Composable
 private fun ProductItem(
     mobile: Mobile,
+    onClickAddToCart: () -> Unit,
     navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
 ) {
@@ -356,7 +379,7 @@ private fun ProductItem(
             )
 
             OutlinedButton(
-                onClick = {},
+                onClick = { onClickAddToCart() },
                 modifier = Modifier
                     .size(40.dp)
                     .align(End),

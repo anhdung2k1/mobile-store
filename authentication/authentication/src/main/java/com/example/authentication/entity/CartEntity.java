@@ -13,7 +13,14 @@ import java.util.List;
 @Table(name = "CARTS")
 public class CartEntity {
     public CartEntity() {
-
+        this.mobiles = null;
+        this.user = null;
+        this.cartDate = new Date();
+    }
+    public CartEntity(UserEntity userEntity) {
+        this.mobiles = null;
+        this.user = userEntity;
+        this.cartDate = new Date();
     }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

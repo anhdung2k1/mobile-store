@@ -46,7 +46,7 @@ public class MobileController {
     }
     // Update Mobile
     @PatchMapping(value = "/mobiles/{mobileId}")
-    public ResponseEntity<Mobile> updateMobileDevice(@PathVariable("mobileId") Long mobileId, @RequestBody Mobile mobile) throws Exception{
+    public ResponseEntity<Boolean> updateMobileDevice(@PathVariable("mobileId") Long mobileId, @RequestBody Mobile mobile) throws Exception{
         return ResponseEntity.ok(mobileService.updateMobileInformation(mobileId, mobile));
     }
     // Delete Mobile

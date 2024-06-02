@@ -21,6 +21,8 @@ public class UserEntity implements Serializable{
         this.address = "UNKNOWN";
         this.gender = "UNKNOWN";
         this.birth_day = new Date();
+        this.userName = "UNKNOWN";
+        this.imageUrl = "";
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
     }
@@ -28,6 +30,7 @@ public class UserEntity implements Serializable{
         this.userName = userName;
         this.address = "UNKNOWN";
         this.gender = "UNKNOWN";
+        this.imageUrl = "";
         this.birth_day = new Date();
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
@@ -53,6 +56,9 @@ public class UserEntity implements Serializable{
 
     @Column(name = "ADDRESS", length = 30)
     private String address;
+
+    @Column(name = "IMAGE_URL")
+    private String imageUrl;
 
     @Column(name = "GENDER", length = 6)
     private String gender;

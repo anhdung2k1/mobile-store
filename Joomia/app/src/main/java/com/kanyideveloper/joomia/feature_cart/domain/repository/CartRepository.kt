@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface CartRepository {
     suspend fun getAllCartItems(id: Int): Flow<Resource<List<CartMobile>>>
+    suspend fun createCartItems(id: Int, cartMobile: CartMobile): Flow<Resource<List<CartMobile>>>
+    suspend fun updateCartItems(id: Int, cartMobile: CartMobile): Flow<Resource<List<CartMobile>>>
 }

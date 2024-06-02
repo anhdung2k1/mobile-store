@@ -1,4 +1,4 @@
-package com.kanyideveloper.joomia.feature_products.presentation.product_adding
+package com.kanyideveloper.joomia.feature_products.presentation.product_saving
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -7,7 +7,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,9 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.GridItemSpan
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -56,7 +53,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -74,7 +70,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.kanyideveloper.joomia.R
-import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.YellowMain
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.AccountScreenDestination
@@ -87,11 +82,12 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Destination
 @Composable
-fun ProductAddingScreen(
+fun ProductSavingScreen(
     navigator: DestinationsNavigator,
-    viewModel: ProductAddingViewModel = hiltViewModel()
+    isUpdate: Boolean = false,
+    mobileID: Int = 0,
+    viewModel: ProductSavingViewModel = hiltViewModel()
 ) {
-    val productID = ""
     var productName by remember { mutableStateOf("") }
     var productModel by remember { mutableStateOf("") }
     var productType by remember { mutableStateOf("") }
@@ -195,16 +191,17 @@ fun ProductAddingScreen(
                         selectedImageUri = selectedImageUri,
                         onSelectImageClick = { imagePickerLauncher.launch("image/*") },
                         onClickSaveProduct = {
-                            viewModel.createProduct(
+                            viewModel.saveProduct(
                                 context,
-                                productID,
+                                mobileID,
                                 productName,
                                 productModel,
                                 productType,
                                 productDescription,
                                 productPrice,
                                 productQuantity,
-                                selectedImageUri
+                                selectedImageUri,
+                                isUpdate = isUpdate
                             )}
                     )
                 }

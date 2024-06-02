@@ -2,13 +2,33 @@ package com.kanyideveloper.joomia.feature_products.presentation.product_details
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +57,7 @@ import com.kanyideveloper.joomia.core.presentation.ui.theme.GrayColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.YellowMain
 import com.kanyideveloper.joomia.core.util.UiEvents
+import com.kanyideveloper.joomia.destinations.ProductSavingScreenDestination
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -49,6 +70,9 @@ fun ProductDetailsScreen(
     navigator: DestinationsNavigator,
     viewModel: ProductDetailsViewModel = hiltViewModel()
 ) {
+
+    val isAdmin = viewModel.isAdminState.value
+
     Scaffold(
         backgroundColor = Color.White,
         topBar = {
@@ -109,6 +133,8 @@ fun ProductDetailsScreen(
         DetailsScreenContent(
             mobile = mobile,
             modifier = Modifier.fillMaxSize(),
+            isAdmin = isAdmin,
+            onProductUpdateClick = { navigator.navigate(ProductSavingScreenDestination(isUpdate = true, mobileID = mobile.mobileID)) },
             onProductDeleteClick = { viewModel.deleteProduct(mobile.mobileID) }
         )
     }
@@ -118,6 +144,8 @@ fun ProductDetailsScreen(
 fun DetailsScreenContent(
     mobile: Mobile,
     modifier: Modifier = Modifier,
+    isAdmin: Boolean,
+    onProductUpdateClick: () -> Unit,
     onProductDeleteClick: () -> Unit
 ) {
     Column {
@@ -170,23 +198,46 @@ fun DetailsScreenContent(
                             modifier = Modifier.weight(1f)
                         )
 
-                        OutlinedButton(
-                            onClick = { onProductDeleteClick() },
-                            modifier = Modifier.size(40.dp),
-                            shape = CircleShape,
-                            border = BorderStroke(0.dp, Color.Transparent),
-                            contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Color.White,
-                                backgroundColor = Color.Red
-                            )
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(20.dp),
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete Product",
-                                tint = MainWhiteColor
-                            )
+                        if (isAdmin) {
+                            OutlinedButton(
+                                onClick = { onProductUpdateClick() },
+                                modifier = Modifier.size(40.dp),
+                                shape = CircleShape,
+                                border = BorderStroke(0.dp, Color.Transparent),
+                                contentPadding = PaddingValues(0.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = Color.White,
+                                    backgroundColor = YellowMain
+                                )
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(20.dp),
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = "Update Product",
+                                    tint = MainWhiteColor
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            OutlinedButton(
+                                onClick = { onProductDeleteClick() },
+                                modifier = Modifier.size(40.dp),
+                                shape = CircleShape,
+                                border = BorderStroke(0.dp, Color.Transparent),
+                                contentPadding = PaddingValues(0.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = Color.White,
+                                    backgroundColor = Color.Red
+                                )
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(20.dp),
+                                    imageVector = Icons.Filled.Delete,
+                                    contentDescription = "Delete Product",
+                                    tint = MainWhiteColor
+                                )
+                            }
                         }
                     }
 
