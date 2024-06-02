@@ -68,8 +68,26 @@ public class CartServiceImpl implements CartService {
                 List<MobileEntity> cartMobiles = cartEntity.getMobiles();
                 if (mobileRepository.findById(mobile.getMobileID()).isPresent()) {
                     MobileEntity mobileAddEntity = mobileRepository.findById(mobile.getMobileID()).get();
-                    // Add the mobile in the list
-                    cartMobiles.add(mobileAddEntity);
+
+                    if (cartMobiles != null) {
+                        // Update the quantity if the item has been created
+                        int index = cartMobiles.indexOf(mobileAddEntity);
+                        if (index != -1) {
+                            mobileAddEntity.setMobileQuantity(mobileAddEntity.getMobileQuantity() + 1);
+                            cartMobiles.set(index, mobileAddEntity);
+                        }
+                        else {
+                            log.warn("The mobile did not exists");
+                            mobileAddEntity.setMobileQuantity(1);
+                            cartMobiles.add(mobileAddEntity);
+                        }
+                    }
+                    else {
+                        // Add the mobile in the list if it did not present
+                        log.warn("Cart mobile is current empty");
+                        mobileAddEntity.setMobileQuantity(mobile.getMobileQuantity());
+                        cartMobiles.add(mobileAddEntity);
+                    }
                     // Update the carts
                     cartEntity.setMobiles(cartMobiles);
                     cartRepository.save(cartEntity);

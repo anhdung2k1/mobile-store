@@ -265,7 +265,7 @@ private fun HomeScreenContent(
                                 mobileID = product.mobileID,
                                 mobileName = product.mobileName,
                                 mobilePrice = product.mobilePrice,
-                                mobileQuantity = product.mobileQuantity,
+                                mobileQuantity = 1,
                                 imageUrl = product.imageUrl
                             ))
                         }

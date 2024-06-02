@@ -34,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,10 +59,12 @@ import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.core.presentation.ui.theme.YellowMain
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.ProductSavingScreenDestination
+import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Destination
 @Composable
@@ -72,6 +75,7 @@ fun ProductDetailsScreen(
 ) {
 
     val isAdmin = viewModel.isAdminState.value
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         backgroundColor = Color.White,
@@ -135,7 +139,19 @@ fun ProductDetailsScreen(
             modifier = Modifier.fillMaxSize(),
             isAdmin = isAdmin,
             onProductUpdateClick = { navigator.navigate(ProductSavingScreenDestination(isUpdate = true, mobileID = mobile.mobileID)) },
-            onProductDeleteClick = { viewModel.deleteProduct(mobile.mobileID) }
+            onProductDeleteClick = { viewModel.deleteProduct(mobile.mobileID) },
+            onClickAddToCart = {
+                coroutineScope.launch {
+                    viewModel.createCartItem(
+                        CartMobile(
+                            mobileID = mobile.mobileID,
+                            mobileName = mobile.mobileName,
+                            mobilePrice = mobile.mobilePrice,
+                            mobileQuantity = 1,
+                            imageUrl = mobile.imageUrl
+                        )
+                    )
+            } }
         )
     }
 }
@@ -146,7 +162,8 @@ fun DetailsScreenContent(
     modifier: Modifier = Modifier,
     isAdmin: Boolean,
     onProductUpdateClick: () -> Unit,
-    onProductDeleteClick: () -> Unit
+    onProductDeleteClick: () -> Unit,
+    onClickAddToCart: () -> Unit
 ) {
     Column {
         Box(modifier = modifier.weight(1f), contentAlignment = Alignment.Center) {
@@ -313,8 +330,7 @@ fun DetailsScreenContent(
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Button(
-                        onClick = {
-                        },
+                        onClick = { onClickAddToCart() },
                         colors = ButtonDefaults.buttonColors(
                             contentColor = Color.Black,
                             backgroundColor = YellowMain,
