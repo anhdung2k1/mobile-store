@@ -5,6 +5,7 @@ import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -21,6 +22,10 @@ interface ProductsApiService {
     suspend fun findMobileDeviceName(@Query("query") mobileName: String) : List<MobileDto>
     @POST("api/mobiles")
     suspend fun createMobile(@Body mobile: Mobile): Boolean
+    @PATCH("api/mobiles/{mobileID}")
+    suspend fun updateMobileDevice(@Path("mobileID") id: Int, @Body mobile: Mobile): Boolean
     @DELETE("api/mobiles/{mobileID}")
     suspend fun deleteMobileDevice(@Path("mobileID") id: Int): MutableMap<String, Boolean>
 }
+
+

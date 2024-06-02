@@ -9,6 +9,9 @@ import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
 import com.kanyideveloper.joomia.feature_auth.domain.repository.AuthRepository
+import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
+import com.kanyideveloper.joomia.feature_cart.domain.repository.CartRepository
+import com.kanyideveloper.joomia.feature_cart.presentation.cart.CartItemsState
 import com.kanyideveloper.joomia.feature_products.domain.use_case.FindProductsUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetCategoriesUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetProductsUseCase
@@ -30,12 +33,16 @@ class HomeViewModel @Inject constructor(
     private val findProductsUseCase: FindProductsUseCase,
     private val profileRepository: ProfileRepository,
     private val authRepository: AuthRepository,
+    private val cartRepository: CartRepository,
     private val gson: Gson
 ) :
     ViewModel() {
 
     private val _isAdminState = mutableStateOf(false)
     val isAdminState: State<Boolean> = _isAdminState
+
+    private val _cartState = mutableStateOf(CartItemsState())
+    val cartState: State<CartItemsState> = _cartState
 
     private val _profileState = mutableStateOf(User())
     val profileState: State<User> = _profileState
@@ -93,6 +100,41 @@ class HomeViewModel @Inject constructor(
     private fun getCategories() {
         viewModelScope.launch {
             _categoriesState.value = getCategoriesUseCase()
+        }
+    }
+
+    suspend fun createCartItem(cartMobile: CartMobile) {
+        viewModelScope.launch {
+            _profileState.value.id?.let {
+                cartRepository.createCartItems(it, cartMobile).collectLatest { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            _cartState.value = cartState.value.copy(
+                                cartItems = result.data ?: emptyList(),
+                                isLoading = false
+                            )
+                        }
+
+                        is Resource.Loading -> {
+                            _cartState.value = cartState.value.copy(
+                                isLoading = true
+                            )
+                        }
+
+                        is Resource.Error -> {
+                            _cartState.value = cartState.value.copy(
+                                isLoading = false,
+                                error = result.message
+                            )
+                            _eventFlow.emit(
+                                UiEvents.SnackbarEvent(
+                                    message = result.message ?: "Unknown error occurred!"
+                                )
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 

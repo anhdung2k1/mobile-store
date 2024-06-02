@@ -44,6 +44,10 @@ class ProductsRepositoryImpl(private val productsApiService: ProductsApiService)
         return productsApiService.createMobile(mobile)
     }
 
+    override suspend fun updateMobileDevice(mobileID: Int, mobile: Mobile): Boolean {
+        return productsApiService.updateMobileDevice(mobileID, mobile)
+    }
+
     override suspend fun deleteMobileDevice(mobileID: Int): MutableMap<String, Boolean> {
         return productsApiService.deleteMobileDevice(mobileID)
     }

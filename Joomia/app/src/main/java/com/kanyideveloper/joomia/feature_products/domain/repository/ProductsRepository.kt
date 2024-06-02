@@ -9,5 +9,6 @@ interface ProductsRepository {
     suspend fun getMobileCategories(): List<String>
     suspend fun findMobileDeviceName(mobileName: String) : Flow<Resource<List<Mobile>>>
     suspend fun createMobileDevice(mobile: Mobile) : Boolean
+    suspend fun updateMobileDevice(mobileID: Int, mobile: Mobile): Boolean
     suspend fun deleteMobileDevice(mobileID: Int): MutableMap<String, Boolean>
 }

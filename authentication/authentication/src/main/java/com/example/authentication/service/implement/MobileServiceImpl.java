@@ -137,7 +137,7 @@ public class MobileServiceImpl implements MobileService {
     }
 
     @Override
-    public Mobile updateMobileInformation(Long mobileId, Mobile mobile) throws Exception {
+    public Boolean updateMobileInformation(Long mobileId, Mobile mobile) throws Exception {
         try {
             MobileEntity mobileEntity = mobileRepository.findById(mobileId).isPresent()
                     ? mobileRepository.findById(mobileId).get() : null;
@@ -155,7 +155,7 @@ public class MobileServiceImpl implements MobileService {
             }
             mobileRepository.save(mobileEntity);
             BeanUtils.copyProperties(mobileEntity, mobile);
-            return mobile;
+            return true;
         } catch (NoSuchElementException e) {
             throw new Exception("Could not found Mobile Device " + e.getMessage());
         }
