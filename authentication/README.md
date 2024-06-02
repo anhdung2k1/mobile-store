@@ -88,7 +88,8 @@ $ curl -X DELETE http://localhost:80808/api/user/1
 | 8 | /api/accounts/:userId | DELETE | DELETE Account |
 | **Cart** | | | |
 | 1 | /api/carts/user/:userId | GET | GET Current User Carts |
-| 1 | /api/carts/user/:userId | UPDATE | Update Current User Carts |
+| 2 | /api/carts/user/:userId | UPDATE | UPDATE Current User Carts |
+| 3 | /api/carts/user/:userId | POST | CREATE User Cart & Add item |
 | **Customer** | | | |
 | 1 | /api/customers | POST | Create new Customer |
 | 2 | /api/customers/query?query= | GET | FIND Customer by Name |
