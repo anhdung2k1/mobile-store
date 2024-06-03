@@ -40,6 +40,10 @@ class ProductsRepositoryImpl(private val productsApiService: ProductsApiService)
         }
     }
 
+    override suspend fun getMobileDevice(mobileID: Int): Mobile {
+        return productsApiService.getMobile(mobileID).toDomain()
+    }
+
     override suspend fun createMobileDevice(mobile: Mobile): Boolean {
         return productsApiService.createMobile(mobile)
     }

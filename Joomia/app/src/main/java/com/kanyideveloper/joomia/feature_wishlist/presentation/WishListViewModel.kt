@@ -10,6 +10,8 @@ import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
 import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
 import com.kanyideveloper.joomia.feature_cart.presentation.cart.CartItemsState
+import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
+import com.kanyideveloper.joomia.feature_products.domain.model.Rating
 import com.kanyideveloper.joomia.feature_products.domain.repository.ProductsRepository
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetProductsUseCase
 import com.kanyideveloper.joomia.feature_products.presentation.home.ProductsState
@@ -32,6 +34,7 @@ class WishListViewModel @Inject constructor(
     private val getWishListItemsUseCase: GetWishListItemsUseCase,
     private val wishListRepository: WishListRepository,
     private val profileRepository: ProfileRepository,
+    private val productsRepository: ProductsRepository,
     private val gson: Gson
 ) : ViewModel() {
 
@@ -39,6 +42,9 @@ class WishListViewModel @Inject constructor(
     val evenFlow: SharedFlow<UiEvents> = _eventFlow.asSharedFlow()
 
     private val _profileState = mutableStateOf(User())
+
+    private val _mobileState = mutableStateOf(Mobile(0, "", "", "", 0.0, 0, Rating(0,0.0), "", ""))
+    val mobileState: State<Mobile> = _mobileState
 
     private val _state = mutableStateOf(WishListItemsState())
     val state: State<WishListItemsState> = _state
@@ -57,6 +63,10 @@ class WishListViewModel @Inject constructor(
                 _profileState.value = user.toDomain()
             }
         }
+    }
+
+    suspend fun getMobileDevice(mobileID: Int): Mobile {
+        return productsRepository.getMobileDevice(mobileID)
     }
 
     suspend fun updateWishListItem(wishListMobile: WishListMobile) {

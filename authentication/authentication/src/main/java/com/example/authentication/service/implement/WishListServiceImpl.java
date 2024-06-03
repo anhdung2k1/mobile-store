@@ -126,4 +126,20 @@ public class WishListServiceImpl implements WishListService {
             throw new Exception("Could not get wish list items " + e.getMessage());
         }
     }
+
+    @Override
+    public Boolean removeAllWishListItems(Long userId) throws Exception {
+        try {
+            WishListEntity wishListEntity = wishListRepository.getWishListEntityWithUserId(userId).isPresent()
+                    ? wishListRepository.getWishListEntityWithUserId(userId).get() : null;
+            assert wishListEntity != null;
+            List<MobileEntity> wishListMobiles = wishListEntity.getMobiles();
+            wishListMobiles.clear();
+            wishListEntity.setMobiles(wishListMobiles);
+            wishListRepository.save(wishListEntity);
+            return true;
+        } catch (NoSuchElementException e) {
+            throw new Exception("Could not get wish list items" + e.getMessage());
+        }
+    }
 }
