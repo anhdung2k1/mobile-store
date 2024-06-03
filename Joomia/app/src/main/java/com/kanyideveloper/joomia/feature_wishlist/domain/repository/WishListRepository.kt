@@ -9,4 +9,5 @@ interface WishListRepository {
     suspend fun getAllWishListItems(id: Int): Flow<Resource<List<WishListMobile>>>
     suspend fun createWishListItems(id: Int, wishListMobile: WishListMobile): Flow<Resource<List<WishListMobile>>>
     suspend fun updateWishListItems(id: Int, wishListMobile: WishListMobile): Flow<Resource<List<WishListMobile>>>
+    suspend fun removeAllWishListItems(id: Int): Boolean
 }

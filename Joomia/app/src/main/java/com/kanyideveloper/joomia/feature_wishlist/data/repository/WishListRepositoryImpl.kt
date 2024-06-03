@@ -90,4 +90,9 @@ class WishListRepositoryImpl(
             emit(Resource.Error(message = "Oops, something went wrong when update Carts!"))
         }
     }
+
+    override suspend fun removeAllWishListItems(id: Int): Boolean {
+        Timber.d("removeAllWishListItems(): called")
+        return wishListApiService.removeAllWishListItems(id)
+    }
 }

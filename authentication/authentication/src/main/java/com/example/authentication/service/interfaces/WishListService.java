@@ -8,4 +8,5 @@ public interface WishListService {
     Map<String, Object> getWishListItems(Long userId) throws Exception;
     Map<String, Object> addWishListItems(Long userId, Mobile mobile) throws Exception;
     Map<String, Object> removeWishListItems(Long userId, Mobile mobile) throws Exception;
+    Boolean removeAllWishListItems(Long userId) throws Exception;
 }

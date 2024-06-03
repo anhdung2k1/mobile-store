@@ -26,4 +26,8 @@ public class WishListController {
     public ResponseEntity<Map<String, Object>> removeWishListItems(@PathVariable("userId") Long userId, @RequestBody Mobile mobile) throws Exception {
         return ResponseEntity.ok(wishListService.removeWishListItems(userId, mobile));
     }
+    @PatchMapping(value = "/wishlist/user/{userId}/remove")
+    public ResponseEntity<Boolean> removeAllWishListItems(@PathVariable("userId") Long userId) throws Exception {
+        return ResponseEntity.ok(wishListService.removeAllWishListItems(userId));
+    }
 }

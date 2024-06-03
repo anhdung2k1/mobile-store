@@ -20,6 +20,8 @@ interface ProductsApiService {
     // Search mobile with mobile Name
     @GET("api/mobiles/products/query")
     suspend fun findMobileDeviceName(@Query("query") mobileName: String) : List<MobileDto>
+    @GET("api/mobiles/{mobileID}")
+    suspend fun getMobile(@Path("mobileID") id: Int) : MobileDto
     @POST("api/mobiles")
     suspend fun createMobile(@Body mobile: Mobile): Boolean
     @PATCH("api/mobiles/{mobileID}")
