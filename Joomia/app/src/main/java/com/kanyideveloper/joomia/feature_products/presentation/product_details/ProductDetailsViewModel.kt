@@ -21,8 +21,10 @@ import com.kanyideveloper.joomia.feature_profile.data.toDomain
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import com.kanyideveloper.joomia.feature_wishlist.domain.model.WishListMobile
 import com.kanyideveloper.joomia.feature_wishlist.domain.repository.WishListRepository
+import com.kanyideveloper.joomia.feature_wishlist.domain.use_case.GetWishListItemsUseCase
 import com.kanyideveloper.joomia.feature_wishlist.presentation.WishListItemsState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -38,6 +40,7 @@ class ProductDetailsViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val cartRepository: CartRepository,
     private val wishListRepository: WishListRepository,
+    private val getWishListItemsUseCase: GetWishListItemsUseCase,
     private val gson: Gson
 ): ViewModel() {
 
@@ -58,6 +61,7 @@ class ProductDetailsViewModel @Inject constructor(
     init {
         getProfile()
         checkAdminAccount()
+
     }
 
     private fun checkAdminAccount() {
@@ -73,6 +77,78 @@ class ProductDetailsViewModel @Inject constructor(
             profileRepository.getUserProfile().collectLatest { data ->
                 val user = gson.fromJson(data, UserResponseDto::class.java)
                 _profileState.value = user.toDomain()
+            }
+        }
+    }
+
+    suspend fun checkWishListItem(mobileId: Int): Boolean {
+        val resultDeferred = CompletableDeferred<Boolean>()
+        getWishListItemsUseCase().collectLatest { result ->
+            when (result) {
+                is Resource.Success -> {
+                    val items = result.data?.filter { it.mobileID == mobileId } ?: emptyList()
+                    _wishListState.value = wishListState.value.copy(
+                        wishListItems = items,
+                        isLoading = false
+                    )
+                    resultDeferred.complete(items.isNotEmpty())
+                }
+
+                is Resource.Loading -> {
+                    _wishListState.value = wishListState.value.copy(
+                        isLoading = true
+                    )
+                }
+
+                is Resource.Error -> {
+                    _wishListState.value = wishListState.value.copy(
+                        isLoading = false,
+                        error = result.message
+                    )
+                    _eventFlow.emit(
+                        UiEvents.SnackbarEvent(
+                            message = result.message ?: "Unknown error occurred!"
+                        )
+                    )
+                    resultDeferred.complete(false)
+                }
+            }
+        }
+
+        return resultDeferred.await()
+    }
+
+    suspend fun updateWishListItem(wishListMobile: WishListMobile) {
+        viewModelScope.launch {
+            _profileState.value.id?.let {
+                wishListRepository.updateWishListItems(it, wishListMobile).collectLatest { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            _wishListState.value = wishListState.value.copy(
+                                wishListItems = result.data ?: emptyList(),
+                                isLoading = false
+                            )
+                        }
+
+                        is Resource.Loading -> {
+                            _wishListState.value = wishListState.value.copy(
+                                isLoading = true
+                            )
+                        }
+
+                        is Resource.Error -> {
+                            _wishListState.value = wishListState.value.copy(
+                                isLoading = false,
+                                error = result.message
+                            )
+                            _eventFlow.emit(
+                                UiEvents.SnackbarEvent(
+                                    message = result.message ?: "Unknown error occurred!"
+                                )
+                            )
+                        }
+                    }
+                }
             }
         }
     }
