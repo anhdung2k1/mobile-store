@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,6 +62,7 @@ import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.ProductSavingScreenDestination
 import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
+import com.kanyideveloper.joomia.feature_wishlist.domain.model.WishListMobile
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
@@ -73,9 +75,14 @@ fun ProductDetailsScreen(
     navigator: DestinationsNavigator,
     viewModel: ProductDetailsViewModel = hiltViewModel()
 ) {
-
-    val isAdmin = viewModel.isAdminState.value
     val coroutineScope = rememberCoroutineScope()
+    val isAdmin = viewModel.isAdminState.value
+    var isWishList by remember { mutableStateOf(false) }
+
+    // Check if the item is in the wishlist
+    LaunchedEffect(mobile.mobileID) {
+        isWishList = viewModel.checkWishListItem(mobileId = mobile.mobileID)
+    }
 
     Scaffold(
         backgroundColor = Color.White,
@@ -94,15 +101,40 @@ fun ProductDetailsScreen(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_chevron_left),
-                        contentDescription = null,
+                        contentDescription = "Back to Home",
                         modifier = Modifier.size(32.dp)
                     )
                 }
                 IconButton(
-                    onClick = {},
+                    onClick = {
+                        coroutineScope.launch {
+                            if (isWishList) {
+                                viewModel.updateWishListItem(
+                                    WishListMobile(
+                                        mobileID = mobile.mobileID,
+                                        mobileName = mobile.mobileName,
+                                        mobilePrice = mobile.mobilePrice,
+                                        mobileQuantity = mobile.mobileQuantity,
+                                        imageUrl = mobile.imageUrl
+                                    )
+                                )
+                            } else {
+                                viewModel.createWishListItem(
+                                    WishListMobile(
+                                        mobileID = mobile.mobileID,
+                                        mobileName = mobile.mobileName,
+                                        mobilePrice = mobile.mobilePrice,
+                                        mobileQuantity = mobile.mobileQuantity,
+                                        imageUrl = mobile.imageUrl
+                                    )
+                                )
+                            }
+                            isWishList = !isWishList
+                        }
+                    },
                 ) {
                     Icon(
-                        painterResource(id = R.drawable.ic_heart),
+                        painterResource(id = if (isWishList) R.drawable.ic_heart_fill else R.drawable.ic_heart),
                         tint = GrayColor,
                         contentDescription = null,
                         modifier = Modifier.size(32.dp)
@@ -151,7 +183,8 @@ fun ProductDetailsScreen(
                             imageUrl = mobile.imageUrl
                         )
                     )
-            } }
+                }
+            }
         )
     }
 }

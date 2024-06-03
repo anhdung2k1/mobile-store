@@ -13,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
@@ -66,6 +63,9 @@ public class CartServiceImpl implements CartService {
             }
             if (mobile != null) {
                 List<MobileEntity> cartMobiles = cartEntity.getMobiles();
+                if (cartMobiles == null) {
+                    cartMobiles = new ArrayList<>();
+                }
                 if (mobileRepository.findById(mobile.getMobileID()).isPresent()) {
                     MobileEntity mobileAddEntity = mobileRepository.findById(mobile.getMobileID()).get();
 

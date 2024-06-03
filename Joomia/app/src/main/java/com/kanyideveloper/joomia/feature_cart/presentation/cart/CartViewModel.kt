@@ -48,7 +48,7 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    private fun getProfile() {
+    private suspend fun getProfile() {
         viewModelScope.launch {
             profileRepository.getUserProfile().collectLatest { data ->
                 val user = gson.fromJson(data, UserResponseDto::class.java)
