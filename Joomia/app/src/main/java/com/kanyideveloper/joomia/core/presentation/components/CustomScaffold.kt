@@ -22,6 +22,7 @@ fun CustomScaffold(
     showBottomBar: Boolean = true,
     items: List<BottomNavItem> = listOf(
         BottomNavItem.Home,
+        BottomNavItem.WishList,
         BottomNavItem.Cart,
         BottomNavItem.Account,
     ),

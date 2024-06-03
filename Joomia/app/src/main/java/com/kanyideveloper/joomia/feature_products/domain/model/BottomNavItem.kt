@@ -9,6 +9,11 @@ sealed class BottomNavItem(var icon: Int, var destination: Destination) {
         destination = HomeScreenDestination
     )
 
+    object WishList : BottomNavItem(
+        icon = R.drawable.ic_heart,
+        destination = WishlistScreenDestination
+    )
+
     object Cart : BottomNavItem(
         icon = R.drawable.ic_basket,
         destination = CartScreenDestination

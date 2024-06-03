@@ -61,6 +61,7 @@ import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.ProductSavingScreenDestination
 import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
+import com.kanyideveloper.joomia.feature_wishlist.domain.model.WishListMobile
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
@@ -99,7 +100,19 @@ fun ProductDetailsScreen(
                     )
                 }
                 IconButton(
-                    onClick = {},
+                    onClick = {
+                          coroutineScope.launch {
+                              viewModel.createWishListItem(
+                                  WishListMobile(
+                                      mobileID = mobile.mobileID,
+                                      mobileName = mobile.mobileName,
+                                      mobilePrice = mobile.mobilePrice,
+                                      mobileQuantity = mobile.mobileQuantity,
+                                      imageUrl = mobile.imageUrl
+                                  )
+                              )
+                          }
+                    },
                 ) {
                     Icon(
                         painterResource(id = R.drawable.ic_heart),
