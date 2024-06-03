@@ -25,4 +25,7 @@ interface WishListApiService {
 
     @PATCH("api/wishlist/user/{id}")
     suspend fun updateWishList(@Path("id") id: Int, @Body wishListMobile: WishListMobile): UserWishListResponseDto
+
+    @PATCH("api/wishlist/user/{id}/remove")
+    suspend fun removeAllWishListItems(@Path("id") id: Int): Boolean
 }

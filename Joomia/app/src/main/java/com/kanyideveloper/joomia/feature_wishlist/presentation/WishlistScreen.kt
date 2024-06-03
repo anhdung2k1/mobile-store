@@ -47,6 +47,7 @@ import com.kanyideveloper.joomia.R
 import com.kanyideveloper.joomia.core.presentation.ui.theme.YellowMain
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.ProductDetailsScreenDestination
+import com.kanyideveloper.joomia.destinations.WishlistScreenDestination
 import com.kanyideveloper.joomia.feature_wishlist.domain.model.WishListMobile
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -61,6 +62,7 @@ fun WishlistScreen (
 ) {
 
     val state = viewModel.state.value
+    val user = viewModel.profilState.value
     val scaffoldState = rememberScaffoldState()
 
     val coroutineScope = rememberCoroutineScope()
@@ -96,7 +98,10 @@ fun WishlistScreen (
                 actions = {
                     IconButton(
                         onClick = {
-//                            viewModel.deleteAllWishlist()
+                            coroutineScope.launch {
+                                user.id?.let { viewModel.removeAllWishListItems(it) }
+                                navigator.navigate(WishlistScreenDestination.route)
+                            }
                         },
                     ) {
                         Icon(

@@ -42,6 +42,7 @@ class WishListViewModel @Inject constructor(
     val evenFlow: SharedFlow<UiEvents> = _eventFlow.asSharedFlow()
 
     private val _profileState = mutableStateOf(User())
+    val profilState: State<User> = _profileState
 
     private val _mobileState = mutableStateOf(Mobile(0, "", "", "", 0.0, 0, Rating(0,0.0), "", ""))
     val mobileState: State<Mobile> = _mobileState
@@ -101,6 +102,12 @@ class WishListViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    suspend fun removeAllWishListItems(userID: Int) {
+        viewModelScope.launch {
+            wishListRepository.removeAllWishListItems(userID)
         }
     }
 

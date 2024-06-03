@@ -31,14 +31,17 @@ import com.kanyideveloper.joomia.R
 import com.kanyideveloper.joomia.core.presentation.ui.theme.MainWhiteColor
 import com.kanyideveloper.joomia.core.util.LoadingAnimation
 import com.kanyideveloper.joomia.core.util.UiEvents
+import com.kanyideveloper.joomia.destinations.CheckOutScreenDestination
 import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Destination
 @Composable
 fun CartScreen(
+    navigator: DestinationsNavigator,
     viewModel: CartViewModel = hiltViewModel(),
 ) {
 
@@ -78,6 +81,9 @@ fun CartScreen(
     ) {
         CartScreenContent(
             state = state,
+            onClickCheckOut = {
+              navigator.navigate(CheckOutScreenDestination.route)
+            },
             viewModel = viewModel
         )
     }
@@ -86,6 +92,7 @@ fun CartScreen(
 @Composable
 private fun CartScreenContent(
     state: CartItemsState,
+    onClickCheckOut: () -> Unit,
     viewModel: CartViewModel = hiltViewModel(),
 ) {
 
@@ -109,7 +116,10 @@ private fun CartScreenContent(
             }
             item {
                 if (state.cartItems.isNotEmpty()) {
-                    CheckoutComponent(state = state)
+                    CheckoutComponent(
+                        state = state,
+                        onClickCheckOut = onClickCheckOut
+                    )
                 }
             }
         }
@@ -161,7 +171,10 @@ private fun CartScreenContent(
 }
 
 @Composable
-private fun CheckoutComponent(state: CartItemsState) {
+private fun CheckoutComponent(
+    state: CartItemsState,
+    onClickCheckOut: () -> Unit
+) {
     Column(Modifier.padding(12.dp)) {
         Row(
             Modifier.fillMaxWidth(),
@@ -205,7 +218,7 @@ private fun CheckoutComponent(state: CartItemsState) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = {},
+            onClick = { onClickCheckOut() },
             shape = RoundedCornerShape(8)
         ) {
             Text(
