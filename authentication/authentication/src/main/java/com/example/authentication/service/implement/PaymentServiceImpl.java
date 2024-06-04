@@ -22,8 +22,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     private HashMap<String, Object> paymentMap(PaymentEntity paymentEntity) {
         return new HashMap<>() {{
+            put("paymentID", paymentEntity.getPaymentId());
             put("paymentMethod", paymentEntity.getPaymentMethod());
             put("paymentDescription", paymentEntity.getPaymentDescription());
+            put("imageUrl", paymentEntity.getImageUrl());
         }};
     }
     @Override
@@ -47,17 +49,17 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<Map<String, Object>> getAllPaymentByCustomerId(Long customerId) throws Exception {
+    public List<Map<String, Object>> getAllPaymentByUserId(Long userId) throws Exception {
         try {
             List<Map<String, Object>> paymentMapList = new ArrayList<>();
-            List<PaymentEntity> paymentEntities = paymentRepository.findAllPaymentByCustomerId(customerId).isPresent()
-                    ? paymentRepository.findAllPaymentByCustomerId(customerId).get() : null;
+            List<PaymentEntity> paymentEntities = paymentRepository.findAllPaymentByUserId(userId).isPresent()
+                    ? paymentRepository.findAllPaymentByUserId(userId).get() : null;
             assert paymentEntities != null;
             paymentEntities.forEach((paymentEntity ->
                     paymentMapList.add(paymentMap(paymentEntity))));
             return paymentMapList;
         } catch (NoSuchElementException e) {
-            throw new Exception("Could not get list of payments from " + customerId + e.getMessage());
+            throw new Exception("Could not get list of payments from " + userId + e.getMessage());
         }
     }
 

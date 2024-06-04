@@ -16,15 +16,13 @@ import java.time.LocalDateTime;
 @Transactional(rollbackOn = Exception.class)
 public class TransactionEntity {
     public TransactionEntity(){
-        this.transactionName = "";
         this.transactionType = "";
-        this.payments = new PaymentEntity();
+        this.payment = new PaymentEntity();
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
     }
 
     public TransactionEntity(String transactionName, String transactionType) {
-        this.transactionName = transactionName;
         this.transactionType = transactionType;
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
@@ -41,17 +39,20 @@ public class TransactionEntity {
             allocationSize = 1)
     private Long transactionId;
 
-    @Column(name = "TRANS_NAME", nullable = false, length = 100)
-    @NotBlank(message = "Transaction Name must not be blank")
-    private String transactionName;
-
-    @Column(name = "TRANS_TYPE", nullable = false, length = 10)
+    @Column(name = "TRANS_TYPE", nullable = false, length = 100)
     @NotBlank(message = "Must specify the transaction type")
     private String transactionType;
 
+    @Column(name = "SHIPPING_ADDRESS", nullable = false)
+    @NotBlank(message = "The Shipping Address must not be blank")
+    private String shippingAddress;
+
+    @Column(name = "BILLING_PAYMENT", nullable = false)
+    private Double billingPayment;
+
     @ManyToOne
     @JoinColumn(name = "PAY_ID")
-    private PaymentEntity payments;
+    private PaymentEntity payment;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_AT")

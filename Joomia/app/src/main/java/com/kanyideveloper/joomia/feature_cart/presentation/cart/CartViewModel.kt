@@ -8,12 +8,9 @@ import com.google.gson.Gson
 import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
-import com.kanyideveloper.joomia.feature_auth.data.local.AuthPreferences
-import com.kanyideveloper.joomia.feature_auth.domain.repository.AuthRepository
 import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
 import com.kanyideveloper.joomia.feature_cart.domain.repository.CartRepository
 import com.kanyideveloper.joomia.feature_cart.domain.use_case.GetCartItemsUseCase
-import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import com.kanyideveloper.joomia.feature_profile.data.repository.ProfileRepository
 import com.kanyideveloper.joomia.feature_profile.data.toDomain
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
@@ -22,7 +19,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

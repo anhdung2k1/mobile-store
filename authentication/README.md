@@ -90,12 +90,6 @@ $ curl -X DELETE http://localhost:80808/api/user/1
 | 1 | /api/carts/user/:userId | GET | GET Current User Carts |
 | 2 | /api/carts/user/:userId | UPDATE | UPDATE Current User Carts |
 | 3 | /api/carts/user/:userId | POST | CREATE User Cart & Add item |
-| **Customer** | | | |
-| 1 | /api/customers | POST | Create new Customer |
-| 2 | /api/customers/query?query= | GET | FIND Customer by Name |
-| 3 | /api/customers/:id | GET | GET one customer by ID |
-| 4 | /api/customers/:id | PATCH | UPDATE customer information |
-| 5 | /api/customers/:id | DELETE | DELETE customer information |
 | **Mobile** | | | |
 | 1 | /api/mobiles | POST | Create new Mobile |
 | 2 | /api/mobiles | GET | GET all Mobiles |
@@ -107,7 +101,7 @@ $ curl -X DELETE http://localhost:80808/api/user/1
 | 8 | /api/mobiles/:id | DELETE | DELETE Mobile by Id |
 | **Payment** | | | |
 | 1 | /api/payments | POST | Create new Payment Method |
-| 2 | /api/payments/customers/:customerId | GET | GET All Payments by Customer ID |
+| 2 | /api/payments/users/:userId | GET | GET All Payments by User ID |
 | 3 | /api/payments/ | GET | GET All Payments |
 | 4 | /api/payments/:id | GET | GET Payment By ID |
 | 5 | /api/payments/:id | PATCH | UPDATE Payment By ID |
@@ -129,9 +123,9 @@ $ curl -X DELETE http://localhost:80808/api/user/1
 | 4 | /api/roles/:id | PATCH | UPDATE Role |
 | 5 | /api/roles/:id | DELETE | DELETE Role |
 | **Transaction** | | | |
-| 1 | /api/transactions/:customerID | POST | Create new Transaction |
+| 1 | /api/transactions/:userId | POST | Create new Transaction |
 | 2 | /api/transactions/query?query= | GET | GET All Transactions By Name |
-| 3 | /api/transactions/customer/:customerId | GET | GET All Transactions By Customer ID |
+| 3 | /api/transactions/user/:userId | GET | GET All Transactions By User ID |
 | 4 | /api/transactions/:id | PATCH | UPDATE Transaction |
 | 5 | /api/transactions/:id | GET | GET Transaction |
 | 6 | /api/transactions/:id | DELETE | DELETE Transaction |

@@ -3,6 +3,8 @@ package com.kanyideveloper.joomia.feature_cart.data.repository
 import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.feature_cart.data.remote.CartApiService
 import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
+import com.kanyideveloper.joomia.feature_cart.domain.model.Payment
+import com.kanyideveloper.joomia.feature_cart.domain.model.Transaction
 import com.kanyideveloper.joomia.feature_cart.domain.repository.CartRepository
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import kotlinx.coroutines.flow.Flow
@@ -90,5 +92,31 @@ class CartRepositoryImpl(
         } catch (e: HttpException) {
             emit(Resource.Error(message = "Oops, something went wrong when update Carts!"))
         }
+    }
+
+    override suspend fun getAllPayments(): Flow<Resource<List<Payment>>> {
+        Timber.d("Get all payments called")
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val response = cartApiService.getAllPayments()
+                val payments = ArrayList<Payment>()
+                response.forEach { it ->
+                    val payment = Payment(it.paymentID, it.paymentMethod, it.imageUrl)
+                    payments.add(payment)
+
+                    emit(Resource.Success(payments.toList().distinctBy { it.paymentMethod }))
+                }
+            } catch (e: IOException) {
+                emit(Resource.Error(message = "Could not reach the server, please check your internet connection!"))
+            } catch (e: HttpException) {
+                emit(Resource.Error(message = "Oops, something went wrong when update Carts!"))
+            }
+        }
+    }
+
+    override suspend fun createTransaction(userId: Int, transaction: Transaction): Boolean {
+        Timber.d("Create transaction called")
+        return cartApiService.createTransaction(userId, transaction)
     }
 }

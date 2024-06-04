@@ -18,19 +18,19 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
     // Create new transaction
-    @PostMapping(value="/transactions/{customerId}")
-    public ResponseEntity<Boolean> createTransaction(@RequestBody Transactions transactions, @PathVariable("customerId") Long customerId) throws Exception {
-        return ResponseEntity.ok(transactionService.createTransaction(transactions, customerId));
+    @PostMapping(value="/transactions/{userId}")
+    public ResponseEntity<Boolean> createTransaction(@RequestBody Transactions transactions, @PathVariable("userId") Long userId) throws Exception {
+        return ResponseEntity.ok(transactionService.createTransaction(transactions, userId));
     }
     // Get all Transactions by PayID
     @GetMapping(value = "/transactions/query")
     public ResponseEntity<List<Map<String, Object>>> getAllTransactions(@RequestParam("query") String transactionName) throws Exception {
         return ResponseEntity.ok(transactionService.getAllTransactionsByName(transactionName));
     }
-    // Get all Transactions by CustomerID
-    @GetMapping(value = "/transactions/customers/{customerId}")
-    public ResponseEntity<List<Map<String, Object>>> getAllTransactionsByCustomerId(@PathVariable("customerId") Long customerId) throws Exception {
-        return ResponseEntity.ok(transactionService.getAllTransactionByCustomerId(customerId));
+    // Get all Transactions by userId
+    @GetMapping(value = "/transactions/user/{userId}")
+    public ResponseEntity<List<Map<String, Object>>> userId(@PathVariable("userId") Long userId) throws Exception {
+        return ResponseEntity.ok(transactionService.getAllTransactionByUserId(userId));
     }
     // Get Transaction Details
     @GetMapping(value = "/transactions/{transactionId}")
