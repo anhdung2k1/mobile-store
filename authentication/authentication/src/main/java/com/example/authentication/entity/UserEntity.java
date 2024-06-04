@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -62,6 +63,9 @@ public class UserEntity implements Serializable{
 
     @Column(name = "GENDER", length = 6)
     private String gender;
+
+    @ManyToMany(mappedBy = "payedUsers")
+    Set<PaymentEntity> pays;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_AT")

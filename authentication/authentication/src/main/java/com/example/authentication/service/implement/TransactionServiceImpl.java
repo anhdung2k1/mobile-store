@@ -24,27 +24,30 @@ public class TransactionServiceImpl implements TransactionService {
     private Map<String, Object> transactionMap(TransactionEntity transactionEntity) {
         return new HashMap<>(){{
             put("transactionID", transactionEntity.getTransactionId());
-            put("transactionName", transactionEntity.getTransactionName());
             put("transactionType", transactionEntity.getTransactionType());
-            put("paymentMethod", transactionEntity.getPayments().getPaymentMethod());
+            put("shippingAddress", transactionEntity.getShippingAddress());
+            put("billingPayment", transactionEntity.getBillingPayment());
+            put("paymentMethod", transactionEntity.getPayment().getPaymentMethod());
         }};
     }
 
     @Override
-    public Boolean createTransaction(Transactions transactions, Long customerId) throws Exception {
+    public Boolean createTransaction(Transactions transactions, Long userId) throws Exception {
         try {
             TransactionEntity transactionEntity = new TransactionEntity();
-            PaymentEntity paymentEntity = paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayments().getPaymentMethod()).isPresent()
-                    ? paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayments().getPaymentMethod()).get() : null;
+            PaymentEntity paymentEntity = paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayment().getPaymentMethod()).isPresent()
+                    ? paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayment().getPaymentMethod()).get() : null;
             assert paymentEntity != null;
             BeanUtils.copyProperties(transactions, transactionEntity);
-            transactionEntity.setPayments(paymentEntity);
+            transactionEntity.setPayment(paymentEntity);
+            transactionEntity.setCreateAt(LocalDateTime.now());
+            transactionEntity.setUpdateAt(LocalDateTime.now());
             transactionRepository.save(transactionEntity);
-            Long paymentId = paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayments().getPaymentMethod()).isPresent()
-                    ? paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayments().getPaymentMethod()).get().getPaymentId() : null;
+            Long paymentId = paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayment().getPaymentMethod()).isPresent()
+                    ? paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayment().getPaymentMethod()).get().getPaymentId() : null;
             Long transactionId = transactionEntity.getTransactionId();
             assert paymentId != null;
-            transactionRepository.insertTransactionWithCustomer(paymentId, customerId, transactionId);
+            transactionRepository.insertTransactionWithCustomer(paymentId, userId, transactionId);
             return true;
         } catch (Exception e) {
             throw new Exception("Could not create new transaction" + e.getMessage());
@@ -68,17 +71,17 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Map<String, Object>> getAllTransactionByCustomerId(Long customerId) throws Exception {
+    public List<Map<String, Object>> getAllTransactionByUserId(Long userId) throws Exception {
         try {
             List<Map<String, Object>> transactionMapList = new ArrayList<>();
-            List<TransactionEntity> transactionEntities = transactionRepository.findAllTransactionByCustomerId(customerId).isPresent()
-                    ? transactionRepository.findAllTransactionByCustomerId(customerId).get() : null;
+            List<TransactionEntity> transactionEntities = transactionRepository.findAllTransactionByUserId(userId).isPresent()
+                    ? transactionRepository.findAllTransactionByUserId(userId).get() : null;
             assert transactionEntities != null;
             transactionEntities.forEach((transactionEntity
                     -> transactionMapList.add(transactionMap(transactionEntity))));
             return transactionMapList;
         } catch (NoSuchElementException e) {
-            throw new Exception("Could not retrieve all the transaction by the Customer ID: " + customerId +  e.getMessage());
+            throw new Exception("Could not retrieve all the transaction by the userId: " + userId +  e.getMessage());
         }
     }
 
@@ -101,8 +104,9 @@ public class TransactionServiceImpl implements TransactionService {
             TransactionEntity transactionEntity = transactionRepository.findById(transactionId).isPresent()
                     ? transactionRepository.findById(transactionId).get() : null;
             assert transactionEntity != null;
-            transactionEntity.setTransactionName(transactions.getTransactionName());
             transactionEntity.setTransactionType(transactions.getTransactionType());
+            transactionEntity.setShippingAddress(transactions.getShippingAddress());
+            transactionEntity.setBillingPayment(transactions.getBillingPayment());
             transactionEntity.setUpdateAt(LocalDateTime.now());
             transactionRepository.save(transactionEntity);
             return transactions;

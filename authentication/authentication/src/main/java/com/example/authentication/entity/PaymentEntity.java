@@ -35,11 +35,11 @@ public class PaymentEntity {
 
     @ManyToMany
     @JoinTable(
-            name = "CUSTOMER_PAYMENT",
+            name = "USER_PAYMENT",
             joinColumns = @JoinColumn(name = "PAY_ID"),
-            inverseJoinColumns = @JoinColumn(name = "CUS_ID")
+            inverseJoinColumns = @JoinColumn(name = "USER_ID")
     )
-    Set<CustomerEntity> payedCustomers;
+    Set<UserEntity> payedUsers;
 
     @Column(name = "PAY_DESC")
     private String paymentDescription;
@@ -47,6 +47,9 @@ public class PaymentEntity {
     @Column(name = "PAY_METHOD", nullable = false)
     @NotBlank(message = "Must specify the payment method")
     private String paymentMethod;
+
+    @Column(name = "IMAGE_URL")
+    private String imageUrl;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_AT")

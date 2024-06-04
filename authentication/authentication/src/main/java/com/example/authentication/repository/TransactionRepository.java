@@ -14,10 +14,10 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
     @Query(value =  "SELECT trans.* " +
                     "FROM transactions trans INNER JOIN " +
-                    "customer_payment cp ON trans.trans_id = cp.trans_id " +
-                    "WHERE cp.cus_id =:customerId " +
+                    "user_payment cp ON trans.trans_id = cp.trans_id " +
+                    "WHERE cp.user_id =:userId " +
                     "LIMIT 28", nativeQuery = true)
-    Optional<List<TransactionEntity>> findAllTransactionByCustomerId(Long customerId);
+    Optional<List<TransactionEntity>> findAllTransactionByUserId(Long userId);
 
     @Query(value =  "SELECT trans.* FROM transactions trans " +
                     "WHERE trans.trans_name LIKE %:transactionName% " +
@@ -26,6 +26,6 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query(value = "INSERT INTO customer_payment(pay_id, cus_id, trans_id) VALUES(:paymentId, :customerId, :transactionId)", nativeQuery = true)
-    void insertTransactionWithCustomer(Long paymentId, Long customerId, Long transactionId);
+    @Query(value = "INSERT INTO user_payment(pay_id, user_id, trans_id) VALUES(:paymentId, :userId, :transactionId)", nativeQuery = true)
+    void insertTransactionWithCustomer(Long paymentId, Long userId, Long transactionId);
 }

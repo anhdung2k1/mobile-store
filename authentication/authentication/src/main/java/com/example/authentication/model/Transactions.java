@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Transactions {
     private Long transactionId;
-    private String transactionName;
     private String transactionType;
-    private PaymentEntity payments;
+    private String shippingAddress;
+    private Double billingPayment;
+    private PaymentEntity payment;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
 }

@@ -81,8 +81,9 @@ fun CartScreen(
     ) {
         CartScreenContent(
             state = state,
-            onClickCheckOut = {
-              navigator.navigate(CheckOutScreenDestination.route)
+            totalPrice = state.cartItems.sumOf { (it.mobilePrice * it.mobileQuantity) },
+            onClickCheckOut = { billingPayment ->
+              navigator.navigate(CheckOutScreenDestination(billingPayment).route)
             },
             viewModel = viewModel
         )
@@ -92,7 +93,8 @@ fun CartScreen(
 @Composable
 private fun CartScreenContent(
     state: CartItemsState,
-    onClickCheckOut: () -> Unit,
+    totalPrice: Double,
+    onClickCheckOut: (Double) -> Unit,
     viewModel: CartViewModel = hiltViewModel(),
 ) {
 
@@ -118,7 +120,8 @@ private fun CartScreenContent(
                 if (state.cartItems.isNotEmpty()) {
                     CheckoutComponent(
                         state = state,
-                        onClickCheckOut = onClickCheckOut
+                        totalPrice = totalPrice,
+                        onClickCheckOut = { onClickCheckOut(totalPrice) }
                     )
                 }
             }
@@ -173,8 +176,10 @@ private fun CartScreenContent(
 @Composable
 private fun CheckoutComponent(
     state: CartItemsState,
-    onClickCheckOut: () -> Unit
+    totalPrice: Double,
+    onClickCheckOut: (Double) -> Unit
 ) {
+
     Column(Modifier.padding(12.dp)) {
         Row(
             Modifier.fillMaxWidth(),
@@ -208,9 +213,8 @@ private fun CheckoutComponent(
         ) {
             Text(text = "Total")
             Text(
-                text = "$${
-                    state.cartItems.sumOf { (it.mobilePrice * it.mobileQuantity) } + 60.00
-                }", color = Color.Black,
+                text = "$${ totalPrice }",
+                color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -218,7 +222,7 @@ private fun CheckoutComponent(
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = { onClickCheckOut() },
+            onClick = { onClickCheckOut(totalPrice) },
             shape = RoundedCornerShape(8)
         ) {
             Text(
