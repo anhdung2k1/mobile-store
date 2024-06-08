@@ -8,14 +8,10 @@ import com.google.gson.Gson
 import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
-import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
-import com.kanyideveloper.joomia.feature_cart.presentation.cart.CartItemsState
+import com.kanyideveloper.joomia.feature_auth.domain.repository.AuthRepository
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import com.kanyideveloper.joomia.feature_products.domain.model.Rating
 import com.kanyideveloper.joomia.feature_products.domain.repository.ProductsRepository
-import com.kanyideveloper.joomia.feature_products.domain.use_case.GetProductsUseCase
-import com.kanyideveloper.joomia.feature_products.presentation.home.ProductsState
-import com.kanyideveloper.joomia.feature_profile.data.repository.ProfileRepository
 import com.kanyideveloper.joomia.feature_profile.data.toDomain
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import com.kanyideveloper.joomia.feature_wishlist.domain.model.WishListMobile
@@ -33,7 +29,7 @@ import javax.inject.Inject
 class WishListViewModel @Inject constructor(
     private val getWishListItemsUseCase: GetWishListItemsUseCase,
     private val wishListRepository: WishListRepository,
-    private val profileRepository: ProfileRepository,
+    private val authRepository: AuthRepository,
     private val productsRepository: ProductsRepository,
     private val gson: Gson
 ) : ViewModel() {
@@ -59,7 +55,7 @@ class WishListViewModel @Inject constructor(
 
     private suspend fun getProfile() {
         viewModelScope.launch {
-            profileRepository.getUserProfile().collectLatest { data ->
+            authRepository.getUserProfile().collectLatest { data ->
                 val user = gson.fromJson(data, UserResponseDto::class.java)
                 _profileState.value = user.toDomain()
             }

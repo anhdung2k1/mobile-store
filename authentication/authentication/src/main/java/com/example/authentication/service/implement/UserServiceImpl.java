@@ -8,17 +8,20 @@ import com.example.authentication.service.interfaces.UserService;
 import com.example.authentication.utils.S3Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService{
 
     private final S3Utils s3Utils;
@@ -34,7 +37,7 @@ public class UserServiceImpl implements UserService{
         return new HashMap<>() {{
             put("id", userEntity.getUser_id());
             put("userName", userEntity.getUserName());
-            put("adddress", userEntity.getAddress());
+            put("address", userEntity.getAddress());
             put("birthDay", userEntity.getBirth_day());
             put("gender", userEntity.getGender());
             put("imageUrl", userEntity.getImageUrl());
@@ -47,6 +50,11 @@ public class UserServiceImpl implements UserService{
             UserEntity userEntity = new UserEntity();
             user.setCreateAt(LocalDateTime.now());
             user.setUpdateAt(LocalDateTime.now());
+            if (!user.getImageURL().isEmpty()) {
+                // Save to S3 Bucket
+                URL objectURL = s3Utils.getS3URL(user.getImageURL());
+                user.setImageURL(objectURL.toString());
+            }
             BeanUtils.copyProperties(user, userEntity);
             userRepository.save(userEntity);
             return user;
@@ -60,6 +68,14 @@ public class UserServiceImpl implements UserService{
     public boolean deleteUser(Long id) throws Exception {
        try{
             if(userRepository.findById(id).isPresent()) {
+                String fileURI = userRepository.findById(id).get().getImageUrl();
+                String [] fileURISplitted = fileURI.split("/");
+                log.info("fileURISplitted: {}", (Object) fileURISplitted);
+                String fileName = fileURISplitted[fileURISplitted.length-1];
+                log.info("FileName: {}", fileName);
+                s3Client.deleteObject(bucketName, fileName);
+                log.info("FileName: {} removed", fileName);
+
                userRepository.delete(userRepository.findById(id).get());
                return true;
             }
@@ -126,6 +142,10 @@ public class UserServiceImpl implements UserService{
             userEntity.setBirth_day(user.getBirth_day());
             userEntity.setGender(user.getGender());
             userEntity.setUpdateAt(LocalDateTime.now());
+            if (user.getImageURL() != null) {
+                URL objectURL = s3Utils.getS3URL(user.getImageURL());
+                userEntity.setImageUrl(objectURL.toString());
+            }
             userRepository.save(userEntity);
             BeanUtils.copyProperties(userEntity, user);
             return user;

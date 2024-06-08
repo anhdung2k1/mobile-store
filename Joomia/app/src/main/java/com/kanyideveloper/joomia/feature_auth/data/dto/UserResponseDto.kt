@@ -14,5 +14,7 @@ data class UserResponseDto(
     @SerializedName("address")
     val address: String,
     @SerializedName("gender")
-    val gender: String
+    val gender: String,
+    @SerializedName("imageUrl")
+    val imageUrl: String
 )

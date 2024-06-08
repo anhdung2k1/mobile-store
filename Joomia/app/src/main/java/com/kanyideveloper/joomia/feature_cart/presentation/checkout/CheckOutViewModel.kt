@@ -8,14 +8,12 @@ import com.google.gson.Gson
 import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
-import com.kanyideveloper.joomia.feature_cart.domain.model.Payment
+import com.kanyideveloper.joomia.feature_auth.domain.repository.AuthRepository
 import com.kanyideveloper.joomia.feature_cart.domain.model.Transaction
 import com.kanyideveloper.joomia.feature_cart.domain.repository.CartRepository
-import com.kanyideveloper.joomia.feature_profile.data.repository.ProfileRepository
 import com.kanyideveloper.joomia.feature_profile.data.toDomain
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -26,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CheckOutViewModel @Inject constructor(
     private val cartRepository: CartRepository,
-    private val profileRepository: ProfileRepository,
+    private val authRepository: AuthRepository,
     private val gson: Gson
 ) : ViewModel() {
 
@@ -50,7 +48,7 @@ class CheckOutViewModel @Inject constructor(
 
     private suspend fun getProfile() {
         viewModelScope.launch {
-            profileRepository.getUserProfile().collectLatest { data ->
+            authRepository.getUserProfile().collectLatest { data ->
                 val user = gson.fromJson(data, UserResponseDto::class.java)
                 _profileState.value = user.toDomain()
             }

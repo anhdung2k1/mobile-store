@@ -8,10 +8,10 @@ import com.google.gson.Gson
 import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
+import com.kanyideveloper.joomia.feature_auth.domain.repository.AuthRepository
 import com.kanyideveloper.joomia.feature_cart.domain.model.CartMobile
 import com.kanyideveloper.joomia.feature_cart.domain.repository.CartRepository
 import com.kanyideveloper.joomia.feature_cart.domain.use_case.GetCartItemsUseCase
-import com.kanyideveloper.joomia.feature_profile.data.repository.ProfileRepository
 import com.kanyideveloper.joomia.feature_profile.data.toDomain
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +26,7 @@ import javax.inject.Inject
 class CartViewModel @Inject constructor(
     private val getCartItemsUseCase: GetCartItemsUseCase,
     private val cartRepository: CartRepository,
-    private val profileRepository: ProfileRepository,
+    private val authRepository: AuthRepository,
     private val gson: Gson
 ) : ViewModel() {
     private val _state = mutableStateOf(CartItemsState())
@@ -46,7 +46,7 @@ class CartViewModel @Inject constructor(
 
     private suspend fun getProfile() {
         viewModelScope.launch {
-            profileRepository.getUserProfile().collectLatest { data ->
+            authRepository.getUserProfile().collectLatest { data ->
                 val user = gson.fromJson(data, UserResponseDto::class.java)
                 _profileState.value = user.toDomain()
             }

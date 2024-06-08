@@ -431,7 +431,7 @@ fun MyTopAppBar(
                 Image(
                     painter = rememberAsyncImagePainter(
                         ImageRequest.Builder(LocalContext.current)
-                            .data(data = "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg")
+                            .data(data = user.imageUrl?.ifEmpty { R.drawable.ic_user })
                             .apply(block = fun ImageRequest.Builder.() {
                                 crossfade(true)
                             }).build()

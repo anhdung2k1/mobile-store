@@ -2,7 +2,9 @@ package com.kanyideveloper.joomia.feature_profile.presentation.account
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -51,6 +53,7 @@ import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.AccountScreenDestination
 import com.kanyideveloper.joomia.destinations.CartScreenDestination
 import com.kanyideveloper.joomia.destinations.HomeScreenDestination
+import com.kanyideveloper.joomia.destinations.UserProfileScreenDestination
 import com.kanyideveloper.joomia.feature_profile.domain.model.Account
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import com.ramcosta.composedestinations.annotation.Destination
@@ -64,9 +67,7 @@ fun AccountScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
     navigator: DestinationsNavigator,
 ) {
-    LaunchedEffect(key1 = true, block = {
-        viewModel.getProfile()
-    })
+
     val user = viewModel.profileState.value
 
     val scaffoldState = rememberScaffoldState()
@@ -119,24 +120,31 @@ fun AccountScreen(
             )
         }
     ) {
-        AccountScreenContent(
-            user = user,
-            onClickSignOut = {
-                viewModel.logout()
-            }
-        )
+        user.profiles?.let { it1 ->
+            AccountScreenContent(
+                user = it1,
+                onClickAvatar = {
+                    navigator.navigate(UserProfileScreenDestination.route)
+                },
+                onClickSignOut = {
+                    viewModel.logout()
+                }
+            )
+        }
     }
 }
 
 @Composable
 private fun AccountScreenContent(
     user: User,
-    onClickSignOut: () -> Unit,
+    onClickAvatar: () -> Unit,
+    onClickSignOut: () -> Unit
 ) {
     LazyColumn {
         item {
             UserItem(
                 user = user,
+                onClickAvatar = onClickAvatar,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(130.dp)
@@ -202,6 +210,7 @@ private fun AccountScreenContent(
 @Composable
 fun UserItem(
     user: User,
+    onClickAvatar: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -210,23 +219,29 @@ fun UserItem(
         elevation = 3.dp
     ) {
         Row {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(data = "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg")
-                        .apply(block = fun ImageRequest.Builder.() {
-                            placeholder(R.drawable.ic_placeholder)
-                            crossfade(true)
-                        }).build()
-                ),
-                contentDescription = null,
+            Box(
                 modifier = Modifier
                     .padding(5.dp)
-                    .weight(1f)
                     .clip(CircleShape)
-                    .fillMaxHeight(),
-                contentScale = ContentScale.Inside
-            )
+                    .clickable { onClickAvatar() }
+                    .fillMaxHeight()
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current)
+                            .data(data = user.imageUrl?.ifEmpty { R.drawable.ic_user } )
+                            .apply(block = fun ImageRequest.Builder.() {
+                                placeholder(R.drawable.ic_placeholder)
+                                crossfade(true)
+                            }).build()
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .fillMaxHeight(),
+                    contentScale = ContentScale.Inside
+                )
+            }
             Spacer(modifier = Modifier.width(5.dp))
 
             Column(
@@ -261,6 +276,7 @@ fun UserItem(
                 Button(
                     modifier = Modifier.align(End),
                     onClick = {
+                        onClickAvatar()
                     },
                     colors = ButtonDefaults.buttonColors(
                         contentColor = Color.Black,

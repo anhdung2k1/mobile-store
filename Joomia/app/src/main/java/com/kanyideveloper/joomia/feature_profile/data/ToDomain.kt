@@ -9,6 +9,7 @@ internal fun UserResponseDto.toDomain(): User {
         userName = userName,
         address = address,
         birthDay = birthDay,
-        gender = gender
+        gender = gender,
+        imageUrl = imageUrl
     )
 }
