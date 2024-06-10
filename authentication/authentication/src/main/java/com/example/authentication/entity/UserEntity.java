@@ -56,7 +56,7 @@ public class UserEntity implements Serializable{
     @Column(name = "ADDRESS", length = 30)
     private String address;
 
-    @Column(name = "GENDER", length = 6)
+    @Column(name = "GENDER", length = 10)
     private String gender;
 
     @Column(name = "IMAGE_URL")

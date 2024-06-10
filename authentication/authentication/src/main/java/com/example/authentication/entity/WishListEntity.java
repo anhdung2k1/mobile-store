@@ -21,7 +21,7 @@ public class WishListEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "WISHLIST_ID", nullable = false, unique = true)
-    @TableGenerator(name = "CART_GEN",
+    @TableGenerator(name = "WISHLIST_GEN",
             table = "SEQUENCER",
             pkColumnName = "SEQ_NAME",
             valueColumnName = "SEQ_COUNT",
