@@ -57,6 +57,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.kanyideveloper.joomia.R
 import com.kanyideveloper.joomia.destinations.CheckOutScreenDestination
+import com.kanyideveloper.joomia.destinations.HomeScreenDestination
 import com.kanyideveloper.joomia.feature_cart.domain.model.Payment
 import com.kanyideveloper.joomia.feature_cart.domain.model.Transaction
 import com.ramcosta.composedestinations.annotation.Destination
@@ -93,7 +94,7 @@ fun CheckOutScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navigator.navigateUp() }) {
+                    IconButton(onClick = { navigator.navigate(HomeScreenDestination.route) }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_chevron_left),
                             contentDescription = "Back",

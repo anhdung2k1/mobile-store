@@ -1,14 +1,12 @@
 package com.kanyideveloper.joomia.feature_products.presentation.product_saving
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Base64
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kanyideveloper.joomia.Utils.Utils
 import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.HomeScreenDestination
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
@@ -21,8 +19,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,34 +45,6 @@ class ProductSavingViewModel @Inject constructor(
         }
     }
 
-    private fun compressImage(context: Context, uri: Uri): Bitmap? {
-        var inputStream: InputStream? = null
-        try {
-            inputStream = context.contentResolver.openInputStream(uri)
-            val options = BitmapFactory.Options()
-            options.inSampleSize = 2 // Adjust this value as needed for compression
-            return BitmapFactory.decodeStream(inputStream, null, options)
-        } catch (e: Exception) {
-            Timber.e("Error compressing image: $e")
-        } finally {
-            inputStream?.close()
-        }
-        return null
-    }
-
-    private fun convertImageToBase64(context: Context, uri: Uri): String {
-        val bitmap = compressImage(context, uri)
-        return if (bitmap != null) {
-            val outputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream) // Adjust compression quality as needed
-            val byteArray = outputStream.toByteArray()
-            Base64.encodeToString(byteArray, Base64.NO_WRAP)
-        } else {
-            ""
-        }
-    }
-
-
     fun saveProduct(
         context: Context,
         productID: Int,
@@ -98,7 +66,7 @@ class ProductSavingViewModel @Inject constructor(
             mobilePrice = productPrice.toDoubleOrNull() ?: 0.0,
             mobileQuantity = productQuantity.toIntOrNull() ?: 0,
             mobileModel = productModel, // Fill in the appropriate value for the mobile model
-            imageUrl = selectedImageUri?.let { convertImageToBase64(context, it) } ?: "", // Convert Uri to string
+            imageUrl = selectedImageUri?.let { Utils.convertImageToBase64(context, it) } ?: "", // Convert Uri to string
             rating = Rating(0,0.0), // Create an appropriate Rating object
         )
 

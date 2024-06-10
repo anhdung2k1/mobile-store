@@ -12,5 +12,5 @@ public interface AccountService {
     Accounts getAccountsById(Long id) throws Exception;
     Long getAccIdByUserName (String userName) throws Exception;
     Boolean checkAdminAccount(String userName) throws Exception;
-    Accounts updatePasswordAccount(Long id, Accounts accounts) throws Exception;
+    Boolean updatePasswordAccount(Long id, String password) throws Exception;
 }

@@ -8,7 +8,11 @@ import com.kanyideveloper.joomia.feature_auth.data.local.AuthPreferences
 import com.kanyideveloper.joomia.feature_auth.data.remote.AuthApiService
 import com.kanyideveloper.joomia.feature_auth.data.remote.request.AuthRequest
 import com.kanyideveloper.joomia.feature_auth.domain.repository.AuthRepository
+import com.kanyideveloper.joomia.feature_profile.data.toDomain
+import com.kanyideveloper.joomia.feature_profile.domain.model.User
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
@@ -88,6 +92,46 @@ class AuthRepositoryImpl(
         val isAdmin = authApiService.checkAdminAccount(userName)
         Timber.d("checkAdminAccount($userName): $isAdmin")
         return isAdmin
+    }
+
+    override suspend fun getAccountIdByUserName(userName: String): Int {
+        val accountId = authApiService.getAccountIDByUserName(userName)
+        Timber.d("getAccountIdByUserName($userName): $accountId")
+        return accountId
+    }
+
+    override suspend fun updateAccountPassword(accountId: Int, newPassword: String): Boolean {
+        val isUpdatedPassword = authApiService.updateAccountPassword(accountId, newPassword)
+        Timber.d("updateAccountPassword($accountId, $newPassword): $isUpdatedPassword")
+        return isUpdatedPassword
+    }
+
+    override suspend fun updateUser(userId: Int, user: User): Flow<Resource<User>> = flow{
+        emit(Resource.Loading())
+        try {
+            val response = authApiService.updateUser(userId, user)
+            emit(Resource.Success(response.toDomain()))
+        } catch (e: IOException) {
+            emit(Resource.Error(message = "Could not reach the server, please check your internet connection!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = "Oops, something went wrong!"))
+        }
+    }
+
+    override suspend fun getUserProfileByUserId(userId: Int): Flow<Resource<User>> = flow {
+        emit(Resource.Loading())
+        try {
+            val response = authApiService.getUserById(userId)
+            emit(Resource.Success(response.toDomain()))
+        } catch (e: IOException) {
+            emit(Resource.Error(message = "Could not reach the server, please check your internet connection!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = "Oops, something went wrong!"))
+        }
+    }
+
+    override suspend fun getUserProfile(): Flow<String> {
+        return authPreferences.getUserData
     }
 
     private suspend fun getUser(name: String): UserResponseDto? {

@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 @Getter
@@ -20,8 +19,8 @@ public class UserEntity implements Serializable{
     //Default Constructor
     public UserEntity(){
         this.address = "UNKNOWN";
-        this.gender = "UNKNOWN";
-        this.birth_day = new Date();
+        this.gender = "";
+        this.birthDay = "2000-01-01";
         this.userName = "UNKNOWN";
         this.imageUrl = "";
         this.createAt = LocalDateTime.now();
@@ -30,9 +29,9 @@ public class UserEntity implements Serializable{
     public UserEntity(String userName) {
         this.userName = userName;
         this.address = "UNKNOWN";
-        this.gender = "UNKNOWN";
+        this.gender = "";
         this.imageUrl = "";
-        this.birth_day = new Date();
+        this.birthDay = "2000-01-01";
         this.createAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
     }
@@ -51,9 +50,8 @@ public class UserEntity implements Serializable{
     @Column(name = "USER_NAME", nullable = false, length = 20)
     private String userName;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "BIRTH_DAY")
-    private Date birth_day;
+    private String birthDay;
 
     @Column(name = "ADDRESS", length = 30)
     private String address;

@@ -162,6 +162,7 @@ build_repo() {
             -e DB_USERNAME=${COMMON_DB} \
             -e DB_NAME=${COMMON_DB} \
             -e DB_PASSWORD=${COMMON_DB} \
+	    -p 8080:8080 \
             $MAVEN_IMAGE mvn clean install -Dskiptest \
             || die "[ERROR]: Failed to compile"
 
@@ -181,6 +182,7 @@ build_repo() {
                 -e DB_USERNAME=${COMMON_DB} \
                 -e DB_NAME=${COMMON_DB} \
                 -e DB_PASSWORD=${COMMON_DB} \
+		-p 8080:8080 \
                 ${DOCKER_REGISTRY}/${image_name}:${version} \
                 || die "[ERROR]: Failed to compile"
     ;;
@@ -209,6 +211,7 @@ build_repo() {
                 -e DB_USERNAME=${COMMON_DB} \
                 -e DB_NAME=${COMMON_DB} \
                 -e DB_PASSWORD=${COMMON_DB} \
+		-p 8000:8000 \
                 ${DOCKER_REGISTRY}/${image_name}:${version} \
                 || die "[ERROR]: Failed to compile"
     esac

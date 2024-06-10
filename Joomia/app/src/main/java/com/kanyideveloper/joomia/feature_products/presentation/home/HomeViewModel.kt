@@ -15,7 +15,6 @@ import com.kanyideveloper.joomia.feature_cart.presentation.cart.CartItemsState
 import com.kanyideveloper.joomia.feature_products.domain.use_case.FindProductsUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetCategoriesUseCase
 import com.kanyideveloper.joomia.feature_products.domain.use_case.GetProductsUseCase
-import com.kanyideveloper.joomia.feature_profile.data.repository.ProfileRepository
 import com.kanyideveloper.joomia.feature_profile.data.toDomain
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +30,6 @@ class HomeViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val findProductsUseCase: FindProductsUseCase,
-    private val profileRepository: ProfileRepository,
     private val authRepository: AuthRepository,
     private val cartRepository: CartRepository,
     private val gson: Gson
@@ -90,7 +88,7 @@ class HomeViewModel @Inject constructor(
 
     private fun getProfile() {
         viewModelScope.launch {
-            profileRepository.getUserProfile().collectLatest { data ->
+            authRepository.getUserProfile().collectLatest { data ->
                 val user = gson.fromJson(data, UserResponseDto::class.java)
                 _profileState.value = user.toDomain()
             }
