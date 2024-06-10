@@ -56,11 +56,11 @@ public class UserEntity implements Serializable{
     @Column(name = "ADDRESS", length = 30)
     private String address;
 
-    @Column(name = "IMAGE_URL")
-    private String imageUrl;
-
     @Column(name = "GENDER", length = 6)
     private String gender;
+
+    @Column(name = "IMAGE_URL")
+    private String imageUrl;
 
     @ManyToMany(mappedBy = "payedUsers")
     Set<PaymentEntity> pays;
