@@ -1,6 +1,10 @@
 package com.kanyideveloper.joomia.feature_profile.data
 
 import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
+import com.kanyideveloper.joomia.feature_cart.data.remote.dto.PaymentDto
+import com.kanyideveloper.joomia.feature_cart.data.remote.dto.TransactionDto
+import com.kanyideveloper.joomia.feature_cart.domain.model.Payment
+import com.kanyideveloper.joomia.feature_cart.domain.model.Transaction
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
 
 internal fun UserResponseDto.toDomain(): User {

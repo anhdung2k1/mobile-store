@@ -23,6 +23,7 @@ fun CustomScaffold(
     items: List<BottomNavItem> = listOf(
         BottomNavItem.Home,
         BottomNavItem.WishList,
+        BottomNavItem.Order,
         BottomNavItem.Cart,
         BottomNavItem.Account,
     ),

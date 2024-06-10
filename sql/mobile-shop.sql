@@ -118,6 +118,20 @@ CREATE TABLE transactions(
     FOREIGN KEY (pay_id) REFERENCES payment(pay_id)
 );
 
+CREATE TABLE orders(
+    order_id BIGINT NOT NULL AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    trans_id BIGINT NOT NULL,
+    order_date VARCHAR(255) NOT NULL,
+    order_status VARCHAR(255) NOT NULL,
+    total_amount DOUBLE(10, 2) NOT NULL,
+    create_at DATETIME(6),
+    update_at DATETIME(6),
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (trans_id) REFERENCES transactions(trans_id)
+);
+
 INSERT INTO rating(rating_count, rating_rate) VALUES
 (100, 4.5),
 (150, 4.8),

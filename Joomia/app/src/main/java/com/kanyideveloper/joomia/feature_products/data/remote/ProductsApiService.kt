@@ -1,6 +1,7 @@
 package com.kanyideveloper.joomia.feature_products.data.remote
 
 import com.kanyideveloper.joomia.feature_products.data.remote.dto.MobileDto
+import com.kanyideveloper.joomia.feature_products.data.remote.dto.OrderDto
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -28,6 +29,14 @@ interface ProductsApiService {
     suspend fun updateMobileDevice(@Path("mobileID") id: Int, @Body mobile: Mobile): Boolean
     @DELETE("api/mobiles/{mobileID}")
     suspend fun deleteMobileDevice(@Path("mobileID") id: Int): MutableMap<String, Boolean>
+
+    // GET ALL orders by Admin role
+    @GET("api/orders")
+    suspend fun getAllOrders() : List<OrderDto>
+
+    // GET ALL orders by User role
+    @GET("api/orders/{userID}")
+    suspend fun getAllOrdersByUserID(@Path("userID") userID: Int) : List<OrderDto>
 }
 
 

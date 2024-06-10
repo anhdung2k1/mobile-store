@@ -17,6 +17,7 @@ import com.kanyideveloper.joomia.core.presentation.ui.theme.JoomiaTheme
 import com.kanyideveloper.joomia.destinations.AccountScreenDestination
 import com.kanyideveloper.joomia.destinations.CartScreenDestination
 import com.kanyideveloper.joomia.destinations.HomeScreenDestination
+import com.kanyideveloper.joomia.destinations.ProductOrderScreenDestination
 import com.kanyideveloper.joomia.destinations.ProductSavingScreenDestination
 import com.kanyideveloper.joomia.destinations.WishlistScreenDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -42,6 +43,7 @@ class MainActivity : ComponentActivity() {
                         showBottomBar = route in listOf(
                             HomeScreenDestination.route,
                             WishlistScreenDestination.route,
+                            ProductOrderScreenDestination.route,
                             ProductSavingScreenDestination.route,
                             CartScreenDestination.route,
                             AccountScreenDestination.route
