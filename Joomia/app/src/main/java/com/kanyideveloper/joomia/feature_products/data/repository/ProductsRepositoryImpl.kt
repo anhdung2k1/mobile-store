@@ -4,6 +4,7 @@ import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.feature_products.data.remote.ProductsApiService
 import com.kanyideveloper.joomia.feature_products.data.remote.mappers.toDomain
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
+import com.kanyideveloper.joomia.feature_products.domain.model.Order
 import com.kanyideveloper.joomia.feature_products.domain.repository.ProductsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -54,5 +55,31 @@ class ProductsRepositoryImpl(private val productsApiService: ProductsApiService)
 
     override suspend fun deleteMobileDevice(mobileID: Int): MutableMap<String, Boolean> {
         return productsApiService.deleteMobileDevice(mobileID)
+    }
+
+    // Get Orders by ADMIN
+    override suspend fun getOrders(): Flow<Resource<List<Order>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val response = productsApiService.getAllOrders()
+            emit(Resource.Success(response.map { it.toDomain() }))
+        } catch (e: IOException) {
+            emit(Resource.Error(message = "Could not reach the server, please check your internet connection!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = "Oops, something went wrong!"))
+        }
+    }
+
+    // Get Orders by USER
+    override suspend fun getOrdersByUserID(userID: Int): Flow<Resource<List<Order>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val response = productsApiService.getAllOrdersByUserID(userID)
+            emit(Resource.Success(response.map { it.toDomain() }))
+        } catch (e: IOException) {
+            emit(Resource.Error(message = "Could not reach the server, please check your internet connection!"))
+        } catch (e: HttpException) {
+            emit(Resource.Error(message = "Oops, something went wrong!"))
+        }
     }
 }

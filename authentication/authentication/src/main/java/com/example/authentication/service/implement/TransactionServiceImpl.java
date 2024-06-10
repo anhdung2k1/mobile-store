@@ -1,10 +1,13 @@
 package com.example.authentication.service.implement;
 
+import com.example.authentication.entity.OrderEntity;
 import com.example.authentication.entity.PaymentEntity;
 import com.example.authentication.entity.TransactionEntity;
 import com.example.authentication.model.Transactions;
+import com.example.authentication.repository.OrderRepository;
 import com.example.authentication.repository.PaymentRepository;
 import com.example.authentication.repository.TransactionRepository;
+import com.example.authentication.repository.UserRepository;
 import com.example.authentication.service.interfaces.TransactionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -20,6 +24,8 @@ import java.util.*;
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final PaymentRepository paymentRepository;
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
 
     private Map<String, Object> transactionMap(TransactionEntity transactionEntity) {
         return new HashMap<>(){{
@@ -43,11 +49,20 @@ public class TransactionServiceImpl implements TransactionService {
             transactionEntity.setCreateAt(LocalDateTime.now());
             transactionEntity.setUpdateAt(LocalDateTime.now());
             transactionRepository.save(transactionEntity);
+            // Insert to Many to many tables
             Long paymentId = paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayment().getPaymentMethod()).isPresent()
                     ? paymentRepository.findPaymentEntitiesByPaymentMethod(transactions.getPayment().getPaymentMethod()).get().getPaymentId() : null;
             Long transactionId = transactionEntity.getTransactionId();
             assert paymentId != null;
             transactionRepository.insertTransactionWithCustomer(paymentId, userId, transactionId);
+            // Create order
+            OrderEntity orderEntity = new OrderEntity();
+            orderEntity.setTransaction(transactionRepository.findById(transactionId).get());
+            orderEntity.setOrderStatus("Success");
+            orderEntity.setOrderDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            orderEntity.setTotalAmount(transactionEntity.getBillingPayment());
+            orderEntity.setUser(userRepository.findById(userId).get());
+            orderRepository.save(orderEntity);
             return true;
         } catch (Exception e) {
             throw new Exception("Could not create new transaction" + e.getMessage());

@@ -2,6 +2,7 @@ package com.kanyideveloper.joomia.feature_products.domain.repository
 
 import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.feature_products.domain.model.Mobile
+import com.kanyideveloper.joomia.feature_products.domain.model.Order
 import kotlinx.coroutines.flow.Flow
 
 interface ProductsRepository {
@@ -12,4 +13,8 @@ interface ProductsRepository {
     suspend fun createMobileDevice(mobile: Mobile) : Boolean
     suspend fun updateMobileDevice(mobileID: Int, mobile: Mobile): Boolean
     suspend fun deleteMobileDevice(mobileID: Int): MutableMap<String, Boolean>
+    // Get Orders with ADMIN
+    suspend fun getOrders(): Flow<Resource<List<Order>>>
+    // Get Orders with USER
+    suspend fun getOrdersByUserID(userID: Int): Flow<Resource<List<Order>>>
 }
