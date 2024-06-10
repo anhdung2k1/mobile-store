@@ -1,3 +1,5 @@
+@file:Suppress("OPT_IN_IS_NOT_ENABLED")
+
 package com.kanyideveloper.joomia.feature_products.presentation.product_saving
 
 import android.net.Uri
@@ -79,7 +81,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Destination
 @Composable
 fun ProductSavingScreen(
@@ -115,7 +117,7 @@ fun ProductSavingScreen(
                         Box(modifier = Modifier
                             .fillMaxSize()
                             .padding(end = 72.dp), contentAlignment = Alignment.Center) {
-                            Text("NEW PRODUCT", color = Color.Black.copy(alpha = 0.7f), fontWeight = FontWeight.Light)
+                            Text( if(isUpdate) "UPDATE PRODUCT" else "NEW PRODUCT", color = Color.Black.copy(alpha = 0.7f), fontWeight = FontWeight.Light)
                         }
                     },
                 backgroundColor = Color.White,

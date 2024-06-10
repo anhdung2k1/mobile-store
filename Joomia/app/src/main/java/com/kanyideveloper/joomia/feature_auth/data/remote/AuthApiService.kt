@@ -8,6 +8,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -36,4 +37,9 @@ interface AuthApiService {
 
     @GET("api/accounts/admin")
     suspend fun checkAdminAccount(@Query("userName") userName: String): Boolean
+
+    @GET("api/accounts/find")
+    suspend fun getAccountIDByUserName(@Query("userName") userName: String): Int
+    @PUT("api/accounts/{accountID}")
+    suspend fun updateAccountPassword(@Path("accountID") accountID: Int, @Body password: String): Boolean
 }

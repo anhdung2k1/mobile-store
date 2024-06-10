@@ -55,8 +55,8 @@ public class AccountController {
 
     //Put Account Change Password
     @PutMapping(value = "/accounts/{id}")
-    public ResponseEntity<Accounts> updateAccountPassword(@PathVariable Long id, @RequestBody Accounts account) throws Exception{
-        return ResponseEntity.ok(accountService.updatePasswordAccount(id, account));
+    public ResponseEntity<Boolean> updateAccountPassword(@PathVariable Long id, @RequestBody String password) throws Exception{
+        return ResponseEntity.ok(accountService.updatePasswordAccount(id, password));
     }
     //Delete Account
     @DeleteMapping(value = "/accounts/{userId}")

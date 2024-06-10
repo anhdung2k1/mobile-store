@@ -171,23 +171,23 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public Accounts updatePasswordAccount(Long id, Accounts accounts) throws Exception {
+    public Boolean updatePasswordAccount(Long id, String password) throws Exception {
        try{
             AccountEntity accountEntity = accountRepository.findById(id).isPresent() ? accountRepository.findById(id).get() : null;
             assert accountEntity != null;
-            if(accounts.getPassword() == null){
+            if(password.isEmpty()){
                 throw new Exception("Password editing must not be null");
             }
             else{
-                accountEntity.setPassword(passwordEncoder.encode(accounts.getPassword()));
+                accountEntity.setPassword(passwordEncoder.encode(password));
                 accountEntity.setUpdateAt(LocalDateTime.now());
                 accountRepository.save(accountEntity);
-                BeanUtils.copyProperties(accountEntity, accounts);
-                return accounts;
+                BeanUtils.copyProperties(accountEntity, password);
+                return true;
             }
        } catch(NoSuchElementException e){
         throw new Exception(String.format("Could not find any account within id: %s", id));
        }
     }
-    
+
 }

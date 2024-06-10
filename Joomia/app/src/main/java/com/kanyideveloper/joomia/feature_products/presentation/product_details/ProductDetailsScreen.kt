@@ -135,7 +135,7 @@ fun ProductDetailsScreen(
                 ) {
                     Icon(
                         painterResource(id = if (isWishList) R.drawable.ic_heart_fill else R.drawable.ic_heart),
-                        tint = GrayColor,
+                        tint = Color.Red,
                         contentDescription = null,
                         modifier = Modifier.size(32.dp)
                     )

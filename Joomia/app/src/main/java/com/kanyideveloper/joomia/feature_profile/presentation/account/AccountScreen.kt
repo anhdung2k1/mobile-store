@@ -68,7 +68,7 @@ fun AccountScreen(
     navigator: DestinationsNavigator,
 ) {
 
-    val user = viewModel.profileState.value
+    val user = viewModel.userProfileState.value
 
     val scaffoldState = rememberScaffoldState()
 

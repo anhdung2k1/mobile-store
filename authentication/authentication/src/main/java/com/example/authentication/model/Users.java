@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -13,10 +12,10 @@ import java.util.Date;
 public class Users {
     private Long user_id;
     private String userName;
-    private Date birth_day;
+    private String birthDay;
     private String address;
     private String gender;
-    private String imageURL;
+    private String imageUrl;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
 }

@@ -11,6 +11,8 @@ interface AuthRepository {
     suspend fun autoLogin(): Resource<Unit>
     suspend fun logout(): Resource<Unit>
     suspend fun checkAdminAccount(userName: String): Boolean
+    suspend fun getAccountIdByUserName(userName: String): Int
+    suspend fun updateAccountPassword(accountId: Int, newPassword: String): Boolean
     suspend fun updateUser(userId: Int, user: User): Flow<Resource<User>>
     suspend fun getUserProfile(): Flow<String>
     suspend fun getUserProfileByUserId(userId: Int): Flow<Resource<User>>

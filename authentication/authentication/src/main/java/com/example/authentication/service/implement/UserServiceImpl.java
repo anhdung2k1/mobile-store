@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService{
             put("id", userEntity.getUser_id());
             put("userName", userEntity.getUserName());
             put("address", userEntity.getAddress());
-            put("birthDay", userEntity.getBirth_day());
+            put("birthDay", userEntity.getBirthDay());
             put("gender", userEntity.getGender());
             put("imageUrl", userEntity.getImageUrl());
         }};
@@ -50,10 +50,10 @@ public class UserServiceImpl implements UserService{
             UserEntity userEntity = new UserEntity();
             user.setCreateAt(LocalDateTime.now());
             user.setUpdateAt(LocalDateTime.now());
-            if (!user.getImageURL().isEmpty()) {
+            if (!user.getImageUrl().isEmpty()) {
                 // Save to S3 Bucket
-                URL objectURL = s3Utils.getS3URL(user.getImageURL());
-                user.setImageURL(objectURL.toString());
+                URL objectURL = s3Utils.getS3URL(user.getImageUrl());
+                user.setImageUrl(objectURL.toString());
             }
             BeanUtils.copyProperties(user, userEntity);
             userRepository.save(userEntity);
@@ -139,11 +139,11 @@ public class UserServiceImpl implements UserService{
             UserEntity userEntity = userRepository.findById(id).isPresent() ? userRepository.findById(id).get() : null;
             assert userEntity != null;
             userEntity.setAddress(user.getAddress());
-            userEntity.setBirth_day(user.getBirth_day());
+            userEntity.setBirthDay(user.getBirthDay());
             userEntity.setGender(user.getGender());
             userEntity.setUpdateAt(LocalDateTime.now());
-            if (user.getImageURL() != null) {
-                URL objectURL = s3Utils.getS3URL(user.getImageURL());
+            if (user.getImageUrl() != null) {
+                URL objectURL = s3Utils.getS3URL(user.getImageUrl());
                 userEntity.setImageUrl(objectURL.toString());
             }
             userRepository.save(userEntity);

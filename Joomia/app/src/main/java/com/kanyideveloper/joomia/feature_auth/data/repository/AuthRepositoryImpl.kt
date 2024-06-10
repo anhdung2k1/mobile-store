@@ -94,6 +94,18 @@ class AuthRepositoryImpl(
         return isAdmin
     }
 
+    override suspend fun getAccountIdByUserName(userName: String): Int {
+        val accountId = authApiService.getAccountIDByUserName(userName)
+        Timber.d("getAccountIdByUserName($userName): $accountId")
+        return accountId
+    }
+
+    override suspend fun updateAccountPassword(accountId: Int, newPassword: String): Boolean {
+        val isUpdatedPassword = authApiService.updateAccountPassword(accountId, newPassword)
+        Timber.d("updateAccountPassword($accountId, $newPassword): $isUpdatedPassword")
+        return isUpdatedPassword
+    }
+
     override suspend fun updateUser(userId: Int, user: User): Flow<Resource<User>> = flow{
         emit(Resource.Loading())
         try {

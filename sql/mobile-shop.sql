@@ -1,7 +1,7 @@
 CREATE TABLE users(
     user_id BIGINT NOT NULL AUTO_INCREMENT, 
     address VARCHAR(255), 
-    birth_day DATE, 
+    birth_day VARCHAR(255), 
     gender VARCHAR(255), 
     user_name VARCHAR(255) NOT NULL,
     image_url VARCHAR(255), 
