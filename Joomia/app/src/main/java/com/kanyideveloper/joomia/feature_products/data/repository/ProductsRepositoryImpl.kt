@@ -82,4 +82,16 @@ class ProductsRepositoryImpl(private val productsApiService: ProductsApiService)
             emit(Resource.Error(message = "Oops, something went wrong!"))
         }
     }
+
+    override suspend fun getOrderByOrderID(orderID: Int): Order {
+        return productsApiService.getOrderByOrderID(orderID).toDomain()
+    }
+
+    override suspend fun updateOrder(orderID: Int, orderStatus: String): Order {
+        return productsApiService.updateOrder(orderID, orderStatus).toDomain()
+    }
+
+    override suspend fun deleteOrder(orderID: Int): MutableMap<String, Boolean> {
+        return productsApiService.deleteOrder(orderID)
+    }
 }

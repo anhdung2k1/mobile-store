@@ -56,4 +56,43 @@ public class OrderServiceImpl implements OrderService {
             throw new Exception("Could not get orders", e);
         }
     }
+
+    @Override
+    public Map<String, Object> getOrderByID(Long orderID) throws Exception {
+        try {
+            OrderEntity orderEntity = orderRepository.findById(orderID).isPresent()
+                    ? orderRepository.findById(orderID).get() : null;
+            assert orderEntity != null;
+            return orderMap(orderEntity);
+        } catch (Exception e) {
+            throw new Exception("Could not retrieve order " + orderID, e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> updateOrder(Long orderID, String orderStatus) throws Exception {
+        try {
+            OrderEntity orderEntity = orderRepository.findById(orderID).isPresent()
+                    ? orderRepository.findById(orderID).get() : null;
+            assert orderEntity != null;
+            orderEntity.setOrderStatus(orderStatus);
+            orderRepository.save(orderEntity);
+            return orderMap(orderEntity);
+        } catch (Exception e) {
+            throw new Exception("Could not retrieve order " + orderID, e);
+        }
+    }
+
+    @Override
+    public Boolean deleteOrder(Long orderID) throws Exception {
+        try {
+            OrderEntity orderEntity = orderRepository.findById(orderID).isPresent()
+                    ? orderRepository.findById(orderID).get() : null;
+            assert orderEntity != null;
+            orderRepository.delete(orderEntity);
+            return true;
+        } catch (Exception e) {
+            throw new Exception("Could not retrieve order " + orderID, e);
+        }
+    }
 }

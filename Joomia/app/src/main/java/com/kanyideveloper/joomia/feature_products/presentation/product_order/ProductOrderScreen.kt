@@ -41,6 +41,7 @@ import coil.request.ImageRequest
 import com.kanyideveloper.joomia.R
 import com.kanyideveloper.joomia.core.util.LoadingAnimation
 import com.kanyideveloper.joomia.core.util.UiEvents
+import com.kanyideveloper.joomia.destinations.ProductOrderDetailsScreenDestination
 import com.kanyideveloper.joomia.feature_products.domain.model.Order
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -91,9 +92,9 @@ fun ProductOrderScreen (
         OrderScreenContent(
             state = state,
             onOrderClick = {
-                // TO-DO: Navigate to order detail screen -> If admin go to edit/delet screen
+                // TO-DO: Navigate to order detail screen -> If admin go to edit/delete screen
                 // If user go to order -> go to view detail order screen (no edit/delete)
-                
+                navigator.navigate(ProductOrderDetailsScreenDestination(orderId = it))
             }
         )
     }

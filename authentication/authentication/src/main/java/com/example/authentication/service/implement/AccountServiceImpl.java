@@ -182,7 +182,6 @@ public class AccountServiceImpl implements AccountService{
                 accountEntity.setPassword(passwordEncoder.encode(password));
                 accountEntity.setUpdateAt(LocalDateTime.now());
                 accountRepository.save(accountEntity);
-                BeanUtils.copyProperties(accountEntity, password);
                 return true;
             }
        } catch(NoSuchElementException e){

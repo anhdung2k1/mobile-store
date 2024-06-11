@@ -8,4 +8,7 @@ public interface OrderService {
     List<Map<String, Object>> getAllOrders() throws Exception;
     // This use in USER role
     List<Map<String, Object>> getAllOrdersByUserID(Long userID) throws Exception;
+    Map<String, Object> getOrderByID(Long orderID) throws Exception;
+    Map<String, Object> updateOrder(Long orderID, String orderStatus) throws Exception;
+    Boolean deleteOrder(Long orderID) throws Exception;
 }
