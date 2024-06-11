@@ -2,11 +2,9 @@ package com.example.authentication.controller;
 
 import com.example.authentication.service.interfaces.OrderService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,5 +20,19 @@ public class OrderController {
     @GetMapping(value = "/orders/{userID}")
     public ResponseEntity<List<Map<String, Object>>> getAllOrdersByUserID(@PathVariable("userID") Long userID) throws Exception {
         return ResponseEntity.ok(orderService.getAllOrdersByUserID(userID));
+    }
+    @GetMapping(value = "/orders/order/{orderID}")
+    public ResponseEntity<Map<String, Object>> getOrderByOrderID(@PathVariable("orderID") Long orderID) throws Exception {
+        return ResponseEntity.ok(orderService.getOrderByID(orderID));
+    }
+    @PatchMapping(value = "/orders/order/{orderID}")
+    public ResponseEntity<Map<String, Object>> updateOrder(@PathVariable("orderID") Long orderID, @RequestBody String orderStatus) throws Exception {
+        return ResponseEntity.ok(orderService.updateOrder(orderID, orderStatus));
+    }
+    @DeleteMapping(value = "/orders/order/{orderID}")
+    public ResponseEntity<Map<String, Boolean>> deleteOrder(@PathVariable("orderID") Long orderID) throws Exception {
+        return ResponseEntity.ok(new HashMap<>() {{
+            put("deleted", orderService.deleteOrder(orderID));
+        }});
     }
 }

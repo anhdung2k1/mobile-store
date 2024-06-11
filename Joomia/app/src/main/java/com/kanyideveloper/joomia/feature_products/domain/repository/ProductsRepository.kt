@@ -17,4 +17,10 @@ interface ProductsRepository {
     suspend fun getOrders(): Flow<Resource<List<Order>>>
     // Get Orders with USER
     suspend fun getOrdersByUserID(userID: Int): Flow<Resource<List<Order>>>
+    // Get Order By OrderID
+    suspend fun getOrderByOrderID(orderID: Int): Order
+    // UPDATE Order
+    suspend fun updateOrder(orderID: Int, orderStatus: String): Order
+    // DELETE Order
+    suspend fun deleteOrder(orderID: Int): MutableMap<String, Boolean>
 }

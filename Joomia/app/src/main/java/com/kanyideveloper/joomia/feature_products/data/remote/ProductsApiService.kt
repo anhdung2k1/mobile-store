@@ -37,6 +37,15 @@ interface ProductsApiService {
     // GET ALL orders by User role
     @GET("api/orders/{userID}")
     suspend fun getAllOrdersByUserID(@Path("userID") userID: Int) : List<OrderDto>
+    // GET Order by OrderID
+    @GET("api/orders/order/{orderID}")
+    suspend fun getOrderByOrderID(@Path("orderID") orderID: Int) : OrderDto
+    // UPDATE Order
+    @PATCH("api/orders/order/{orderID}")
+    suspend fun updateOrder(@Path("orderID") orderID: Int, @Body orderStatus: String) : OrderDto
+    // DELETE Order
+    @DELETE("api/orders/order/{orderID}")
+    suspend fun deleteOrder(@Path("orderID") orderID: Int) : MutableMap<String, Boolean>
 }
 
 
