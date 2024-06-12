@@ -54,6 +54,8 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+var wishListCount = 0
+
 @Destination
 @Composable
 fun WishlistScreen (
@@ -66,6 +68,8 @@ fun WishlistScreen (
     val scaffoldState = rememberScaffoldState()
 
     val coroutineScope = rememberCoroutineScope()
+
+    wishListCount = state.wishListItems.size
 
     LaunchedEffect(key1 = true) {
         viewModel.evenFlow.collectLatest { event ->

@@ -77,7 +77,8 @@ fun CheckOutScreen(
     val paymentMethods = viewModel.paymentState.value
 
     var selectedPaymentMethod by remember { mutableStateOf<Payment?>(null) }
-    var shippingAddress by remember { mutableStateOf("") }
+    val defaultAddress = "123 Street, City, Country"
+    var shippingAddress by remember { mutableStateOf(defaultAddress) }
 
     Scaffold(
         backgroundColor = Color.White,
@@ -114,7 +115,7 @@ fun CheckOutScreen(
             // Shipping Address
             EditableShippingAddress(
                 title = "Shipping Address",
-                address = "123 Street, City, Country",
+                address = defaultAddress,
                 onAddressChanged = {
                     // Handle address change
                     shippingAddress = it

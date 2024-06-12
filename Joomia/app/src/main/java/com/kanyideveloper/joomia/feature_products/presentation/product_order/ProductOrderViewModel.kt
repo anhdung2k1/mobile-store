@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.kanyideveloper.joomia.core.util.Resource
 import com.kanyideveloper.joomia.core.util.UiEvents
-import com.kanyideveloper.joomia.destinations.HomeScreenDestination
 import com.kanyideveloper.joomia.destinations.ProductOrderScreenDestination
 import com.kanyideveloper.joomia.feature_auth.data.dto.UserResponseDto
 import com.kanyideveloper.joomia.feature_auth.domain.repository.AuthRepository
@@ -17,6 +16,8 @@ import com.kanyideveloper.joomia.feature_profile.data.toDomain
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -42,8 +43,14 @@ class ProductOrderViewModel @Inject constructor(
     private val _userState = mutableStateOf(User())
     val userState: State<User> = _userState
 
-    private val _orderState = mutableStateOf(Order(0,0,0,"","",0.0))
-    val orderState: State<Order> = _orderState
+    val orderState = mutableStateOf(Order(0,0,0,"","",0.0))
+
+    private val _refreshTrigger = MutableStateFlow(false)
+    val refreshTrigger: StateFlow<Boolean> = _refreshTrigger
+
+    fun triggerRefresh() {
+        _refreshTrigger.value = !_refreshTrigger.value
+    }
 
     init {
         getProfile()
@@ -92,8 +99,11 @@ class ProductOrderViewModel @Inject constructor(
             }
         }
     }
-    suspend fun getOrderByOrderID(orderID: Int) : Order {
-        return productsRepository.getOrderByOrderID(orderID)
+    suspend fun getOrderByOrderID(orderID: Int) {
+        viewModelScope.launch {
+            orderState.value = productsRepository.getOrderByOrderID(orderID)
+            Timber.d("orderState: ${orderState.value}")
+        }
     }
 
     suspend fun updateOrder(orderID: Int, orderStatus: String) {
@@ -102,7 +112,7 @@ class ProductOrderViewModel @Inject constructor(
                 Timber.d("updateOrder(): called")
                 Timber.d("orderID: $orderID")
                 Timber.d("orderStatus: $orderStatus")
-                _orderState.value = productsRepository.updateOrder(orderID, orderStatus)
+                orderState.value = productsRepository.updateOrder(orderID, orderStatus)
             } catch (e: Exception) {
                 _eventFlow.emit(
                     UiEvents.SnackbarEvent(
@@ -127,11 +137,6 @@ class ProductOrderViewModel @Inject constructor(
                             ProductOrderScreenDestination.route
                         )
                     )
-                    if (_isAdminState.value) {
-                        getAllOrders()
-                    } else {
-                        getAllOrdersByUserID()
-                    }
                 } else {
                     _eventFlow.emit(
                         UiEvents.SnackbarEvent(
@@ -149,7 +154,7 @@ class ProductOrderViewModel @Inject constructor(
         }
     }
 
-    private fun getAllOrdersByUserID() {
+    fun getAllOrdersByUserID() {
         viewModelScope.launch {
             _profileState.value.id?.let {
                 productsRepository.getOrdersByUserID(it).collectLatest { result ->
@@ -179,7 +184,7 @@ class ProductOrderViewModel @Inject constructor(
         }
     }
 
-    private fun getAllOrders() {
+    fun getAllOrders() {
         viewModelScope.launch {
             productsRepository.getOrders().collectLatest { result ->
                 when(result) {
