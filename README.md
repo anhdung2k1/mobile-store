@@ -53,36 +53,36 @@ The recommend standard development environment is Ubuntu 18.04 LTS or later
 
 2. Install make
     ```bash
-    sudo apt install make
+    $ sudo apt install make
     ```
 
 3. Building steps are done via make, the builders:
     - If you don't want to clean the build artifacts, run the following command
     ```bash
-    make build image push
+    $ make build image push
     ```
     - If you wan't to clean the build and re-run all the building steps
     ```bash
-    make clean init train build image push
+    $ make clean init train build image push
     ```
 
-4. For local development only, the docker used can be executed
+4. For local development only, the docker used can be executed to run API server with docker
    ```bash
-   make build
+   $ make build-authentication
    ```
    This will automatically build image and running the docker container.
 
 5. The listed API supports [API_ENDPOINTS](https://github.com/anhdung2k1/mobile-store/tree/main/authentication)
 6. If you run the Back end API servers with docker, this automatically sync the data from [vas.sh](https://github.com/anhdung2k1/mobile-store/blob/main/vas.sh)
 ```
- #Start docker mysql container
-    docker run -d --name $mysql_con \
-        -e MYSQL_ROOT_PASSWORD=root \
-        -e MYSQL_DATABASE=${COMMON_DB} \
-        -e MYSQL_USER=${COMMON_DB} \
-        -e MYSQL_PASSWORD=${COMMON_DB} \
-        -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
-        -p 3306:3306 \
-        mysql:latest \
-    || die "[ERROR]: Failed to run mysql docker"
+#Start docker mysql container
+docker run -d --name $mysql_con \
+    -e MYSQL_ROOT_PASSWORD=root \
+    -e MYSQL_DATABASE=${COMMON_DB} \
+    -e MYSQL_USER=${COMMON_DB} \
+    -e MYSQL_PASSWORD=${COMMON_DB} \
+    -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
+    -p 3306:3306 \
+    mysql:latest \
+|| die "[ERROR]: Failed to run mysql docker"
 ```
