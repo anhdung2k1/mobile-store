@@ -129,3 +129,10 @@ $ curl -X DELETE http://localhost:80808/api/user/1
 | 4 | /api/transactions/:id | PATCH | UPDATE Transaction |
 | 5 | /api/transactions/:id | GET | GET Transaction |
 | 6 | /api/transactions/:id | DELETE | DELETE Transaction |
+| **Order** | | | |
+| 1 | /api/orders | GET | GET All Orders With ADMIN |
+| 2 | /api/orders/{userID} | GET | GET All Orders By USER |
+| 3 | /api/orders/order/{orderID} | GET | GET the current Order |
+| 4 | /api/orders/order/{orderID} | PATCH | UPDATE the current Order |
+| 5 | /api/orders/order/{orderID} | DELETE | DELETE the current Order |
+
