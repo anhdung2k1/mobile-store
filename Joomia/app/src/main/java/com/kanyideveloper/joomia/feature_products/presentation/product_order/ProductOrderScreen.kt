@@ -24,6 +24,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +48,8 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
 
+var orderCount = 0
+
 @Destination
 @Composable
 fun ProductOrderScreen (
@@ -55,6 +58,18 @@ fun ProductOrderScreen (
 ) {
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
+    val isAdminState = viewModel.isAdminState.value
+    val refreshTrigger = viewModel.refreshTrigger.collectAsState()
+
+    orderCount = state.orderItems.size
+
+    LaunchedEffect(refreshTrigger) {
+        if (isAdminState) {
+            viewModel.getAllOrders()
+        } else {
+            viewModel.getAllOrdersByUserID()
+        }
+    }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->

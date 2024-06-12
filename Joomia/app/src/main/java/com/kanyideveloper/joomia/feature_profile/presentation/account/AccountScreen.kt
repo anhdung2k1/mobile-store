@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -53,9 +52,12 @@ import com.kanyideveloper.joomia.core.util.UiEvents
 import com.kanyideveloper.joomia.destinations.AccountScreenDestination
 import com.kanyideveloper.joomia.destinations.CartScreenDestination
 import com.kanyideveloper.joomia.destinations.HomeScreenDestination
+import com.kanyideveloper.joomia.destinations.ProductOrderScreenDestination
 import com.kanyideveloper.joomia.destinations.UserProfileScreenDestination
-import com.kanyideveloper.joomia.feature_profile.domain.model.Account
+import com.kanyideveloper.joomia.destinations.WishlistScreenDestination
+import com.kanyideveloper.joomia.feature_products.presentation.product_order.orderCount
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
+import com.kanyideveloper.joomia.feature_wishlist.presentation.wishListCount
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
@@ -65,7 +67,7 @@ import java.util.Locale
 @Composable
 fun AccountScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
-    navigator: DestinationsNavigator,
+    navigator: DestinationsNavigator
 ) {
 
     val user = viewModel.userProfileState.value
@@ -128,7 +130,8 @@ fun AccountScreen(
                 },
                 onClickSignOut = {
                     viewModel.logout()
-                }
+                },
+                navigator = navigator
             )
         }
     }
@@ -138,7 +141,8 @@ fun AccountScreen(
 private fun AccountScreenContent(
     user: User,
     onClickAvatar: () -> Unit,
-    onClickSignOut: () -> Unit
+    onClickSignOut: () -> Unit,
+    navigator: DestinationsNavigator,
 ) {
     LazyColumn {
         item {
@@ -151,43 +155,30 @@ private fun AccountScreenContent(
                     .padding(4.dp)
             )
         }
-        items(accountItems) { item ->
-            Card(
-                modifier = Modifier.padding(8.dp),
-                border = BorderStroke(0.3.dp, GrayColor),
-                shape = RoundedCornerShape(8.dp)
+
+        item {
+            CardAccount(
+                title = "My Orders",
+                content = "You have $orderCount completed orders"
             ) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = item.title,
-                            color = Color.Black,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = item.content,
-                            color = Color.Black,
-                            fontWeight = FontWeight.Light,
-                            fontSize = 12.sp
-                        )
-                    }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.ChevronRight,
-                            contentDescription = null
-                        )
-                    }
-                }
+                navigator.navigate(ProductOrderScreenDestination.route)
+            }
+
+            CardAccount(
+                title = "My WishLists",
+                content = "You have $wishListCount in wishlists"
+            ) {
+                navigator.navigate(WishlistScreenDestination.route)
+            }
+
+            CardAccount(
+                title = "User Profile",
+                content = "Manage your account settings"
+            ) {
+                navigator.navigate(UserProfileScreenDestination.route)
             }
         }
+
         item {
             Spacer(modifier = Modifier.height(16.dp))
             Button(
@@ -201,6 +192,49 @@ private fun AccountScreenContent(
                         .padding(12.dp),
                     text = "Sign Out",
                     textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CardAccount(
+    title: String,
+    content: String,
+    onClickAccount: () -> Unit
+) {
+    Card(
+        modifier = Modifier.padding(8.dp),
+        border = BorderStroke(0.3.dp, GrayColor),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = title,
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = content,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Light,
+                    fontSize = 12.sp
+                )
+            }
+            IconButton(onClick = { onClickAccount() }) {
+                Icon(
+                    imageVector = Icons.Outlined.ChevronRight,
+                    contentDescription = null
                 )
             }
         }
@@ -296,22 +330,3 @@ fun UserItem(
         }
     }
 }
-
-private val accountItems = listOf(
-    Account(
-        "My Orders",
-        "You have 10 completed orders"
-    ),
-    Account(
-        "Shipping Address",
-        "2 addresses have been set"
-    ),
-    Account(
-        "My Reviews",
-        "Reviewed 3 items"
-    ),
-    Account(
-        "Settings",
-        "Notifications, password, language"
-    )
-)

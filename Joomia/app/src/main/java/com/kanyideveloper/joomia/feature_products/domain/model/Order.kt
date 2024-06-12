@@ -8,6 +8,6 @@ data class Order (
     val userID: Int,
     val transactionID: Int,
     val orderDate: String,
-    val orderStatus: String,
+    var orderStatus: String,
     val totalAmount: Double
 )
