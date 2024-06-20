@@ -1,4 +1,4 @@
-<p align="center"><img src="screenshots/joomia.png" alt="Joomia" height="100px"></p>
+<p align="center"><img src="screenshots/splash.png" alt="Joomia" height="100px"></p>
 
 # Joomia 🛒
 A Mobile Shopping App built with Jetpack Compose consuming [MOBILE STORE API](https://github.com/anhdung2k1/mobile-store/tree/main/authentication)
@@ -17,11 +17,11 @@ A Mobile Shopping App built with Jetpack Compose consuming [MOBILE STORE API](ht
 ## Demo
 <img src="screenshots/splash.png" width="250"/> <img src="screenshots/auth.png" width="250"/>
 
-<img src="screenshots/register.png" width="250"/> <img src="screenshots/login.png" width="250"/>
+<img src="screenshots/signup.png" width="250"/> <img src="screenshots/log_in.png" width="250"/>
 
-<img src="screenshots/home.png" width="250"/> <img src="screenshots/details.png" width="250"/> <img src="screenshots/wishlist.png" width="250"/>
+<img src="screenshots/homepage.png" width="250"/> <img src="screenshots/order_details.png" width="250"/> <img src="screenshots/wishlist.png" width="250"/>
 
-<img src="screenshots/cart.png" width="250"/> <img src="screenshots/account.png" width="250"/>
+<img src="screenshots/checkout.png" width="250"/> <img src="screenshots/profile.png" width="250"/>
 
 
 ## Tech Stack.
