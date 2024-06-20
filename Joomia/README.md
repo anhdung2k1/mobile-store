@@ -1,5 +1,3 @@
-<p align="center"><img src="screenshots/splash.png" alt="Joomia" height="100px"></p>
-
 # Joomia 🛒
 A Mobile Shopping App built with Jetpack Compose consuming [MOBILE STORE API](https://github.com/anhdung2k1/mobile-store/tree/main/authentication)
 
