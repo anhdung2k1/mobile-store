@@ -1,5 +1,7 @@
 package com.kanyideveloper.joomia.feature_cart.presentation.checkout
 
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,6 +38,8 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +47,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -79,6 +81,10 @@ fun CheckOutScreen(
     var selectedPaymentMethod by remember { mutableStateOf<Payment?>(null) }
     val defaultAddress = "123 Street, City, Country"
     var shippingAddress by remember { mutableStateOf(defaultAddress) }
+
+    val payPalAccessToken by viewModel.payPalAccessToken.collectAsState()
+    val orderResponse by viewModel.orderResponse.collectAsState()
+    val captureResponse by viewModel.captureResponse.collectAsState()
 
     Scaffold(
         backgroundColor = Color.White,
@@ -165,21 +171,23 @@ fun CheckOutScreen(
             // Checkout Button
             Button(
                 onClick = {
-                  coroutineScope.launch {
-                      selectedPaymentMethod?.let { it1 ->
-                          Transaction(
-                              transactionID = 0,
-                              transactionType = "Sale",
-                              shippingAddress = shippingAddress,
-                              billingPayment = billingPayment,
-                              payment = it1
-                          )
-                      }?.let { it2 ->
-                          viewModel.createTransaction(
-                              it2
-                          )
-                      }
-                  }
+                    coroutineScope.launch {
+                        selectedPaymentMethod?.let { paymentMethod ->
+                            if (paymentMethod.paymentMethod.contains("Paypal", ignoreCase = true)) {
+                                viewModel.getPayPalAccessToken()
+                            } else {
+                                viewModel.createTransaction(
+                                    Transaction(
+                                        transactionID = 0,
+                                        transactionType = "Sale",
+                                        shippingAddress = shippingAddress,
+                                        billingPayment = billingPayment,
+                                        payment = paymentMethod
+                                    )
+                                )
+                            }
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -191,6 +199,48 @@ fun CheckOutScreen(
             ) {
                 Text(text = "Payment", color = Color.White)
             }
+
+            // Handle PayPal Access Token Retrieval
+            payPalAccessToken?.let {
+                if (selectedPaymentMethod?.paymentMethod?.contains("Paypal", ignoreCase = true) == true) {
+                    viewModel.createPayPalOrder(billingPayment.toString(), "USD")
+                }
+            }
+
+            // Handle PayPal Order Creation
+            orderResponse?.let { order ->
+                // Launch a custom tab for PayPal approval
+                val customTabsIntent = CustomTabsIntent.Builder().build()
+                val approvalUrl = Uri.parse(order.approvalUrl)
+                customTabsIntent.launchUrl(LocalContext.current, approvalUrl)
+            }
+
+            // Use LaunchedEffect to capture PayPal order after approval
+            LaunchedEffect(orderResponse) {
+                orderResponse?.let { order ->
+                    val approvalUrl = Uri.parse(order.approvalUrl)
+                    if (approvalUrl.getQueryParameter("PayerID") != null) {
+                        approvalUrl.getQueryParameter("PayerID")
+                        viewModel.capturePayPalOrder(order.id)
+                    }
+                }
+            }
+
+            // Handle PayPal Order Capture
+            captureResponse?.let {
+                coroutineScope.launch {
+                    viewModel.createTransaction(
+                        Transaction(
+                            transactionID = 0,
+                            transactionType = "Sale",
+                            shippingAddress = shippingAddress,
+                            billingPayment = billingPayment,
+                            payment = selectedPaymentMethod!!
+                        )
+                    )
+                }
+            }
+
             if (viewModel.isTransactionCreated.value) {
                 PaymentSuccessDialog (
                     onDismiss = {
