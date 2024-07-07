@@ -6,8 +6,10 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.google.gson.Gson
+import com.kanyideveloper.joomia.core.util.Constants
 import com.kanyideveloper.joomia.feature_auth.data.local.AuthPreferences
 import com.kanyideveloper.joomia.feature_auth.util.Constants.AUTH_PREFERENCES
+import com.paypal.android.sdk.payments.PayPalConfiguration
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,5 +55,13 @@ object AppModule {
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             }).build()
+    }
+
+    @Provides
+    @Singleton
+    fun providePayPalConfiguration(): PayPalConfiguration {
+        return PayPalConfiguration()
+            .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
+            .clientId(Constants.PAYPAL_CLIENT_ID)
     }
 }

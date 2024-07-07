@@ -38,6 +38,8 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+const val shippingFee = 60
+
 @Destination
 @Composable
 fun CartScreen(
@@ -81,7 +83,7 @@ fun CartScreen(
     ) {
         CartScreenContent(
             state = state,
-            totalPrice = state.cartItems.sumOf { (it.mobilePrice * it.mobileQuantity) },
+            totalPrice = state.cartItems.sumOf { (it.mobilePrice * it.mobileQuantity) + shippingFee },
             onClickCheckOut = { billingPayment ->
               navigator.navigate(CheckOutScreenDestination(billingPayment).route)
             },
@@ -179,7 +181,6 @@ private fun CheckoutComponent(
     totalPrice: Double,
     onClickCheckOut: (Double) -> Unit
 ) {
-
     Column(Modifier.padding(12.dp)) {
         Row(
             Modifier.fillMaxWidth(),
@@ -187,7 +188,7 @@ private fun CheckoutComponent(
         ) {
             Text(text = "${state.cartItems.size} items")
             Text(
-                text = "${state.cartItems.sumOf { (it.mobilePrice * it.mobileQuantity) }}",
+                text = "${state.cartItems.sumOf { (it.mobilePrice * it.mobileQuantity) + shippingFee }}",
                 color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
@@ -200,7 +201,7 @@ private fun CheckoutComponent(
         ) {
             Text(text = "Shipping fee")
             Text(
-                text = "$60.00", color = Color.Black,
+                text = "$${shippingFee}", color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )

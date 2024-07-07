@@ -1,5 +1,9 @@
 package com.kanyideveloper.joomia.feature_cart.presentation.checkout
 
+import android.app.Activity
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,7 +13,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,6 +40,8 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +49,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -60,9 +64,15 @@ import com.kanyideveloper.joomia.destinations.CheckOutScreenDestination
 import com.kanyideveloper.joomia.destinations.HomeScreenDestination
 import com.kanyideveloper.joomia.feature_cart.domain.model.Payment
 import com.kanyideveloper.joomia.feature_cart.domain.model.Transaction
+import com.paypal.android.sdk.payments.PayPalService
+import com.paypal.android.sdk.payments.PaymentActivity
+import com.paypal.android.sdk.payments.PaymentConfirmation
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.math.BigDecimal
 
 @Destination
 @Composable
@@ -73,12 +83,56 @@ fun CheckOutScreen(
 ) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val paymentMethods = viewModel.paymentState.value
 
     var selectedPaymentMethod by remember { mutableStateOf<Payment?>(null) }
     val defaultAddress = "123 Street, City, Country"
     var shippingAddress by remember { mutableStateOf(defaultAddress) }
+    var showPayPalDialog by remember { mutableStateOf<Boolean?>(false) }
+
+    // PayPal service management
+    DisposableEffect(Unit) {
+        val intent = Intent(context, PayPalService::class.java).apply {
+            putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, viewModel.payPalConfig)
+        }
+        context.startService(intent)
+        onDispose {
+            context.stopService(intent)
+        }
+    }
+
+    // Register for activity result
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            val confirm = data?.getParcelableExtra<PaymentConfirmation>(PaymentActivity.EXTRA_RESULT_CONFIRMATION)
+            if (confirm != null) {
+                try {
+                    val paymentDetails = confirm.toJSONObject().toString(4)
+                    Timber.d(paymentDetails)
+                    // Process payment details
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        } else if (result.resultCode == Activity.RESULT_CANCELED) {
+            // Handle payment cancellation
+            Timber.d("Payment Cancel")
+        } else if (result.resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
+            // Handle invalid payment details
+            Timber.d("Invalid payment details")
+        }
+    }
+
+    // Collect payment events and launch PayPal payment
+    LaunchedEffect(Unit) {
+        viewModel.payPalPaymentEvent.collectLatest { intent ->
+            Timber.d("Launching PayPal payment intent")
+            launcher.launch(intent)
+        }
+    }
 
     Scaffold(
         backgroundColor = Color.White,
@@ -88,9 +142,11 @@ fun CheckOutScreen(
                 elevation = 1.dp,
                 backgroundColor = Color.White,
                 title = {
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(end = 72.dp), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(end = 72.dp), contentAlignment = Alignment.Center
+                    ) {
                         Text("CHECK OUT", color = Color.Black.copy(alpha = 0.7f), fontWeight = FontWeight.Light)
                     }
                 },
@@ -155,7 +211,7 @@ fun CheckOutScreen(
             ) {
                 Text(text = "Total")
                 Text(
-                    text = "$${ billingPayment }",
+                    text = "$$billingPayment",
                     color = Color.Black,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
@@ -165,21 +221,23 @@ fun CheckOutScreen(
             // Checkout Button
             Button(
                 onClick = {
-                  coroutineScope.launch {
-                      selectedPaymentMethod?.let { it1 ->
-                          Transaction(
-                              transactionID = 0,
-                              transactionType = "Sale",
-                              shippingAddress = shippingAddress,
-                              billingPayment = billingPayment,
-                              payment = it1
-                          )
-                      }?.let { it2 ->
-                          viewModel.createTransaction(
-                              it2
-                          )
-                      }
-                  }
+                    coroutineScope.launch {
+                        selectedPaymentMethod?.let { paymentMethod ->
+                            if (paymentMethod.paymentMethod.contains("Paypal")) {
+                                showPayPalDialog = true
+                            } else {
+                                viewModel.createTransaction(
+                                    Transaction(
+                                        transactionID = 0,
+                                        transactionType = "Sale",
+                                        shippingAddress = shippingAddress,
+                                        billingPayment = billingPayment,
+                                        payment = paymentMethod
+                                    )
+                                )
+                            }
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -191,8 +249,27 @@ fun CheckOutScreen(
             ) {
                 Text(text = "Payment", color = Color.White)
             }
+
+            if (showPayPalDialog == true) {
+                if (selectedPaymentMethod?.paymentMethod?.contains("Paypal") == true) {
+                    PayPalConfirmationDialog(
+                        onConfirm = {
+                            showPayPalDialog = false
+                            viewModel.initialPayPalPayment(
+                                context = context,
+                                amount = BigDecimal(billingPayment),
+                                currency = "USD",
+                                description = "Sample Item"
+                            )
+                        },
+                        onDismiss = {
+                            showPayPalDialog = false
+                        }
+                    )
+                }
+            }
             if (viewModel.isTransactionCreated.value) {
-                PaymentSuccessDialog (
+                PaymentSuccessDialog(
                     onDismiss = {
                         navigator.navigate(CheckOutScreenDestination(billingPayment).route)
                     }
@@ -200,6 +277,32 @@ fun CheckOutScreen(
             }
         }
     }
+}
+
+@Composable
+fun PayPalConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Start PayPal Payment") },
+        text = { Text(text = "Do you want to proceed with PayPal payment?") },
+        confirmButton = {
+            Button(
+                onClick = onConfirm
+            ) {
+                Text(text = "Yes")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text(text = "No")
+            }
+        }
+    )
 }
 
 @Composable

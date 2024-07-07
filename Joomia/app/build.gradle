@@ -101,6 +101,9 @@ dependencies {
     // JWT
     implementation "com.auth0:java-jwt:4.0.0"
 
+    // Paypal Sandbox
+    implementation "com.paypal.sdk:paypal-android-sdk:2.16.0"
+
     // System UI Controller for Jetpack Compose
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.24.10-beta"
 

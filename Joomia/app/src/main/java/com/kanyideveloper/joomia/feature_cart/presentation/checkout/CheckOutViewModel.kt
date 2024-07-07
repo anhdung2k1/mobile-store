@@ -1,5 +1,7 @@
 package com.kanyideveloper.joomia.feature_cart.presentation.checkout
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -13,19 +15,26 @@ import com.kanyideveloper.joomia.feature_cart.domain.model.Transaction
 import com.kanyideveloper.joomia.feature_cart.domain.repository.CartRepository
 import com.kanyideveloper.joomia.feature_profile.data.toDomain
 import com.kanyideveloper.joomia.feature_profile.domain.model.User
+import com.paypal.android.sdk.payments.PayPalConfiguration
+import com.paypal.android.sdk.payments.PayPalPayment
+import com.paypal.android.sdk.payments.PayPalService
+import com.paypal.android.sdk.payments.PaymentActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.math.BigDecimal
 import javax.inject.Inject
 
 @HiltViewModel
 class CheckOutViewModel @Inject constructor(
     private val cartRepository: CartRepository,
     private val authRepository: AuthRepository,
-    private val gson: Gson
+    private val gson: Gson,
+    private var payPalConfiguration: PayPalConfiguration
 ) : ViewModel() {
 
     private val _paymentState = mutableStateOf(PaymentState(paymentItems = emptyList()))
@@ -38,6 +47,12 @@ class CheckOutViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<UiEvents>()
     val eventFlow: SharedFlow<UiEvents> = _eventFlow.asSharedFlow()
+
+    private val _payPalPaymentEvent = MutableSharedFlow<Intent>()
+    val payPalPaymentEvent: SharedFlow<Intent> = _payPalPaymentEvent.asSharedFlow()
+
+    val payPalConfig: PayPalConfiguration
+        get() = payPalConfiguration
 
     init {
         viewModelScope.launch {
@@ -92,6 +107,19 @@ class CheckOutViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun initialPayPalPayment(context: Context, amount: BigDecimal, currency: String, description: String) {
+        Timber.d("initialPayPalPayment called with amount: $amount, currency: $currency, description: $description")
+        val payment = PayPalPayment(amount, currency, description, PayPalPayment.PAYMENT_INTENT_SALE)
+        val intent = Intent(context, PaymentActivity::class.java).apply {
+            putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, payPalConfiguration)
+            putExtra(PaymentActivity.EXTRA_PAYMENT, payment)
+        }
+        viewModelScope.launch {
+            Timber.d("Emitting PayPal payment intent: $intent")
+            _payPalPaymentEvent.emit(intent)
         }
     }
 }
