@@ -201,7 +201,7 @@ private fun CheckoutComponent(
         ) {
             Text(text = "Shipping fee")
             Text(
-                text = "$${shippingFee}}", color = Color.Black,
+                text = "$${shippingFee}", color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )
