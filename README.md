@@ -37,18 +37,23 @@ The recommend standard development environment is Ubuntu 18.04 LTS or later
 1. Install docker: [docker installation](https://docs.docker.com/engine/install/ubuntu/)
 
     ```bash
-    sudo apt-get -y update
-    sudo apt-get -y upgrade
-    sudo apt-get install apt-transport-https ca-certificates curl \
-        gnupg-agent software-properties-common
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository \
-        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-        $(lsb_release -cs) \
-        stable"
-    sudo apt-get -y update
-    sudo apt-get install docker-ce docker-ce-cli containerd.io
+    sudo apt-get update
+    sudo apt-get install ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+    
+    # Add the repository to Apt sources:
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get update
+    
+    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo groupadd docker
     sudo usermod -aG docker $USER
+    newgrp docker
     ```
 
 2. Install make
@@ -61,9 +66,9 @@ The recommend standard development environment is Ubuntu 18.04 LTS or later
     ```bash
     $ make build image push
     ```
-    - If you wan't to clean the build and re-run all the building steps
+    - If you wan't to clean the build and re-run all the building steps -> This will build C++ socket-server for socket client connection, API Java Spring Boot, MySQL.
     ```bash
-    $ make clean init train build image push
+    $ make clean init build image push
     ```
 
 4. For local development only, the docker used can be executed to run API server with docker
