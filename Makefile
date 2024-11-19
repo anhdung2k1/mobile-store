@@ -51,3 +51,13 @@ push-authentication:
 push-socket-server:
 	@echo "push image-socket-server"
 	./vas.sh push_image --name=socket-server
+
+test: test-authentication \
+	test-socket-server
+
+test-authentication:
+	@echo "test-authentication"
+	./vas.sh test_repo --name=authentication
+test-socket-server:
+	@echo "test-socket-server"
+	./vas.sh test_repo --name=socket-server

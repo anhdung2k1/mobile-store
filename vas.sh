@@ -131,29 +131,29 @@ build_repo() {
     echo "# Prepare the docker local build : #"
     echo "##################################"
 
-    mysql_container=$(docker ps -a --format "{{.Names}}" | grep -i mysql_container)
-    if [[ -n "$mysql_container" ]]; then
-        docker rm -f $mysql_con
-    fi
-    #Start docker mysql container
-    docker run -d --name $mysql_con \
-        -e MYSQL_ROOT_PASSWORD=root \
-        -e MYSQL_DATABASE=${COMMON_DB} \
-        -e MYSQL_USER=${COMMON_DB} \
-        -e MYSQL_PASSWORD=${COMMON_DB} \
-        -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
-        -p 3306:3306 \
-        mysql:latest \
-    || die "[ERROR]: Failed to run mysql docker"
-    mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
-    echo $mysql_IP
-
     case $__name in
     "authentication")
         echo "Start to build Spring boot compile"
         rm -rf $API_DIR/src/main/resources/application.properties
         pushd .
         cd $API_DIR
+
+        mysql_container=$(docker ps -a --format "{{.Names}}" | grep -i mysql_container)
+        if [[ -n "$mysql_container" ]]; then
+            docker rm -f $mysql_con
+        fi
+        #Start docker mysql container
+        docker run -d --name $mysql_con \
+            -e MYSQL_ROOT_PASSWORD=root \
+            -e MYSQL_DATABASE=${COMMON_DB} \
+            -e MYSQL_USER=${COMMON_DB} \
+            -e MYSQL_PASSWORD=${COMMON_DB} \
+            -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
+            -p 3306:3306 \
+            mysql:latest \
+        || die "[ERROR]: Failed to run mysql docker"
+        mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
+        echo $mysql_IP
 
         echo "Start to build Spring boot compile"
         docker run -it --rm -v "$(pwd -P)":/app \
@@ -162,7 +162,7 @@ build_repo() {
             -e DB_USERNAME=${COMMON_DB} \
             -e DB_NAME=${COMMON_DB} \
             -e DB_PASSWORD=${COMMON_DB} \
-	    -p 8080:8080 \
+	        -p 8080:8080 \
             $MAVEN_IMAGE mvn clean install -Dskiptest \
             || die "[ERROR]: Failed to compile"
 
@@ -170,32 +170,72 @@ build_repo() {
 
         cp -f $API_DIR/target/*.jar $DOCKER_DIR/$__name/ \
             || die "Target file does not exists in $API_DIR/target/"
-        
-        authen_container=$(docker ps -a --format "{{.Names}}" | grep -i $__name)
-        if [[ -n $authen_container ]]; then
-            docker rm -f $__name
-        fi
-        
-        $vas build_image --name=$__name
-        docker run -it -d --name $__name \
-                -e DB_HOST=${mysql_IP} \
-                -e DB_USERNAME=${COMMON_DB} \
-                -e DB_NAME=${COMMON_DB} \
-                -e DB_PASSWORD=${COMMON_DB} \
-		-p 8080:8080 \
-                ${DOCKER_REGISTRY}/${image_name}:${version} \
-                || die "[ERROR]: Failed to compile"
     ;;
     "socket-server")
+        echo "Start to build socket-server docker image"
         echo "Copy folder $__name to docker"
         cp -rf $VAS_GIT/$__name/ $DOCKER_DIR/$__name \
             || die "Source directory does not exists $VAS_GIT/$__name"
-        echo "Start to build socket-server docker image"
-        #Need to build image first
+        
         server_image=$(docker images | awk '$1 {print $1}' | grep -v -w "REPOSITORY" | grep -i "${DOCKER_REGISTRY}/${image_name}")
         if [[ -n "${server_image}" ]]; then 
             docker rmi -f ${server_image}:$version
         fi
+    esac
+}
+
+test_repo() {
+    test -n "$VAS_GIT" || die "Not set [VAS_GIT]"
+    test -n "$__name" || die "Module name required"
+    COMMON_DB="mobile"
+    image_name=mb-$__name
+    mysql_con="mysql_container"
+    version=$(get_version)
+
+    echo "##################################"
+    echo "##### Running Docker Test : ######"
+    echo "##################################"
+
+    case $__name in
+    "authentication")
+        echo "Start to test Spring boot Authentication..."
+        mysql_container=$(docker ps -a --format "{{.Names}}" | grep -i mysql_container)
+        if [[ -n "$mysql_container" ]]; then
+            docker rm -f $mysql_con
+        fi
+        #Start docker mysql container
+        docker run -d --name $mysql_con \
+            -e MYSQL_ROOT_PASSWORD=root \
+            -e MYSQL_DATABASE=${COMMON_DB} \
+            -e MYSQL_USER=${COMMON_DB} \
+            -e MYSQL_PASSWORD=${COMMON_DB} \
+            -v ${VAS_GIT}/sql:/docker-entrypoint-initdb.d \
+            -p 3306:3306 \
+            mysql:latest \
+        || die "[ERROR]: Failed to run mysql docker"
+        sleep 30
+        # Remove the docker container running
+        authen_container=$(docker ps -a --format "{{.Names}}" | grep -i $__name)
+        if [[ -n $authen_container ]]; then
+            docker rm -f $__name
+        fi
+	
+	mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
+        echo $mysql_IP
+
+        docker run -it -d --name $__name \
+            -e DB_HOST=${mysql_IP} \
+            -e DB_USERNAME=${COMMON_DB} \
+            -e DB_NAME=${COMMON_DB} \
+            -e DB_PASSWORD=${COMMON_DB} \
+            -p 8080:8080 \
+            ${DOCKER_REGISTRY}/${image_name}:${version} \
+            || die "[ERROR]: Failed to compile"
+    ;;
+    "socket-server")
+        echo "Start to test Socket-Server..."
+        mysql_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $mysql_con)
+        echo $mysql_IP
         # Remove the docker container running
         server_container=$(docker ps -a --format "{{.Names}}" | grep -i $__name)
         if [[ -n $server_container ]]; then
@@ -204,14 +244,13 @@ build_repo() {
 
         API_HOST=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' authentication)
         echo $API_HOST
-        $vas build_image --name=$__name
         docker run -it -d --name $__name \
                 -e API_HOST=${API_HOST} \
                 -e DB_HOST=${mysql_IP} \
                 -e DB_USERNAME=${COMMON_DB} \
                 -e DB_NAME=${COMMON_DB} \
                 -e DB_PASSWORD=${COMMON_DB} \
-		-p 8000:8000 \
+		        -p 8000:8000 \
                 ${DOCKER_REGISTRY}/${image_name}:${version} \
                 || die "[ERROR]: Failed to compile"
     esac
