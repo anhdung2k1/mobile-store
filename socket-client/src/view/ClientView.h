@@ -21,7 +21,7 @@
 #include "../view/StatusBar.h"
 
 using std::map;
-class ChatView
+class ClientView
 {
 private:
     static const int buffer_size = 8124;
