@@ -80,15 +80,15 @@ void ClientView::LoginMenu()
    curs_set(0);
    refresh();
    wattron(loginMenu, COLOR_PAIR(4));
-   mvwprintw(loginMenu, 2, (loginMenu->_maxx - 24) / 2, ">>>>====Mobile Shop====<<<<");
+   mvwprintw(loginMenu, 2, (getmaxx(loginMenu) - 24) / 2, ">>>>====Mobile Shop====<<<<");
    mvwprintw(loginMenu, 6, 3, "Register");
    mvwprintw(loginMenu, 8, 3, "Login");
-   mvwprintw(loginMenu, 6, (loginMenu->_maxx - 12), "(Press R)");
-   mvwprintw(loginMenu, 8, (loginMenu->_maxx - 12), "(Press L)");
+   mvwprintw(loginMenu, 6, (getmaxx(loginMenu) - 12), "(Press R)");
+   mvwprintw(loginMenu, 8, (getmaxx(loginMenu) - 12), "(Press L)");
    wattroff(loginMenu, COLOR_PAIR(4));
    wattron(loginMenu, COLOR_PAIR(2));
    mvwprintw(loginMenu, 10, 3, "Exit");
-   mvwprintw(loginMenu, 10, (loginMenu->_maxx - 14), "(Press Esc)");
+   mvwprintw(loginMenu, 10, (getmaxx(loginMenu) - 14), "(Press Esc)");
    wattroff(loginMenu, COLOR_PAIR(2));
    wrefresh(loginMenu);
 }
@@ -162,7 +162,7 @@ void ClientView::handleLogin(int sock, int selection)
       // box(usernameWin, 0, 0);
       // wrefresh(registerWin);
       wattron(registerWin, COLOR_PAIR(4));
-      mvwprintw(registerWin, registerWin->_begy + 2, (registerWin->_maxx - 16) / 2, "*** REGISTER ***");
+      mvwprintw(registerWin, getbegy(registerWin) + 2, (getmaxx(registerWin) - 16) / 2, "*** REGISTER ***");
       mvwprintw(registerWin, 7, 2, "Username: ");
       mvwprintw(registerWin, 12, 2, "Password: ");
       mvwprintw(registerWin, 18, 2, "Notification:");
@@ -176,7 +176,7 @@ void ClientView::handleLogin(int sock, int selection)
       mvwprintw(registerWin, 15, 5, "special char !\"#$%%'()*+,-./:;<=>?@[\\ ]^_`{|}~ and number,");
       mvwprintw(registerWin, 16, 5, "ex: 4vQj*SFp)");
       wattroff(registerWin, COLOR_PAIR(1));
-      mvwprintw(registerWin, registerWin->_begy + 3, (registerWin->_maxx - 19) / 2, "(Press Esc to back)");
+      mvwprintw(registerWin, getbegy(registerWin) + 3, (getmaxx(registerWin) - 19) / 2, "(Press Esc to back)");
       wrefresh(registerWin);
       // End register window design
       wrefresh(nameWin);
@@ -471,9 +471,9 @@ void ClientView::handleLogin(int sock, int selection)
                {
                   curs_set(0);
                   attron(COLOR_PAIR(1));
-                  mvprintw(registerWin->_begy + 20, 5, "Password must atleast 8 characters and include alphabet, ");
-                  mvprintw(registerWin->_begy + 21, 5, "special char !\"#$%%'()*+,-./:;<=>?@[\\]^_`{|}~ and number,");
-                  mvprintw(registerWin->_begy + 22, 5, "ex: 4vQj*SFp. Press ENTER to continue.");
+                  mvprintw(getbegy(registerWin) + 20, 5, "Password must atleast 8 characters and include alphabet, ");
+                  mvprintw(getbegy(registerWin) + 21, 5, "special char !\"#$%%'()*+,-./:;<=>?@[\\]^_`{|}~ and number,");
+                  mvprintw(getbegy(registerWin) + 22, 5, "ex: 4vQj*SFp. Press ENTER to continue.");
                   attroff(COLOR_PAIR(1));
                   refresh();
                   while (getch() != 10)
@@ -555,8 +555,8 @@ void ClientView::handleLogin(int sock, int selection)
       init_pair(6, COLOR_GREEN, COLOR_BLACK);
       init_pair(7, COLOR_WHITE, COLOR_BLACK);
       int height, width, start_x, start_y;
-      height = stdscr->_begy + 12;
-      width = stdscr->_begx + 61;
+      height = getbegy(stdscr) + 12;
+      width = getbegx(stdscr) + 61;
       start_x = start_y = 0;
       WINDOW *loginWin = newwin(19, 60, 0, 0);
       WINDOW *nameWin = subwin(loginWin, 3, 42, 6, 14);
@@ -941,7 +941,7 @@ void ClientView::Menu()
    mvwprintw(userMenu, 4, 2, "------------------------------------------------------------------");
    wattroff(userMenu, COLOR_PAIR(3));
    wattron(userMenu, COLOR_PAIR(4));
-   mvwprintw(userMenu, 2, (userMenu->_maxx - 28) / 2, ">>>>> Mobile Store Management <<<<<");
+   mvwprintw(userMenu, 2, (getmaxx(userMenu) - 28) / 2, ">>>>> Mobile Store Management <<<<<");
    mvwprintw(userMenu, 6, 3, "Create Mobile Instances");
    mvwprintw(userMenu, 8, 3, "Manage Mobile Inventory");
    mvwprintw(userMenu, 10, 3, "Transaction History");
@@ -949,17 +949,17 @@ void ClientView::Menu()
    mvwprintw(userMenu, 14, 3, "Find user(s)");
    mvwprintw(userMenu, 16, 3, "Update profile");
    mvwprintw(userMenu, 18, 3, "Log out");
-   mvwprintw(userMenu, 6, (userMenu->_maxx - 11), "(Press A)");
-   mvwprintw(userMenu, 8, (userMenu->_maxx - 11), "(Press N)");
-   mvwprintw(userMenu, 10, (userMenu->_maxx - 11), "(Press I)");
-   mvwprintw(userMenu, 12, (userMenu->_maxx - 11), "(Press J)");
-   mvwprintw(userMenu, 14, (userMenu->_maxx - 11), "(Press F)");
-   mvwprintw(userMenu, 16, (userMenu->_maxx - 11), "(Press U)");
-   mvwprintw(userMenu, 18, (userMenu->_maxx - 11), "(Press O)");
+   mvwprintw(userMenu, 6, (getmaxx(userMenu) - 11), "(Press A)");
+   mvwprintw(userMenu, 8, (getmaxx(userMenu) - 11), "(Press N)");
+   mvwprintw(userMenu, 10, (getmaxx(userMenu) - 11), "(Press I)");
+   mvwprintw(userMenu, 12, (getmaxx(userMenu) - 11), "(Press J)");
+   mvwprintw(userMenu, 14, (getmaxx(userMenu) - 11), "(Press F)");
+   mvwprintw(userMenu, 16, (getmaxx(userMenu) - 11), "(Press U)");
+   mvwprintw(userMenu, 18, (getmaxx(userMenu) - 11), "(Press O)");
    wattroff(userMenu, COLOR_PAIR(4));
    wattron(userMenu, COLOR_PAIR(2));
    mvwprintw(userMenu, 20, 3, "Exit");
-   mvwprintw(userMenu, 20, (userMenu->_maxx - 13), "(Press Esc)");
+   mvwprintw(userMenu, 20, (getmaxx(userMenu) - 13), "(Press Esc)");
    wattroff(userMenu, COLOR_PAIR(2));
    wrefresh(userMenu);
 }
@@ -1002,14 +1002,14 @@ void ClientView::UserConsole(int sock)
    ClientService::GetCurrentProfile(sock, currentUser);
    refresh();
    wattron(updateWin, COLOR_PAIR(4));
-   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + currentUser.getName().length())) / 2, "*** Current user: %s ***", currentUser.getName().c_str());
+   mvwprintw(updateWin, 2, (getmaxx(updateWin) - (22 + currentUser.getName().length())) / 2, "*** Current user: %s ***", currentUser.getName().c_str());
    mvwprintw(updateWin, 6, 3, "1. Address: ");
    mvwprintw(updateWin, 8, 3, "2. Gender: ");
    mvwprintw(updateWin, 10, 3, "3. Change password ");
-   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
-   mvwprintw(updateWin, 14, (updateWin->_maxx - 40) / 2, "Select an option that you want to change");
+   mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+   mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+   mvwprintw(updateWin, 10, (getmaxx(updateWin) - 6), "(P)");
+   mvwprintw(updateWin, 14, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to change");
    wattroff(updateWin, COLOR_PAIR(4));
    wattron(updateWin, COLOR_PAIR(6));
    mvwprintw(updateWin, 6, 15, "%s", currentUser.getAddress().c_str());
@@ -1238,20 +1238,20 @@ void ClientView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
    wattroff(updateWin, COLOR_PAIR(3));
    refresh();
    wattron(updateWin, COLOR_PAIR(4));
-   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + mobile.getMobileName().length())) / 2, "*** Current Mobile: %s ***", mobile.getMobileName().c_str());
+   mvwprintw(updateWin, 2, (getmaxx(updateWin) - (22 + mobile.getMobileName().length())) / 2, "*** Current Mobile: %s ***", mobile.getMobileName().c_str());
    mvwprintw(updateWin, 6, 3, "1. Mobile Name: ");
    mvwprintw(updateWin, 8, 3, "2. Mobile Type: ");
    mvwprintw(updateWin, 10, 3, "3. Mobile Model: ");
    mvwprintw(updateWin, 12, 3, "4. Mobile Quantity: ");
    mvwprintw(updateWin, 14, 3, "5. Mobile Price: ");
    mvwprintw(updateWin, 16, 3, "6. Mobile Description: ");
-   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
-   mvwprintw(updateWin, 12, (updateWin->_maxx - 6), "(O)");
-   mvwprintw(updateWin, 14, (updateWin->_maxx - 6), "(R)");
-   mvwprintw(updateWin, 16, (updateWin->_maxx - 6), "(D)");
-   mvwprintw(updateWin, 22, (updateWin->_maxx - 40) / 2, "Select an option that you want to fill");
+   mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+   mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+   mvwprintw(updateWin, 10, (getmaxx(updateWin) - 6), "(P)");
+   mvwprintw(updateWin, 12, (getmaxx(updateWin) - 6), "(O)");
+   mvwprintw(updateWin, 14, (getmaxx(updateWin) - 6), "(R)");
+   mvwprintw(updateWin, 16, (getmaxx(updateWin) - 6), "(D)");
+   mvwprintw(updateWin, 22, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to fill");
    wattroff(updateWin, COLOR_PAIR(4));
    wattron(updateWin, COLOR_PAIR(6));
    mvwprintw(updateWin, 6, 27, "%s", mobile.getMobileName().c_str());
@@ -1664,18 +1664,18 @@ void ClientView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
    wattroff(updateWin, COLOR_PAIR(3));
    refresh();
    wattron(updateWin, COLOR_PAIR(4));
-   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + customer.getCustomerName().length())) / 2, "*** Current Customer: %s ***", customer.getCustomerName().c_str());
+   mvwprintw(updateWin, 2, (getmaxx(updateWin) - (22 + customer.getCustomerName().length())) / 2, "*** Current Customer: %s ***", customer.getCustomerName().c_str());
    mvwprintw(updateWin, 6, 3, "1. Customer Name: ");
    mvwprintw(updateWin, 8, 3, "2. Customer Address: ");
    mvwprintw(updateWin, 10, 3, "3. Customer Gender: ");
    mvwprintw(updateWin, 12, 3, "4. Customer Birthday: ");
    mvwprintw(updateWin, 14, 3, "5. Customer Email: ");
-   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
-   mvwprintw(updateWin, 12, (updateWin->_maxx - 6), "(O)");
-   mvwprintw(updateWin, 14, (updateWin->_maxx - 6), "(R)");
-   mvwprintw(updateWin, 22, (updateWin->_maxx - 40) / 2, "Select an option that you want to fill");
+   mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+   mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+   mvwprintw(updateWin, 10, (getmaxx(updateWin) - 6), "(P)");
+   mvwprintw(updateWin, 12, (getmaxx(updateWin) - 6), "(O)");
+   mvwprintw(updateWin, 14, (getmaxx(updateWin) - 6), "(R)");
+   mvwprintw(updateWin, 22, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to fill");
    wattroff(updateWin, COLOR_PAIR(4));
    wattron(updateWin, COLOR_PAIR(6));
    mvwprintw(updateWin, 6, 27, "%s", customer.getCustomerName().c_str());
@@ -2032,14 +2032,14 @@ void ClientView::TransactionConsole(int sock, Transaction& transaction, bool isU
    wattroff(updateWin, COLOR_PAIR(3));
    refresh();
    wattron(updateWin, COLOR_PAIR(4));
-   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + transaction.getTransactionName().length())) / 2, "*** Current Transaction: %s ***", transaction.getTransactionName().c_str());
+   mvwprintw(updateWin, 2, (getmaxx(updateWin) - (22 + transaction.getTransactionName().length())) / 2, "*** Current Transaction: %s ***", transaction.getTransactionName().c_str());
    mvwprintw(updateWin, 6, 3, "1. Transaction Name: ");
    mvwprintw(updateWin, 8, 3, "2. Transaction Type: ");
    mvwprintw(updateWin, 10, 3, "3. Payment Method: ");
-   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
-   mvwprintw(updateWin, 16, (updateWin->_maxx - 40) / 2, "Select an option that you want to fill");
+   mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+   mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+   mvwprintw(updateWin, 10, (getmaxx(updateWin) - 6), "(P)");
+   mvwprintw(updateWin, 16, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to fill");
    wattroff(updateWin, COLOR_PAIR(4));
    wattron(updateWin, COLOR_PAIR(6));
    mvwprintw(updateWin, 6, 27, "%s", transaction.getTransactionName().c_str());
@@ -2749,12 +2749,12 @@ void ClientView::handleMenu(int sock, int selection)
          mvwprintw(updateWin, 4, 2, "--------------------------------------------------------");
          mvwprintw(updateWin, 12, 2, "--------------------------------------------------------");
          wattron(updateWin, COLOR_PAIR(4));
-         mvwprintw(updateWin, 2, (updateWin->_maxx - 40), "*** Mobile Inventory ***");
+         mvwprintw(updateWin, 2, (getmaxx(updateWin) - 40), "*** Mobile Inventory ***");
          mvwprintw(updateWin, 6, 3, "1. Create New Mobile Devices: ");
          mvwprintw(updateWin, 8, 3, "2. Create New Customer: ");
-         mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-         mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-         mvwprintw(updateWin, 14, (updateWin->_maxx - 40) / 2, "Select an option that you want to add");
+         mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+         mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+         mvwprintw(updateWin, 14, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to add");
          wattroff(updateWin, COLOR_PAIR(4));
          wattron(updateWin, COLOR_PAIR(6));
          int curs_x, curs_y;
@@ -2819,12 +2819,12 @@ void ClientView::handleMenu(int sock, int selection)
          mvwprintw(updateWin, 4, 2, "--------------------------------------------------------");
          mvwprintw(updateWin, 12, 2, "--------------------------------------------------------");
          wattron(updateWin, COLOR_PAIR(4));
-         mvwprintw(updateWin, 2, (updateWin->_maxx - 40), "*** Mobile Inventory ***");
+         mvwprintw(updateWin, 2, (getmaxx(updateWin) - 40), "*** Mobile Inventory ***");
          mvwprintw(updateWin, 6, 3, "1. Find Mobile Devices by Mobile Name: ");
          mvwprintw(updateWin, 8, 3, "2. Find Mobile Devices by Mobile Category: ");
-         mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-         mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-         mvwprintw(updateWin, 14, (updateWin->_maxx - 40) / 2, "Select an option that you want to find");
+         mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+         mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+         mvwprintw(updateWin, 14, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to find");
          wattroff(updateWin, COLOR_PAIR(4));
          wattron(updateWin, COLOR_PAIR(6));
          int curs_x, curs_y;
@@ -2940,7 +2940,7 @@ void ClientView::handleMenu(int sock, int selection)
                      spacePos += 1;
                   }
 
-                  mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
+                  mvprintw((getmaxx(currentWin) - 20), 0, "Press any key to continue!");
                   int back = getch();
                   if (back == 27)
                   {
@@ -3057,7 +3057,7 @@ void ClientView::handleMenu(int sock, int selection)
                      spacePos += 1;
                   }
 
-                  mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
+                  mvprintw((getmaxx(currentWin) - 20), 0, "Press any key to continue!");
                   int back = getch();
                   if (back == 27)
                   {
@@ -3183,7 +3183,7 @@ void ClientView::handleMenu(int sock, int selection)
                spacePos += 1;
             }
             
-            mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
+            mvprintw((getmaxx(currentWin) - 20), 0, "Press any key to continue!");
             int back = getch();
             if (back == 27) {
                clear();
@@ -3298,7 +3298,7 @@ void ClientView::handleMenu(int sock, int selection)
                spacePos++;
             }
 
-            mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
+            mvprintw((getmaxx(currentWin) - 20), 0, "Press any key to continue!");
             int back = getch();
             if (back == 27) {
                clear();
@@ -3669,7 +3669,7 @@ void ClientView::MobileUI(int sock, int mobileId) {
    refresh();
    int curs_x, curs_y;
    curs_x = 34;
-   curs_y = (currentWin->_maxx - 30);
+   curs_y = (getmaxx(currentWin) - 30);
    wmove(currentWin, curs_x, curs_y);
 
    int n;
@@ -3814,7 +3814,7 @@ void ClientView::CustomerUI(int sock, int customerId) {
    refresh();
    int curs_x, curs_y;
    curs_x = 34;
-   curs_y = (currentWin->_maxx - 30);
+   curs_y = (getmaxx(currentWin) - 30);
    wmove(currentWin, curs_x, curs_y);
 
    int n;
@@ -3952,7 +3952,7 @@ void ClientView::CustomerUI(int sock, int customerId) {
 
             while (true) {
                wattron(currentWin, COLOR_PAIR(4));
-               mvwprintw(currentWin, (currentWin->_maxx - 10), 1, "Press Enter to continue");
+               mvwprintw(currentWin, (getmaxx(currentWin) - 10), 1, "Press Enter to continue");
                wattroff(currentWin, COLOR_PAIR(4));
                sig = wgetch(currentWin);
                if (sig == 10) {
@@ -4002,7 +4002,7 @@ void ClientView::TransactionUI(int sock, int transactionId) {
    refresh();
    int curs_x, curs_y;
    curs_x = 34;
-   curs_y = (currentWin->_maxx - 30);
+   curs_y = (getmaxx(currentWin) - 30);
    wmove(currentWin, curs_x, curs_y);
 
    int n;

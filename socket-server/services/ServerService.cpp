@@ -113,7 +113,7 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         {
             response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/find?user_name=" + client.user.getName(), flag);
             nlohmann::json j = nlohmann::json::parse(response);
-            client.user.setId(j.at("user_id"));
+            client.user.setId(j.at("id"));
         }
         SendResponse(client.sock, "LOGIN_PASSWORD|" + to_string(flag));
     }
@@ -138,8 +138,9 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         if (flag)
         {
             response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/find?user_name=" + client.user.getName(), flag);
+            cout << "REGISTER_PASSWORD response(): " << response << endl;
             nlohmann::json j = nlohmann::json::parse(response);
-            client.user.setId(j.at("user_id"));
+            client.user.setId(j.at("id"));
         }
         SendResponse(client.sock, "REGISTER_PASSWORD|" + to_string(flag));
     }
@@ -339,7 +340,7 @@ bool ServerService::handleClient(map<int, Client> &clientMap, Client &client, po
         {
             response = curlUtils.getUtil(client.curl, client.res, apiIp + "/users/find?user_name=" + client.user.getName(), flag);
             nlohmann::json j = nlohmann::json::parse(response);
-            client.user.setId(j.at("user_id"));
+            client.user.setId(j.at("id"));
         }
         SendResponse(client.sock, "RECONNECT|");
     }

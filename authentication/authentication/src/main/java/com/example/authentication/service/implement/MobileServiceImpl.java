@@ -45,7 +45,7 @@ public class MobileServiceImpl implements MobileService {
             put("mobileQuantity", mobileEntity.getMobileQuantity());
             put("mobilePrice", mobileEntity.getMobilePrice());
             put("mobileDescription", mobileEntity.getMobileDescription());
-            put("imageUrl", mobileEntity.getImageUrl());
+            put("imageUrl", mobileEntity.getImageUrl() != null ? mobileEntity.getImageUrl() : "");
             put("rating", mobileEntity.getRate());
         }};
     }
@@ -59,7 +59,7 @@ public class MobileServiceImpl implements MobileService {
             RatingEntity ratingEntity = new RatingEntity();
             ratingRepository.save(ratingEntity);
             mobile.setRate(ratingEntity);
-            if (!mobile.getImageUrl().isEmpty()) {
+            if (!mobile.getImageUrl().isEmpty() || mobile.getImageUrl() != null) {
                 // Save to S3 Bucket
                 URL objectURL = s3Utils.getS3URL(mobile.getImageUrl());
                 mobile.setImageUrl(objectURL.toString());
@@ -149,7 +149,7 @@ public class MobileServiceImpl implements MobileService {
             mobileEntity.setMobilePrice(mobile.getMobilePrice());
             mobileEntity.setMobileDescription(mobile.getMobileDescription());
             mobileEntity.setUpdateAt(LocalDateTime.now());
-            if (!mobile.getImageUrl().isEmpty()) {
+            if (!mobile.getImageUrl().isEmpty() || mobile.getImageUrl() != null) {
                 URL objectURL = s3Utils.getS3URL(mobile.getImageUrl());
                 mobileEntity.setImageUrl(objectURL.toString());
             }
@@ -165,14 +165,16 @@ public class MobileServiceImpl implements MobileService {
     public Boolean deleteMobile(Long mobileId) throws Exception {
         try {
             if (mobileRepository.findById(mobileId).isPresent()) {
-                // Delete image in S3 Bucket
-                String fileURI = mobileRepository.findById(mobileId).get().getImageUrl();
-                String [] fileURISplitted = fileURI.split("/");
-                log.info("fileURISplitted: {}", (Object) fileURISplitted);
-                String fileName = fileURISplitted[fileURISplitted.length-1];
-                log.info("FileName: {}", fileName);
-                s3Client.deleteObject(bucketName, fileName);
-                log.info("FileName: {} removed", fileName);
+                if (mobileRepository.findById(mobileId).get().getImageUrl() != null || !mobileRepository.findById(mobileId).get().getImageUrl().isEmpty()) {
+                    // Delete image in S3 Bucket
+                    String fileURI = mobileRepository.findById(mobileId).get().getImageUrl();
+                    String [] fileURISplitted = fileURI.split("/");
+                    log.info("fileURISplitted: {}", (Object) fileURISplitted);
+                    String fileName = fileURISplitted[fileURISplitted.length-1];
+                    log.info("FileName: {}", fileName);
+                    s3Client.deleteObject(bucketName, fileName);
+                    log.info("FileName: {} removed", fileName);
+                }
 
                 mobileRepository.delete(mobileRepository.findById(mobileId).get());
                 return true;
