@@ -1,6 +1,6 @@
 // Copyright [2024] <Anh Dung>
-#include "ChatView.h"
-#include "../services/ChatService.h"
+#include "ClientView.h"
+#include "../services/ClientService.h"
 
 using std::cin;
 using std::cout;
@@ -11,12 +11,12 @@ using std::vector;
 
 #define ctrl(x) (x & 0x1F)
 thread readThread;
-ChatView::View currentView;
+ClientView::View currentView;
 UserClient currentUser;
 StatusBar statusBar;
-string addr = ChatService::GetAddress();
+string addr = ClientService::GetAddress();
 const char *ADDRESS = addr.c_str();
-const int PORT = ChatService::GetPort();
+const int PORT = ClientService::GetPort();
 bool isAdmin = false;
 WINDOW *currentWin;
 
@@ -32,19 +32,19 @@ KeyType getKeyByValue(const std::map<KeyType, ValueType>& map, const ValueType& 
     throw out_of_range("Value not found in map");
 }
 
-void ChatView::UI()
+void ClientView::UI()
 {
    char buffer[buffer_size];
-   int sock = ChatService::handleConnect(ADDRESS, PORT);
-   readThread = thread(ChatService::HandleReceive, sock, buffer);
-   ChatService::RequestSend("ACTIVATE_THREAD", sock);
+   int sock = ClientService::handleConnect(ADDRESS, PORT);
+   readThread = thread(ClientService::HandleReceive, sock, buffer);
+   ClientService::RequestSend("ACTIVATE_THREAD", sock);
    while (true)
    {
-      ChatView::handleLogin(sock, -1);
+      ClientView::handleLogin(sock, -1);
    }
 }
 
-void ChatView::LoginMenu()
+void ClientView::LoginMenu()
 {
    currentView = Login;
    initscr();
@@ -80,20 +80,20 @@ void ChatView::LoginMenu()
    curs_set(0);
    refresh();
    wattron(loginMenu, COLOR_PAIR(4));
-   mvwprintw(loginMenu, 2, (loginMenu->_maxx - 24) / 2, ">>>>====Mobile Shop====<<<<");
+   mvwprintw(loginMenu, 2, (getmaxx(loginMenu) - 24) / 2, ">>>>====Mobile Shop====<<<<");
    mvwprintw(loginMenu, 6, 3, "Register");
    mvwprintw(loginMenu, 8, 3, "Login");
-   mvwprintw(loginMenu, 6, (loginMenu->_maxx - 12), "(Press R)");
-   mvwprintw(loginMenu, 8, (loginMenu->_maxx - 12), "(Press L)");
+   mvwprintw(loginMenu, 6, (getmaxx(loginMenu) - 12), "(Press R)");
+   mvwprintw(loginMenu, 8, (getmaxx(loginMenu) - 12), "(Press L)");
    wattroff(loginMenu, COLOR_PAIR(4));
    wattron(loginMenu, COLOR_PAIR(2));
    mvwprintw(loginMenu, 10, 3, "Exit");
-   mvwprintw(loginMenu, 10, (loginMenu->_maxx - 14), "(Press Esc)");
+   mvwprintw(loginMenu, 10, (getmaxx(loginMenu) - 14), "(Press Esc)");
    wattroff(loginMenu, COLOR_PAIR(2));
    wrefresh(loginMenu);
 }
 
-void ChatView::handleLogin(int sock, int selection)
+void ClientView::handleLogin(int sock, int selection)
 {
    int n;
    int test;
@@ -162,7 +162,7 @@ void ChatView::handleLogin(int sock, int selection)
       // box(usernameWin, 0, 0);
       // wrefresh(registerWin);
       wattron(registerWin, COLOR_PAIR(4));
-      mvwprintw(registerWin, registerWin->_begy + 2, (registerWin->_maxx - 16) / 2, "*** REGISTER ***");
+      mvwprintw(registerWin, getbegy(registerWin) + 2, (getmaxx(registerWin) - 16) / 2, "*** REGISTER ***");
       mvwprintw(registerWin, 7, 2, "Username: ");
       mvwprintw(registerWin, 12, 2, "Password: ");
       mvwprintw(registerWin, 18, 2, "Notification:");
@@ -176,7 +176,7 @@ void ChatView::handleLogin(int sock, int selection)
       mvwprintw(registerWin, 15, 5, "special char !\"#$%%'()*+,-./:;<=>?@[\\ ]^_`{|}~ and number,");
       mvwprintw(registerWin, 16, 5, "ex: 4vQj*SFp)");
       wattroff(registerWin, COLOR_PAIR(1));
-      mvwprintw(registerWin, registerWin->_begy + 3, (registerWin->_maxx - 19) / 2, "(Press Esc to back)");
+      mvwprintw(registerWin, getbegy(registerWin) + 3, (getmaxx(registerWin) - 19) / 2, "(Press Esc to back)");
       wrefresh(registerWin);
       // End register window design
       wrefresh(nameWin);
@@ -322,8 +322,8 @@ void ChatView::handleLogin(int sock, int selection)
          else // if user name is legal then send request to the server
          {
             username = input;
-            ChatService::RequestSend("REGISTER_USER|" + username, sock);
-            isUserAvailable = ChatService::ConvertToBool(ChatService::GetValueFromServer(sock, "REGISTER_USER"));
+            ClientService::RequestSend("REGISTER_USER|" + username, sock);
+            isUserAvailable = ClientService::ConvertToBool(ClientService::GetValueFromServer(sock, "REGISTER_USER"));
             // check if there are already a user with that user name in database
             if (!isUserAvailable)
             {
@@ -467,13 +467,13 @@ void ChatView::handleLogin(int sock, int selection)
             {
                password = input;
                getyx(passWin, curs_y, curs_x);
-               if (ChatService::HandlePassword(password) == FALSE)
+               if (ClientService::HandlePassword(password) == FALSE)
                {
                   curs_set(0);
                   attron(COLOR_PAIR(1));
-                  mvprintw(registerWin->_begy + 20, 5, "Password must atleast 8 characters and include alphabet, ");
-                  mvprintw(registerWin->_begy + 21, 5, "special char !\"#$%%'()*+,-./:;<=>?@[\\]^_`{|}~ and number,");
-                  mvprintw(registerWin->_begy + 22, 5, "ex: 4vQj*SFp. Press ENTER to continue.");
+                  mvprintw(getbegy(registerWin) + 20, 5, "Password must atleast 8 characters and include alphabet, ");
+                  mvprintw(getbegy(registerWin) + 21, 5, "special char !\"#$%%'()*+,-./:;<=>?@[\\]^_`{|}~ and number,");
+                  mvprintw(getbegy(registerWin) + 22, 5, "ex: 4vQj*SFp. Press ENTER to continue.");
                   attroff(COLOR_PAIR(1));
                   refresh();
                   while (getch() != 10)
@@ -497,8 +497,8 @@ void ChatView::handleLogin(int sock, int selection)
                }
                else
                {
-                  ChatService::RequestSend("REGISTER_PASSWORD|" + password, sock);
-                  isSuccess = ChatService::ConvertToBool(ChatService::GetValueFromServer(sock, "REGISTER_PASSWORD"));
+                  ClientService::RequestSend("REGISTER_PASSWORD|" + password, sock);
+                  isSuccess = ClientService::ConvertToBool(ClientService::GetValueFromServer(sock, "REGISTER_PASSWORD"));
                   if (!isSuccess)
                   {
                      mvprintw(20, 2, "Register Failed!");
@@ -512,7 +512,7 @@ void ChatView::handleLogin(int sock, int selection)
                   {
                      currentUser.setName(username);
                      currentUser.setPassword(password);
-                     isAdmin = ChatService::IsAdminAuthenticated(sock);
+                     isAdmin = ClientService::IsAdminAuthenticated(sock);
                      handleMenu(sock, -1);
                      break;
                   }
@@ -555,8 +555,8 @@ void ChatView::handleLogin(int sock, int selection)
       init_pair(6, COLOR_GREEN, COLOR_BLACK);
       init_pair(7, COLOR_WHITE, COLOR_BLACK);
       int height, width, start_x, start_y;
-      height = stdscr->_begy + 12;
-      width = stdscr->_begx + 61;
+      height = getbegy(stdscr) + 12;
+      width = getbegx(stdscr) + 61;
       start_x = start_y = 0;
       WINDOW *loginWin = newwin(19, 60, 0, 0);
       WINDOW *nameWin = subwin(loginWin, 3, 42, 6, 14);
@@ -699,8 +699,8 @@ void ChatView::handleLogin(int sock, int selection)
          else // if user name is legal then send request to the server
          {
             username = input;
-            ChatService::RequestSend("LOGIN_USER|" + username, sock);
-            isUserAvailable = ChatService::ConvertToBool(ChatService::GetValueFromServer(sock, "LOGIN_USER"));
+            ClientService::RequestSend("LOGIN_USER|" + username, sock);
+            isUserAvailable = ClientService::ConvertToBool(ClientService::GetValueFromServer(sock, "LOGIN_USER"));
             // check if there are already a user with that user name in database
             if (!isUserAvailable)
             {
@@ -832,8 +832,8 @@ void ChatView::handleLogin(int sock, int selection)
                else
                {
                   password = input;
-                  ChatService::RequestSend("LOGIN_PASSWORD|" + password, sock);
-                  isSuccess = ChatService::ConvertToBool(ChatService::GetValueFromServer(sock, "LOGIN_PASSWORD"));
+                  ClientService::RequestSend("LOGIN_PASSWORD|" + password, sock);
+                  isSuccess = ClientService::ConvertToBool(ClientService::GetValueFromServer(sock, "LOGIN_PASSWORD"));
                   if (!isSuccess && countFailure < 3)
                   {
                      curs_set(0);
@@ -874,7 +874,7 @@ void ChatView::handleLogin(int sock, int selection)
                   {
                      currentUser.setName(username);
                      currentUser.setPassword(password);
-                     isAdmin = ChatService::IsAdminAuthenticated(sock);
+                     isAdmin = ClientService::IsAdminAuthenticated(sock);
                      handleMenu(sock, -1);
                      break;
                   }
@@ -894,18 +894,18 @@ void ChatView::handleLogin(int sock, int selection)
    case 27: // 27 is Esc key
       refresh();
       endwin();
-      ChatService::exitAppChat(sock);
+      ClientService::exitAppChat(sock);
       readThread.join();
       cout << "Exit chat app!\n";
       break;
       exit(0);
    default: // If not right key then it will not do anything
       // cout<<"Invalid choice!\n";
-      ChatView::handleLogin(sock, -1);
+      ClientView::handleLogin(sock, -1);
    }
 }
 
-void ChatView::Menu()
+void ClientView::Menu()
 {
    currentView = Main;
    clear();
@@ -941,7 +941,7 @@ void ChatView::Menu()
    mvwprintw(userMenu, 4, 2, "------------------------------------------------------------------");
    wattroff(userMenu, COLOR_PAIR(3));
    wattron(userMenu, COLOR_PAIR(4));
-   mvwprintw(userMenu, 2, (userMenu->_maxx - 28) / 2, ">>>>> Mobile Store Management <<<<<");
+   mvwprintw(userMenu, 2, (getmaxx(userMenu) - 28) / 2, ">>>>> Mobile Store Management <<<<<");
    mvwprintw(userMenu, 6, 3, "Create Mobile Instances");
    mvwprintw(userMenu, 8, 3, "Manage Mobile Inventory");
    mvwprintw(userMenu, 10, 3, "Transaction History");
@@ -949,22 +949,22 @@ void ChatView::Menu()
    mvwprintw(userMenu, 14, 3, "Find user(s)");
    mvwprintw(userMenu, 16, 3, "Update profile");
    mvwprintw(userMenu, 18, 3, "Log out");
-   mvwprintw(userMenu, 6, (userMenu->_maxx - 11), "(Press A)");
-   mvwprintw(userMenu, 8, (userMenu->_maxx - 11), "(Press N)");
-   mvwprintw(userMenu, 10, (userMenu->_maxx - 11), "(Press I)");
-   mvwprintw(userMenu, 12, (userMenu->_maxx - 11), "(Press J)");
-   mvwprintw(userMenu, 14, (userMenu->_maxx - 11), "(Press F)");
-   mvwprintw(userMenu, 16, (userMenu->_maxx - 11), "(Press U)");
-   mvwprintw(userMenu, 18, (userMenu->_maxx - 11), "(Press O)");
+   mvwprintw(userMenu, 6, (getmaxx(userMenu) - 11), "(Press A)");
+   mvwprintw(userMenu, 8, (getmaxx(userMenu) - 11), "(Press N)");
+   mvwprintw(userMenu, 10, (getmaxx(userMenu) - 11), "(Press I)");
+   mvwprintw(userMenu, 12, (getmaxx(userMenu) - 11), "(Press J)");
+   mvwprintw(userMenu, 14, (getmaxx(userMenu) - 11), "(Press F)");
+   mvwprintw(userMenu, 16, (getmaxx(userMenu) - 11), "(Press U)");
+   mvwprintw(userMenu, 18, (getmaxx(userMenu) - 11), "(Press O)");
    wattroff(userMenu, COLOR_PAIR(4));
    wattron(userMenu, COLOR_PAIR(2));
    mvwprintw(userMenu, 20, 3, "Exit");
-   mvwprintw(userMenu, 20, (userMenu->_maxx - 13), "(Press Esc)");
+   mvwprintw(userMenu, 20, (getmaxx(userMenu) - 13), "(Press Esc)");
    wattroff(userMenu, COLOR_PAIR(2));
    wrefresh(userMenu);
 }
 
-void ChatView::UserConsole(int sock)
+void ClientView::UserConsole(int sock)
 {
    clear();
    endwin();
@@ -998,18 +998,18 @@ void ChatView::UserConsole(int sock)
    mvwprintw(updateWin, 4, 2, "--------------------------------------------------------");
    mvwprintw(updateWin, 12, 2, "--------------------------------------------------------");
    wattroff(updateWin, COLOR_PAIR(3));
-   ChatService::RequestSend("UPDATE_PROFILE|", sock);
-   ChatService::GetCurrentProfile(sock, currentUser);
+   ClientService::RequestSend("UPDATE_PROFILE|", sock);
+   ClientService::GetCurrentProfile(sock, currentUser);
    refresh();
    wattron(updateWin, COLOR_PAIR(4));
-   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + currentUser.getName().length())) / 2, "*** Current user: %s ***", currentUser.getName().c_str());
+   mvwprintw(updateWin, 2, (getmaxx(updateWin) - (22 + currentUser.getName().length())) / 2, "*** Current user: %s ***", currentUser.getName().c_str());
    mvwprintw(updateWin, 6, 3, "1. Address: ");
    mvwprintw(updateWin, 8, 3, "2. Gender: ");
    mvwprintw(updateWin, 10, 3, "3. Change password ");
-   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
-   mvwprintw(updateWin, 14, (updateWin->_maxx - 40) / 2, "Select an option that you want to change");
+   mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+   mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+   mvwprintw(updateWin, 10, (getmaxx(updateWin) - 6), "(P)");
+   mvwprintw(updateWin, 14, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to change");
    wattroff(updateWin, COLOR_PAIR(4));
    wattron(updateWin, COLOR_PAIR(6));
    mvwprintw(updateWin, 6, 15, "%s", currentUser.getAddress().c_str());
@@ -1040,7 +1040,7 @@ void ChatView::UserConsole(int sock)
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::UserConsole(sock);
+               return ClientView::UserConsole(sock);
             }
             else if (n == 8 || n == 127)
             {
@@ -1054,7 +1054,7 @@ void ChatView::UserConsole(int sock)
             }
             else if (n == 10)
             {
-               ChatService::RequestSend("UPDATE_ADDRESS|" + input, sock);
+               ClientService::RequestSend("UPDATE_ADDRESS|" + input, sock);
                curs_set(0);
                wattron(updateWin, COLOR_PAIR(3));
                mvwprintw(updateWin, 18, 3, "Update complete.");
@@ -1069,7 +1069,7 @@ void ChatView::UserConsole(int sock)
                }
                refresh();
                printf("\n");
-               return ChatView::UserConsole(sock);
+               return ClientView::UserConsole(sock);
             }
             else
             {
@@ -1094,7 +1094,7 @@ void ChatView::UserConsole(int sock)
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::UserConsole(sock);
+               return ClientView::UserConsole(sock);
             }
             else if (n == 8 || n == 127)
             {
@@ -1109,7 +1109,7 @@ void ChatView::UserConsole(int sock)
             else if (n == 10)
             {
                curs_set(0);
-               ChatService::RequestSend("UPDATE_GENDER|" + input, sock);
+               ClientService::RequestSend("UPDATE_GENDER|" + input, sock);
                wattron(updateWin, COLOR_PAIR(3));
                mvwprintw(updateWin, 18, 3, "Update complete.");
                wattron(updateWin, COLOR_PAIR(3));
@@ -1123,7 +1123,7 @@ void ChatView::UserConsole(int sock)
                }
                refresh();
                printf("\n");
-               return ChatView::UserConsole(sock);
+               return ClientView::UserConsole(sock);
             }
             else
             {
@@ -1148,7 +1148,7 @@ void ChatView::UserConsole(int sock)
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::UserConsole(sock);
+               return ClientView::UserConsole(sock);
             }
             else if (n == 8 || n == 127)
             {
@@ -1162,7 +1162,7 @@ void ChatView::UserConsole(int sock)
             }
             else if (n == 10)
             {
-               ChatService::RequestSend("CHANGE_PASSWORD|" + input, sock);
+               ClientService::RequestSend("CHANGE_PASSWORD|" + input, sock);
                curs_set(0);
                wattron(updateWin, COLOR_PAIR(3));
                mvwprintw(updateWin, 18, 3, "Update complete.");
@@ -1177,7 +1177,7 @@ void ChatView::UserConsole(int sock)
                }
                refresh();
                printf("\n");
-               return ChatView::UserConsole(sock);
+               return ClientView::UserConsole(sock);
             }
             else
             {
@@ -1202,7 +1202,7 @@ void ChatView::UserConsole(int sock)
    } while (true);
 }
 
-void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
+void ClientView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
 {
    clear();
    endwin();
@@ -1238,20 +1238,20 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
    wattroff(updateWin, COLOR_PAIR(3));
    refresh();
    wattron(updateWin, COLOR_PAIR(4));
-   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + mobile.getMobileName().length())) / 2, "*** Current Mobile: %s ***", mobile.getMobileName().c_str());
+   mvwprintw(updateWin, 2, (getmaxx(updateWin) - (22 + mobile.getMobileName().length())) / 2, "*** Current Mobile: %s ***", mobile.getMobileName().c_str());
    mvwprintw(updateWin, 6, 3, "1. Mobile Name: ");
    mvwprintw(updateWin, 8, 3, "2. Mobile Type: ");
    mvwprintw(updateWin, 10, 3, "3. Mobile Model: ");
    mvwprintw(updateWin, 12, 3, "4. Mobile Quantity: ");
    mvwprintw(updateWin, 14, 3, "5. Mobile Price: ");
    mvwprintw(updateWin, 16, 3, "6. Mobile Description: ");
-   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
-   mvwprintw(updateWin, 12, (updateWin->_maxx - 6), "(O)");
-   mvwprintw(updateWin, 14, (updateWin->_maxx - 6), "(R)");
-   mvwprintw(updateWin, 16, (updateWin->_maxx - 6), "(D)");
-   mvwprintw(updateWin, 22, (updateWin->_maxx - 40) / 2, "Select an option that you want to fill");
+   mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+   mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+   mvwprintw(updateWin, 10, (getmaxx(updateWin) - 6), "(P)");
+   mvwprintw(updateWin, 12, (getmaxx(updateWin) - 6), "(O)");
+   mvwprintw(updateWin, 14, (getmaxx(updateWin) - 6), "(R)");
+   mvwprintw(updateWin, 16, (getmaxx(updateWin) - 6), "(D)");
+   mvwprintw(updateWin, 22, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to fill");
    wattroff(updateWin, COLOR_PAIR(4));
    wattron(updateWin, COLOR_PAIR(6));
    mvwprintw(updateWin, 6, 27, "%s", mobile.getMobileName().c_str());
@@ -1279,7 +1279,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
       {
       case 27: //ESC
       {
-         return ChatView::handleMenu(sock, -1);
+         return ClientView::handleMenu(sock, -1);
       }
       case 97: // A
       {
@@ -1294,7 +1294,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1319,7 +1319,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else
             {
@@ -1345,7 +1345,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1370,7 +1370,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else
             {
@@ -1396,7 +1396,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1421,7 +1421,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else
             {
@@ -1447,7 +1447,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1472,7 +1472,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else
             {
@@ -1498,7 +1498,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1523,7 +1523,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else
             {
@@ -1549,7 +1549,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1574,7 +1574,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             }
             else
             {
@@ -1592,13 +1592,13 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::handleMenu(sock, -1);
+               return ClientView::handleMenu(sock, -1);
             }
             else if (n == 10) {
                if(isUpdate) {
-                  ChatService::UpdateMobileDevice(sock, mobile);
+                  ClientService::UpdateMobileDevice(sock, mobile);
                } else {
-                  ChatService::CreateMobileDevice(sock, mobile);
+                  ClientService::CreateMobileDevice(sock, mobile);
                }
                curs_set(0);
                wattron(updateWin, COLOR_PAIR(3));
@@ -1609,7 +1609,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
                while (getch() != 10) {}
                refresh();
                printf("\n");
-               return ChatView::MobileConsole(sock, mobile, isUpdate);
+               return ClientView::MobileConsole(sock, mobile, isUpdate);
             } 
          } while (true);
          break;
@@ -1629,7 +1629,7 @@ void ChatView::MobileConsole(int sock, Mobile& mobile, bool isUpdate)
    } while (true);
 }
 
-void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
+void ClientView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
    clear();
    endwin();
    system("clear");
@@ -1664,18 +1664,18 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
    wattroff(updateWin, COLOR_PAIR(3));
    refresh();
    wattron(updateWin, COLOR_PAIR(4));
-   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + customer.getCustomerName().length())) / 2, "*** Current Customer: %s ***", customer.getCustomerName().c_str());
+   mvwprintw(updateWin, 2, (getmaxx(updateWin) - (22 + customer.getCustomerName().length())) / 2, "*** Current Customer: %s ***", customer.getCustomerName().c_str());
    mvwprintw(updateWin, 6, 3, "1. Customer Name: ");
    mvwprintw(updateWin, 8, 3, "2. Customer Address: ");
    mvwprintw(updateWin, 10, 3, "3. Customer Gender: ");
    mvwprintw(updateWin, 12, 3, "4. Customer Birthday: ");
    mvwprintw(updateWin, 14, 3, "5. Customer Email: ");
-   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
-   mvwprintw(updateWin, 12, (updateWin->_maxx - 6), "(O)");
-   mvwprintw(updateWin, 14, (updateWin->_maxx - 6), "(R)");
-   mvwprintw(updateWin, 22, (updateWin->_maxx - 40) / 2, "Select an option that you want to fill");
+   mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+   mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+   mvwprintw(updateWin, 10, (getmaxx(updateWin) - 6), "(P)");
+   mvwprintw(updateWin, 12, (getmaxx(updateWin) - 6), "(O)");
+   mvwprintw(updateWin, 14, (getmaxx(updateWin) - 6), "(R)");
+   mvwprintw(updateWin, 22, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to fill");
    wattroff(updateWin, COLOR_PAIR(4));
    wattron(updateWin, COLOR_PAIR(6));
    mvwprintw(updateWin, 6, 27, "%s", customer.getCustomerName().c_str());
@@ -1698,7 +1698,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
       {
       case 27: //ESC
       {
-         return ChatView::handleMenu(sock, -1);
+         return ClientView::handleMenu(sock, -1);
       }
       case 97: // A
       {
@@ -1713,7 +1713,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1738,7 +1738,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             }
             else
             {
@@ -1764,7 +1764,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1789,7 +1789,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             }
             else
             {
@@ -1815,7 +1815,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1840,7 +1840,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             }
             else
             {
@@ -1866,7 +1866,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1891,7 +1891,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             }
             else
             {
@@ -1917,7 +1917,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             }
             else if (n == 8 || n == 127)
             {
@@ -1942,7 +1942,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             }
             else
             {
@@ -1960,13 +1960,13 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::handleMenu(sock, -1);
+               return ClientView::handleMenu(sock, -1);
             }
             else if (n == 10) {
                if(isUpdate) {
-                  ChatService::UpdateCustomer(sock, customer);
+                  ClientService::UpdateCustomer(sock, customer);
                } else {
-                  ChatService::CreateCustomer(sock, customer);
+                  ClientService::CreateCustomer(sock, customer);
                }
                curs_set(0);
                wattron(updateWin, COLOR_PAIR(3));
@@ -1977,7 +1977,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
                while (getch() != 10) {}
                refresh();
                printf("\n");
-               return ChatView::CustomerConsole(sock, customer, isUpdate);
+               return ClientView::CustomerConsole(sock, customer, isUpdate);
             } 
          } while (true);
          break;
@@ -1997,7 +1997,7 @@ void ChatView::CustomerConsole(int sock, Customer& customer, bool isUpdate) {
    } while (true);
 }
 
-void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpdate, bool isCustomerUI, int customerId) {
+void ClientView::TransactionConsole(int sock, Transaction& transaction, bool isUpdate, bool isCustomerUI, int customerId) {
    clear();
    endwin();
    system("clear");
@@ -2032,14 +2032,14 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
    wattroff(updateWin, COLOR_PAIR(3));
    refresh();
    wattron(updateWin, COLOR_PAIR(4));
-   mvwprintw(updateWin, 2, (updateWin->_maxx - (22 + transaction.getTransactionName().length())) / 2, "*** Current Transaction: %s ***", transaction.getTransactionName().c_str());
+   mvwprintw(updateWin, 2, (getmaxx(updateWin) - (22 + transaction.getTransactionName().length())) / 2, "*** Current Transaction: %s ***", transaction.getTransactionName().c_str());
    mvwprintw(updateWin, 6, 3, "1. Transaction Name: ");
    mvwprintw(updateWin, 8, 3, "2. Transaction Type: ");
    mvwprintw(updateWin, 10, 3, "3. Payment Method: ");
-   mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-   mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-   mvwprintw(updateWin, 10, (updateWin->_maxx - 6), "(P)");
-   mvwprintw(updateWin, 16, (updateWin->_maxx - 40) / 2, "Select an option that you want to fill");
+   mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+   mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+   mvwprintw(updateWin, 10, (getmaxx(updateWin) - 6), "(P)");
+   mvwprintw(updateWin, 16, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to fill");
    wattroff(updateWin, COLOR_PAIR(4));
    wattron(updateWin, COLOR_PAIR(6));
    mvwprintw(updateWin, 6, 27, "%s", transaction.getTransactionName().c_str());
@@ -2060,7 +2060,7 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
       {
       case 27: //ESC
       {
-         return ChatView::handleMenu(sock, -1);
+         return ClientView::handleMenu(sock, -1);
       }
       case 97: // A
       {
@@ -2075,7 +2075,7 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+               return ClientView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
             }
             else if (n == 8 || n == 127)
             {
@@ -2100,7 +2100,7 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+               return ClientView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
             }
             else
             {
@@ -2126,7 +2126,7 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+               return ClientView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
             }
             else if (n == 8 || n == 127)
             {
@@ -2151,7 +2151,7 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+               return ClientView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
             }
             else
             {
@@ -2177,7 +2177,7 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
             n = wgetch(updateWin);
             if (n == 27)
             {
-               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+               return ClientView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
             }
             else if (n == 8 || n == 127)
             {
@@ -2202,7 +2202,7 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
                wrefresh(updateWin);
                refresh();
                printf("\n");
-               return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+               return ClientView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
             }
             else
             {
@@ -2220,13 +2220,13 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
          n = wgetch(updateWin);
          if (n == 27)
          {
-            return ChatView::handleMenu(sock, -1);
+            return ClientView::handleMenu(sock, -1);
          }
          else if (n == 10) {
             if(isUpdate) {
-               ChatService::UpdateTransaction(sock, transaction);
+               ClientService::UpdateTransaction(sock, transaction);
             } else {
-               ChatService::CreateTransaction(sock, transaction, customerId);
+               ClientService::CreateTransaction(sock, transaction, customerId);
             }
             curs_set(0);
             wattron(updateWin, COLOR_PAIR(3));
@@ -2237,7 +2237,7 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
             while (getch() != 10) {}
             refresh();
             printf("\n");
-            return ChatView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
+            return ClientView::TransactionConsole(sock, transaction, isUpdate, isCustomerUI, customerId);
          } 
       } while (true);
       break;
@@ -2246,7 +2246,7 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
       if (n == 27)
       {
          if (isCustomerUI) {
-            return ChatView::CustomerUI(sock, customerId);
+            return ClientView::CustomerUI(sock, customerId);
          } else {
             return handleMenu(sock, -1);
          }
@@ -2259,7 +2259,7 @@ void ChatView::TransactionConsole(int sock, Transaction& transaction, bool isUpd
    } while (true);
 }
 
-int ChatView::selectMenu()
+int ClientView::selectMenu()
 {
    int n;
    Menu();
@@ -2268,7 +2268,7 @@ int ChatView::selectMenu()
    n = getch();
    noecho();
    printw("%d", n);
-   // ChatService::HandleInput();
+   // ClientService::HandleInput();
    // cin.ignore();
    if (n > 0 || n < 99)
    {
@@ -2278,7 +2278,7 @@ int ChatView::selectMenu()
       return selectMenu();
 }
 
-void ChatView::interactUserMenu(int count, map<int, UserClient> foundUser, int sock)
+void ClientView::interactUserMenu(int count, map<int, UserClient> foundUser, int sock)
 {
    refresh();
    endwin();
@@ -2330,7 +2330,7 @@ void ChatView::interactUserMenu(int count, map<int, UserClient> foundUser, int s
       }
       else if (n == 8 || n == 127)
       { // If the key press is backspace, erase current char
-         // ChatView::ChangeBarText(std::to_string(input.length()));
+         // ClientView::ChangeBarText(std::to_string(input.length()));
          if (input.length() != 0) // check if input length == 0 then no need to pop from string input
          {
             input.pop_back();
@@ -2372,7 +2372,7 @@ void ChatView::interactUserMenu(int count, map<int, UserClient> foundUser, int s
 
    if (n == 27)
    {
-      ChatView::handleMenu(sock, -1);
+      ClientView::handleMenu(sock, -1);
    }
    else
    {
@@ -2391,7 +2391,7 @@ void ChatView::interactUserMenu(int count, map<int, UserClient> foundUser, int s
          wattroff(interactUserMenuWin, COLOR_PAIR(1));
          wrefresh(interactUserMenuWin);
          // sleep(1);
-         ChatView::interactUserMenu(count, foundUser, sock);
+         ClientView::interactUserMenu(count, foundUser, sock);
       }
       else
       {
@@ -2400,7 +2400,7 @@ void ChatView::interactUserMenu(int count, map<int, UserClient> foundUser, int s
    }
 }
 
-void ChatView::findMobileMenu(int sock, map<int,int>& idMobileInventory) {
+void ClientView::findMobileMenu(int sock, map<int,int>& idMobileInventory) {
    string input;
    refresh();
    endwin();
@@ -2491,16 +2491,16 @@ void ChatView::findMobileMenu(int sock, map<int,int>& idMobileInventory) {
 
    if (n == 27)
    {
-      ChatView::handleMenu(sock, -1);
+      ClientView::handleMenu(sock, -1);
    }
    else
    {
       int choice = stoi(input);
-      ChatView::MobileUI(sock, getKeyByValue(idMobileInventory, choice));
+      ClientView::MobileUI(sock, getKeyByValue(idMobileInventory, choice));
    }
 }
 
-void ChatView::findCustomerMenu(int sock, map<int,int>& idCustomerInventory) {
+void ClientView::findCustomerMenu(int sock, map<int,int>& idCustomerInventory) {
    string input;
    refresh();
    endwin();
@@ -2591,16 +2591,16 @@ void ChatView::findCustomerMenu(int sock, map<int,int>& idCustomerInventory) {
 
    if (n == 27)
    {
-      ChatView::handleMenu(sock, -1);
+      ClientView::handleMenu(sock, -1);
    }
    else
    {
       int choice = stoi(input);
-      ChatView::CustomerUI(sock, getKeyByValue(idCustomerInventory, choice));
+      ClientView::CustomerUI(sock, getKeyByValue(idCustomerInventory, choice));
    }
 }
 
-void ChatView::findTransactionMenu(int sock, map<int, int>& idTransactionInventory) {
+void ClientView::findTransactionMenu(int sock, map<int, int>& idTransactionInventory) {
    string input;
    refresh();
    endwin();
@@ -2691,16 +2691,16 @@ void ChatView::findTransactionMenu(int sock, map<int, int>& idTransactionInvento
 
    if (n == 27)
    {
-      ChatView::handleMenu(sock, -1);
+      ClientView::handleMenu(sock, -1);
    }
    else
    {
       int choice = stoi(input);
-      ChatView::TransactionUI(sock, getKeyByValue(idTransactionInventory, choice));
+      ClientView::TransactionUI(sock, getKeyByValue(idTransactionInventory, choice));
    }
 }
 
-void ChatView::handleMenu(int sock, int selection)
+void ClientView::handleMenu(int sock, int selection)
 {
    bool isSuccess = false;
    vector<Mobile>mobileList;
@@ -2749,12 +2749,12 @@ void ChatView::handleMenu(int sock, int selection)
          mvwprintw(updateWin, 4, 2, "--------------------------------------------------------");
          mvwprintw(updateWin, 12, 2, "--------------------------------------------------------");
          wattron(updateWin, COLOR_PAIR(4));
-         mvwprintw(updateWin, 2, (updateWin->_maxx - 40), "*** Mobile Inventory ***");
+         mvwprintw(updateWin, 2, (getmaxx(updateWin) - 40), "*** Mobile Inventory ***");
          mvwprintw(updateWin, 6, 3, "1. Create New Mobile Devices: ");
          mvwprintw(updateWin, 8, 3, "2. Create New Customer: ");
-         mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-         mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-         mvwprintw(updateWin, 14, (updateWin->_maxx - 40) / 2, "Select an option that you want to add");
+         mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+         mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+         mvwprintw(updateWin, 14, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to add");
          wattroff(updateWin, COLOR_PAIR(4));
          wattron(updateWin, COLOR_PAIR(6));
          int curs_x, curs_y;
@@ -2765,7 +2765,7 @@ void ChatView::handleMenu(int sock, int selection)
             n = wgetch(updateWin);
 
             if (n == 27) {
-               return ChatView::handleMenu(sock, -1);
+               return ClientView::handleMenu(sock, -1);
             }
 
             if(n == 97) // A
@@ -2774,14 +2774,14 @@ void ChatView::handleMenu(int sock, int selection)
                endwin();
                system("clear");
                // Create new mobile Inventory
-               ChatView::MobileConsole(sock, mobile, false);
+               ClientView::MobileConsole(sock, mobile, false);
             }
             else if (n == 103) { // G
                refresh();
                endwin();
                system("clear");
                // Create new Customer
-               ChatView::CustomerConsole(sock, customer, false);
+               ClientView::CustomerConsole(sock, customer, false);
             }
          } while(true);
          break;
@@ -2819,12 +2819,12 @@ void ChatView::handleMenu(int sock, int selection)
          mvwprintw(updateWin, 4, 2, "--------------------------------------------------------");
          mvwprintw(updateWin, 12, 2, "--------------------------------------------------------");
          wattron(updateWin, COLOR_PAIR(4));
-         mvwprintw(updateWin, 2, (updateWin->_maxx - 40), "*** Mobile Inventory ***");
+         mvwprintw(updateWin, 2, (getmaxx(updateWin) - 40), "*** Mobile Inventory ***");
          mvwprintw(updateWin, 6, 3, "1. Find Mobile Devices by Mobile Name: ");
          mvwprintw(updateWin, 8, 3, "2. Find Mobile Devices by Mobile Category: ");
-         mvwprintw(updateWin, 6, (updateWin->_maxx - 6), "(A)");
-         mvwprintw(updateWin, 8, (updateWin->_maxx - 6), "(G)");
-         mvwprintw(updateWin, 14, (updateWin->_maxx - 40) / 2, "Select an option that you want to find");
+         mvwprintw(updateWin, 6, (getmaxx(updateWin) - 6), "(A)");
+         mvwprintw(updateWin, 8, (getmaxx(updateWin) - 6), "(G)");
+         mvwprintw(updateWin, 14, (getmaxx(updateWin) - 40) / 2, "Select an option that you want to find");
          wattroff(updateWin, COLOR_PAIR(4));
          wattron(updateWin, COLOR_PAIR(6));
          int curs_x, curs_y;
@@ -2887,7 +2887,7 @@ void ChatView::handleMenu(int sock, int selection)
                   n = wgetch(currentWin);
                   if(n == 27)
                   {
-                     return ChatView::handleMenu(sock, -1);
+                     return ClientView::handleMenu(sock, -1);
                   } else if (n == 8 || n == 127) {
                      if (input.length() != 0){
                         input.pop_back();
@@ -2907,7 +2907,7 @@ void ChatView::handleMenu(int sock, int selection)
                      refresh();
                      wmove(currentWin, curs_y, curs_x);
                      wrefresh(currentWin);
-                     ChatView::handleMenu(sock, 110);
+                     ClientView::handleMenu(sock, 110);
                   }
                   else  {
                      c = char(n);
@@ -2924,27 +2924,27 @@ void ChatView::handleMenu(int sock, int selection)
                   break;
                }
                else{
-                  map<int,int> idInventory = ChatService::FindInventoryName(sock, mobileList, input, "FIND_INVENTORY_NAME");
+                  map<int,int> idInventory = ClientService::FindInventoryName(sock, mobileList, input, "FIND_INVENTORY_NAME");
                   if (idInventory.size() == 0) {
                      break;
                   }
                   int spacePos = 0;
                   for (auto mb : mobileList) {
-                     mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(idInventory[mb.getMobileId()])).c_str());
-                     mvprintw(6+spacePos, 5, "%s", ChatService::processString(mb.getMobileName()).c_str());
-                     mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
-                     mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
-                     mvprintw(6+spacePos, 80, "%s", ChatService::processString(to_string(mb.getMobileQuantity())).c_str());
-                     mvprintw(6+spacePos, 100, "%s", ChatService::processString(to_string(mb.getMobilePrice())).c_str());
-                     mvprintw(6+spacePos, 120, "%s", ChatService::processString(mb.getMobileDescription()).c_str());
+                     mvprintw(6+spacePos, 0, "%s", ClientService::processString(to_string(idInventory[mb.getMobileId()])).c_str());
+                     mvprintw(6+spacePos, 5, "%s", ClientService::processString(mb.getMobileName()).c_str());
+                     mvprintw(6+spacePos, 40, "%s", ClientService::processString(mb.getMobileType()).c_str());
+                     mvprintw(6+spacePos, 60, "%s", ClientService::processString(mb.getMobileModel()).c_str());
+                     mvprintw(6+spacePos, 80, "%s", ClientService::processString(to_string(mb.getMobileQuantity())).c_str());
+                     mvprintw(6+spacePos, 100, "%s", ClientService::processString(to_string(mb.getMobilePrice())).c_str());
+                     mvprintw(6+spacePos, 120, "%s", ClientService::processString(mb.getMobileDescription()).c_str());
                      spacePos += 1;
                   }
 
-                  mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
+                  mvprintw((getmaxx(currentWin) - 20), 0, "Press any key to continue!");
                   int back = getch();
                   if (back == 27)
                   {
-                     return ChatView::handleMenu(sock, -1);
+                     return ClientView::handleMenu(sock, -1);
                   }
                   
                   // Search information details for mobile ID
@@ -3004,7 +3004,7 @@ void ChatView::handleMenu(int sock, int selection)
                   n = wgetch(currentWin);
                   if(n == 27)
                   {
-                     return ChatView::handleMenu(sock, -1);
+                     return ClientView::handleMenu(sock, -1);
                   } else if (n == 8 || n == 127) {
                      if (input.length() != 0){
                         input.pop_back();
@@ -3024,7 +3024,7 @@ void ChatView::handleMenu(int sock, int selection)
                      refresh();
                      wmove(currentWin, curs_y, curs_x);
                      wrefresh(currentWin);
-                     ChatView::handleMenu(sock, 110);
+                     ClientView::handleMenu(sock, 110);
                   }
                   else  {
                      c = char(n);
@@ -3041,27 +3041,27 @@ void ChatView::handleMenu(int sock, int selection)
                   break;
                }
                else{
-                  map<int,int> idInventory = ChatService::FindInventoryName(sock, mobileList, input, "FIND_INVENTORY_TYPE");
+                  map<int,int> idInventory = ClientService::FindInventoryName(sock, mobileList, input, "FIND_INVENTORY_TYPE");
                   if (idInventory.size() == 0) {
                      break;
                   }
                   int spacePos = 0;
                   for (auto mb : mobileList) {
-                     mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(idInventory[mb.getMobileId()])).c_str());
-                     mvprintw(6+spacePos, 5, "%s", ChatService::processString(mb.getMobileName()).c_str());
-                     mvprintw(6+spacePos, 40, "%s", ChatService::processString(mb.getMobileType()).c_str());
-                     mvprintw(6+spacePos, 60, "%s", ChatService::processString(mb.getMobileModel()).c_str());
-                     mvprintw(6+spacePos, 80, "%s", ChatService::processString(to_string(mb.getMobileQuantity())).c_str());
-                     mvprintw(6+spacePos, 100, "%s", ChatService::processString(to_string(mb.getMobilePrice())).c_str());
-                     mvprintw(6+spacePos, 120, "%s", ChatService::processString(mb.getMobileDescription()).c_str());
+                     mvprintw(6+spacePos, 0, "%s", ClientService::processString(to_string(idInventory[mb.getMobileId()])).c_str());
+                     mvprintw(6+spacePos, 5, "%s", ClientService::processString(mb.getMobileName()).c_str());
+                     mvprintw(6+spacePos, 40, "%s", ClientService::processString(mb.getMobileType()).c_str());
+                     mvprintw(6+spacePos, 60, "%s", ClientService::processString(mb.getMobileModel()).c_str());
+                     mvprintw(6+spacePos, 80, "%s", ClientService::processString(to_string(mb.getMobileQuantity())).c_str());
+                     mvprintw(6+spacePos, 100, "%s", ClientService::processString(to_string(mb.getMobilePrice())).c_str());
+                     mvprintw(6+spacePos, 120, "%s", ClientService::processString(mb.getMobileDescription()).c_str());
                      spacePos += 1;
                   }
 
-                  mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
+                  mvprintw((getmaxx(currentWin) - 20), 0, "Press any key to continue!");
                   int back = getch();
                   if (back == 27)
                   {
-                     return ChatView::handleMenu(sock, -1);
+                     return ClientView::handleMenu(sock, -1);
                   }
 
                   // Search information details for mobile ID
@@ -3154,7 +3154,7 @@ void ChatView::handleMenu(int sock, int selection)
                refresh();
                wmove(currentWin, curs_y, curs_x);
                wrefresh(currentWin);
-               ChatView::handleMenu(sock, 110);
+               ClientView::handleMenu(sock, 110);
             }
             else  {
                c = char(n);
@@ -3170,20 +3170,20 @@ void ChatView::handleMenu(int sock, int selection)
             break;
          }
          else {
-            map<int,int> idTransactionMapping = ChatService::FindTransactionHistory(sock, transactionList, input);
+            map<int,int> idTransactionMapping = ClientService::FindTransactionHistory(sock, transactionList, input);
             if (idTransactionMapping.size() == 0) {
                break;
             }
             int spacePos = 0;
             for(auto tr : transactionList) {
-               mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(idTransactionMapping[tr.getTransactionId()])).c_str());
-               mvprintw(6+spacePos, 5, "%s", ChatService::processString(tr.getTransactionName()).c_str());
-               mvprintw(6+spacePos, 40, "%s", ChatService::processString(tr.getTransactionType()).c_str());
-               mvprintw(6+spacePos, 80, "%s", ChatService::processString(tr.getPaymentMethod()).c_str());
+               mvprintw(6+spacePos, 0, "%s", ClientService::processString(to_string(idTransactionMapping[tr.getTransactionId()])).c_str());
+               mvprintw(6+spacePos, 5, "%s", ClientService::processString(tr.getTransactionName()).c_str());
+               mvprintw(6+spacePos, 40, "%s", ClientService::processString(tr.getTransactionType()).c_str());
+               mvprintw(6+spacePos, 80, "%s", ClientService::processString(tr.getPaymentMethod()).c_str());
                spacePos += 1;
             }
             
-            mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
+            mvprintw((getmaxx(currentWin) - 20), 0, "Press any key to continue!");
             int back = getch();
             if (back == 27) {
                clear();
@@ -3269,7 +3269,7 @@ void ChatView::handleMenu(int sock, int selection)
                refresh();
                wmove(currentWin, curs_y, curs_x);
                wrefresh(currentWin);
-               ChatView::handleMenu(sock, 110);
+               ClientView::handleMenu(sock, 110);
             } else {
                c = char(n);
                mvwprintw(currentWin, curs_y, curs_x, "%c", c);
@@ -3283,22 +3283,22 @@ void ChatView::handleMenu(int sock, int selection)
             break;
          }
          else {
-            map<int, int> idCustomerMapping = ChatService::FindCustomerName(sock, customerList, input);
+            map<int, int> idCustomerMapping = ClientService::FindCustomerName(sock, customerList, input);
             if (idCustomerMapping.size() == 0) {               
                break;
             }
             int spacePos = 0;
             for (auto cus : customerList) {
-               mvprintw(6+spacePos, 0, "%s", ChatService::processString(to_string(idCustomerMapping[cus.getCustomerId()])).c_str());
-               mvprintw(6+spacePos, 5, "%s", ChatService::processString(cus.getCustomerName()).c_str());
-               mvprintw(6+spacePos, 30, "%s", ChatService::processString(cus.getCustomerGender()).c_str());
-               mvprintw(6+spacePos, 60, "%s", ChatService::processString(cus.getCustomerAddress()).c_str());
-               mvprintw(6+spacePos, 100, "%s", ChatService::processString(cus.getCustomerBirthday()).c_str());
-               mvprintw(6+spacePos, 120, "%s", ChatService::processString(cus.getCustomerEmail()).c_str());
+               mvprintw(6+spacePos, 0, "%s", ClientService::processString(to_string(idCustomerMapping[cus.getCustomerId()])).c_str());
+               mvprintw(6+spacePos, 5, "%s", ClientService::processString(cus.getCustomerName()).c_str());
+               mvprintw(6+spacePos, 30, "%s", ClientService::processString(cus.getCustomerGender()).c_str());
+               mvprintw(6+spacePos, 60, "%s", ClientService::processString(cus.getCustomerAddress()).c_str());
+               mvprintw(6+spacePos, 100, "%s", ClientService::processString(cus.getCustomerBirthday()).c_str());
+               mvprintw(6+spacePos, 120, "%s", ClientService::processString(cus.getCustomerEmail()).c_str());
                spacePos++;
             }
 
-            mvprintw((currentWin->_maxx - 20), 0, "Press any key to continue!");
+            mvprintw((getmaxx(currentWin) - 20), 0, "Press any key to continue!");
             int back = getch();
             if (back == 27) {
                clear();
@@ -3408,11 +3408,11 @@ void ChatView::handleMenu(int sock, int selection)
          else
          {
             searchValue = input;
-            ChatService::RequestSend("FIND_USER|" + searchValue, sock);
+            ClientService::RequestSend("FIND_USER|" + searchValue, sock);
             int count = 0;
             // mvwprintw(finduserWin, 2, 2, "countname");
-            map<int, UserClient> foundUser = ChatService::GetFoundUser(sock, currentUser, count, finduserWin);
-            ChatView::interactUserMenu(count, foundUser, sock);
+            map<int, UserClient> foundUser = ClientService::GetFoundUser(sock, currentUser, count, finduserWin);
+            ClientView::interactUserMenu(count, foundUser, sock);
          }
          break;
       }
@@ -3420,16 +3420,16 @@ void ChatView::handleMenu(int sock, int selection)
          refresh();
          endwin();
          std::system("clear");
-         ChatService::RequestSend("UPDATE_PROFILE|", sock);
-         ChatService::GetCurrentProfile(sock, currentUser);
-         ChatView::UserConsole(sock);
+         ClientService::RequestSend("UPDATE_PROFILE|", sock);
+         ClientService::GetCurrentProfile(sock, currentUser);
+         ClientView::UserConsole(sock);
          break;
       case 111: // O
          refresh();
          clear();
          endwin();
          std::system("clear");
-         ChatService::RequestSend("LOGOUT_USER|", sock);
+         ClientService::RequestSend("LOGOUT_USER|", sock);
          currentUser.setId(-1);
          currentUser.setPassword("");
          currentUser.setName("");
@@ -3438,7 +3438,7 @@ void ChatView::handleMenu(int sock, int selection)
       case 27: // ESC
          refresh();
          endwin();
-         ChatService::exitAppChat(sock);
+         ClientService::exitAppChat(sock);
          readThread.join();
          std::system("clear");
          cout << "Exit chat app!\n";
@@ -3451,7 +3451,7 @@ void ChatView::handleMenu(int sock, int selection)
    } while (!isSuccess);
 }
 
-void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
+void ClientView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
 {
 
    clear();
@@ -3518,7 +3518,7 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
       {
          clear();
          endwin();
-         ChatView::handleMenu(sock, -1);
+         ClientView::handleMenu(sock, -1);
       }
       else if (n == 8 || n == 127)
       {                           // If the key press is backspace, erase current char, ex: hoangmy -> hoangm
@@ -3565,7 +3565,7 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
 
    if (n == 27)
    {
-      ChatView::handleMenu(sock, -1);
+      ClientView::handleMenu(sock, -1);
    }
 
    else
@@ -3576,7 +3576,7 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
       // n = stoi(select);
       if (select == "1")
       {
-         ChatService::GetUserProfile(sock, user, currentWin);
+         ClientService::GetUserProfile(sock, user, currentWin);
          while (true)
          {
             wattron(currentWin, COLOR_PAIR(4));
@@ -3585,7 +3585,7 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
             sig = wgetch(currentWin);
             if (sig == 10)
             {
-               ChatView::UserUI(sock, user, interactUserMenuWin);
+               ClientView::UserUI(sock, user, interactUserMenuWin);
                break;
             }
          }
@@ -3593,7 +3593,7 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
       if (isAdmin) {
          if (select == "2") {
             // Delete account
-            bool isDeleted = ChatService::DeleteAccountUser(sock, user.getId());
+            bool isDeleted = ClientService::DeleteAccountUser(sock, user.getId());
             if (isDeleted) {
                while (true)
                {
@@ -3603,7 +3603,7 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
                   sig = wgetch(currentWin);
                   if (sig == 10)
                   {
-                     ChatView::UserUI(sock, user, interactUserMenuWin);
+                     ClientView::UserUI(sock, user, interactUserMenuWin);
                      break;
                   }
                }
@@ -3617,25 +3617,25 @@ void ChatView::UserUI(int sock, UserClient user, WINDOW *interactUserMenuWin)
                   sig = wgetch(currentWin);
                   if (sig == 10)
                   {
-                     ChatView::UserUI(sock, user, interactUserMenuWin);
+                     ClientView::UserUI(sock, user, interactUserMenuWin);
                      break;
                   }
                }
             }
          }
          else if (select == "3") {
-            ChatView::handleMenu(sock, -1);
+            ClientView::handleMenu(sock, -1);
          }
       } else {
          if (select == "2")
          {
-            ChatView::handleMenu(sock, -1);
+            ClientView::handleMenu(sock, -1);
          }
       }
    }
 }
 
-void ChatView::MobileUI(int sock, int mobileId) {
+void ClientView::MobileUI(int sock, int mobileId) {
    clear();
    refresh();
    endwin();
@@ -3669,7 +3669,7 @@ void ChatView::MobileUI(int sock, int mobileId) {
    refresh();
    int curs_x, curs_y;
    curs_x = 34;
-   curs_y = (currentWin->_maxx - 30);
+   curs_y = (getmaxx(currentWin) - 30);
    wmove(currentWin, curs_x, curs_y);
 
    int n;
@@ -3693,7 +3693,7 @@ void ChatView::MobileUI(int sock, int mobileId) {
       if (n == 27) {
          clear();
          endwin();
-         ChatView::handleMenu(sock, -1);
+         ClientView::handleMenu(sock, -1);
       } 
       else if (n == 8 || n == 127) {
          // If the key press is backspace, erase current char
@@ -3726,14 +3726,14 @@ void ChatView::MobileUI(int sock, int mobileId) {
    } while (true);
    
    if (n == 27) {
-      ChatView::handleMenu(sock, -1);
+      ClientView::handleMenu(sock, -1);
    }
    else {
       string select = input;
       int sig;
 
       if (select == "1") {
-         Mobile mb = ChatService::GetMobileInformation(sock, mobileId);
+         Mobile mb = ClientService::GetMobileInformation(sock, mobileId);
          mvwprintw(currentWin, 9, 1, "%s: %s", "Mobile ID", to_string(mb.getMobileId()).c_str());
          mvwprintw(currentWin, 10, 1, "%s: %s", "Mobile Name", mb.getMobileName().c_str());
          mvwprintw(currentWin, 11, 1, "%s: %s", "Mobile Type", mb.getMobileType().c_str());
@@ -3747,17 +3747,17 @@ void ChatView::MobileUI(int sock, int mobileId) {
             wattroff(currentWin, COLOR_PAIR(4));
             sig = wgetch(currentWin);
             if (sig == 10) {
-               ChatView::MobileUI(sock, mobileId);
+               ClientView::MobileUI(sock, mobileId);
                break;
             }
          }
       }
       else if (select == "2") {
-         Mobile mobile = ChatService::GetMobileInformation(sock, mobileId);
-         ChatView::MobileConsole(sock, mobile, true);
+         Mobile mobile = ClientService::GetMobileInformation(sock, mobileId);
+         ClientView::MobileConsole(sock, mobile, true);
       }
       else if (select == "3") {
-         bool isDeleted = ChatService::DeleteMobileDevice(sock, mobileId);
+         bool isDeleted = ClientService::DeleteMobileDevice(sock, mobileId);
          while (true) {
             wattron(currentWin, COLOR_PAIR(3));
             isDeleted ? mvwprintw(currentWin, 14, 1, "%s", "Mobile has been deleted successfully!!")
@@ -3768,18 +3768,18 @@ void ChatView::MobileUI(int sock, int mobileId) {
             wattroff(currentWin, COLOR_PAIR(4));
             sig = wgetch(currentWin);
             if (sig == 10) {
-               ChatView::handleMenu(sock, -1);
+               ClientView::handleMenu(sock, -1);
                break;
             }
          }
       }
       else if (select == "4") {
-         ChatView::handleMenu(sock, -1);
+         ClientView::handleMenu(sock, -1);
       }
    }
 }
 
-void ChatView::CustomerUI(int sock, int customerId) {
+void ClientView::CustomerUI(int sock, int customerId) {
    Transaction transaction;
    clear();
    refresh();
@@ -3814,7 +3814,7 @@ void ChatView::CustomerUI(int sock, int customerId) {
    refresh();
    int curs_x, curs_y;
    curs_x = 34;
-   curs_y = (currentWin->_maxx - 30);
+   curs_y = (getmaxx(currentWin) - 30);
    wmove(currentWin, curs_x, curs_y);
 
    int n;
@@ -3841,7 +3841,7 @@ void ChatView::CustomerUI(int sock, int customerId) {
       if (n == 27) {
          clear();
          endwin();
-         ChatView::handleMenu(sock, -1);
+         ClientView::handleMenu(sock, -1);
       } 
       else if (n == 8 || n == 127) {
          // If the key press is backspace, erase current char
@@ -3874,14 +3874,14 @@ void ChatView::CustomerUI(int sock, int customerId) {
    } while (true);
    
    if (n == 27) {
-      ChatView::handleMenu(sock, -1);
+      ClientView::handleMenu(sock, -1);
    }
    else {
       string select = input;
       int sig;
 
       if (select == "1") {
-         Customer customer = ChatService::GetCustomerInformation(sock, customerId);
+         Customer customer = ClientService::GetCustomerInformation(sock, customerId);
          mvwprintw(currentWin, 11, 1, "%s: %s", "Customer ID", to_string(customer.getCustomerId()).c_str());
          mvwprintw(currentWin, 12, 1, "%s: %s", "Customer Name", customer.getCustomerName().c_str());
          mvwprintw(currentWin, 13, 1, "%s: %s", "Customer Address", customer.getCustomerAddress().c_str());
@@ -3895,18 +3895,18 @@ void ChatView::CustomerUI(int sock, int customerId) {
             wattroff(currentWin, COLOR_PAIR(4));
             sig = wgetch(currentWin);
             if (sig == 10) {
-               ChatView::CustomerUI(sock, customerId);
+               ClientView::CustomerUI(sock, customerId);
                break;
             }
          }
       }
       else if (select == "2") {
-         Customer customer = ChatService::GetCustomerInformation(sock, customerId);
+         Customer customer = ClientService::GetCustomerInformation(sock, customerId);
          // Update Customer Information
-         ChatView::CustomerConsole(sock, customer, true);
+         ClientView::CustomerConsole(sock, customer, true);
       }
       else if (select == "3") {
-         bool isDeleted = ChatService::DeleteCustomer(sock, customerId);
+         bool isDeleted = ClientService::DeleteCustomer(sock, customerId);
          while (true) {
             wattron(currentWin, COLOR_PAIR(3));
             isDeleted ? mvwprintw(currentWin, 14, 1, "%s", "Customer has been deleted successfully!!")
@@ -3917,7 +3917,7 @@ void ChatView::CustomerUI(int sock, int customerId) {
             wattroff(currentWin, COLOR_PAIR(4));
             sig = wgetch(currentWin);
             if (sig == 10) {
-               ChatView::handleMenu(sock, -1);
+               ClientView::handleMenu(sock, -1);
                break;
             }
          }
@@ -3927,11 +3927,11 @@ void ChatView::CustomerUI(int sock, int customerId) {
          endwin();
          system("clear");
          // Create new Transaction and in customer UI
-         ChatView::TransactionConsole(sock, transaction, false, true, customerId);
+         ClientView::TransactionConsole(sock, transaction, false, true, customerId);
       }
       else if (select == "5") {
          vector<Transaction> transactionList;
-         map<int, int> idTransactionMapping = ChatService::GetTransactionHistoryWithCustomerId(sock, transactionList, customerId);
+         map<int, int> idTransactionMapping = ClientService::GetTransactionHistoryWithCustomerId(sock, transactionList, customerId);
          if (idTransactionMapping.empty()) {
             mvwprintw(currentWin, 14, 1, "%s", "No transaction found!!");
          } else {
@@ -3943,32 +3943,32 @@ void ChatView::CustomerUI(int sock, int customerId) {
             mvwprintw(currentWin, 1, 80, "%s", "Payment Method");
             int spacePos = 0;
             for(auto transaction : transactionList) {
-               mvwprintw(currentWin, 2+spacePos, 2, "%s", ChatService::processString(to_string(idTransactionMapping[transaction.getTransactionId()])).c_str());
-               mvwprintw(currentWin, 2+spacePos, 5, "%s", ChatService::processString(transaction.getTransactionName()).c_str());
-               mvwprintw(currentWin, 2+spacePos, 60, "%s", ChatService::processString(transaction.getTransactionType()).c_str());
-               mvwprintw(currentWin, 2+spacePos, 80, "%s", ChatService::processString(transaction.getPaymentMethod()).c_str());
+               mvwprintw(currentWin, 2+spacePos, 2, "%s", ClientService::processString(to_string(idTransactionMapping[transaction.getTransactionId()])).c_str());
+               mvwprintw(currentWin, 2+spacePos, 5, "%s", ClientService::processString(transaction.getTransactionName()).c_str());
+               mvwprintw(currentWin, 2+spacePos, 60, "%s", ClientService::processString(transaction.getTransactionType()).c_str());
+               mvwprintw(currentWin, 2+spacePos, 80, "%s", ClientService::processString(transaction.getPaymentMethod()).c_str());
                spacePos += 1;
             }
 
             while (true) {
                wattron(currentWin, COLOR_PAIR(4));
-               mvwprintw(currentWin, (currentWin->_maxx - 10), 1, "Press Enter to continue");
+               mvwprintw(currentWin, (getmaxx(currentWin) - 10), 1, "Press Enter to continue");
                wattroff(currentWin, COLOR_PAIR(4));
                sig = wgetch(currentWin);
                if (sig == 10) {
-                  ChatView::CustomerUI(sock, customerId);
+                  ClientView::CustomerUI(sock, customerId);
                   break;
                }
             }
          }
       }
       else if (select == "6") {
-         ChatView::handleMenu(sock, -1);
+         ClientView::handleMenu(sock, -1);
       }
    }
 }
 
-void ChatView::TransactionUI(int sock, int transactionId) {
+void ClientView::TransactionUI(int sock, int transactionId) {
    clear();
    refresh();
    endwin();
@@ -4002,7 +4002,7 @@ void ChatView::TransactionUI(int sock, int transactionId) {
    refresh();
    int curs_x, curs_y;
    curs_x = 34;
-   curs_y = (currentWin->_maxx - 30);
+   curs_y = (getmaxx(currentWin) - 30);
    wmove(currentWin, curs_x, curs_y);
 
    int n;
@@ -4026,7 +4026,7 @@ void ChatView::TransactionUI(int sock, int transactionId) {
       if (n == 27) {
          clear();
          endwin();
-         ChatView::handleMenu(sock, -1);
+         ClientView::handleMenu(sock, -1);
       } 
       else if (n == 8 || n == 127) {
          // If the key press is backspace, erase current char
@@ -4059,14 +4059,14 @@ void ChatView::TransactionUI(int sock, int transactionId) {
    } while (true);
    
    if (n == 27) {
-      ChatView::handleMenu(sock, -1);
+      ClientView::handleMenu(sock, -1);
    }
    else {
       string select = input;
       int sig;
 
       if (select == "1") {
-         Transaction transaction = ChatService::GetTransactionInformation(sock, transactionId);
+         Transaction transaction = ClientService::GetTransactionInformation(sock, transactionId);
          mvwprintw(currentWin, 9, 1, "%s: %s", "Transaction ID", to_string(transaction.getTransactionId()).c_str());
          mvwprintw(currentWin, 10, 1, "%s: %s", "Transaction Type", transaction.getTransactionName().c_str());
          mvwprintw(currentWin, 11, 1, "%s: %s", "Payment Method", transaction.getTransactionType().c_str());
@@ -4077,18 +4077,18 @@ void ChatView::TransactionUI(int sock, int transactionId) {
             wattroff(currentWin, COLOR_PAIR(4));
             sig = wgetch(currentWin);
             if (sig == 10) {
-               ChatView::TransactionUI(sock, transactionId);
+               ClientView::TransactionUI(sock, transactionId);
                break;
             }
          }
       }
       else if (select == "2") {
-         Transaction transaction = ChatService::GetTransactionInformation(sock, transactionId);
+         Transaction transaction = ClientService::GetTransactionInformation(sock, transactionId);
          // Update Customer Information and didn't in Customer UI
-         ChatView::TransactionConsole(sock, transaction, true, false, -1);
+         ClientView::TransactionConsole(sock, transaction, true, false, -1);
       }
       else if (select == "3") {
-         bool isDeleted = ChatService::DeleteTransaction(sock, transactionId);
+         bool isDeleted = ClientService::DeleteTransaction(sock, transactionId);
          while (true) {
             wattron(currentWin, COLOR_PAIR(3));
             isDeleted ? mvwprintw(currentWin, 14, 1, "%s", "Transaction has been deleted successfully!!")
@@ -4099,23 +4099,23 @@ void ChatView::TransactionUI(int sock, int transactionId) {
             wattroff(currentWin, COLOR_PAIR(4));
             sig = wgetch(currentWin);
             if (sig == 10) {
-               ChatView::handleMenu(sock, -1);
+               ClientView::handleMenu(sock, -1);
                break;
             }
          }
       }
       else if (select == "4") {
-         ChatView::handleMenu(sock, -1);
+         ClientView::handleMenu(sock, -1);
       }
    }
 }
 
-UserClient ChatView::getUser()
+UserClient ClientView::getUser()
 {
    return currentUser;
 }
 
-WINDOW *ChatView::getCurrentWin()
+WINDOW *ClientView::getCurrentWin()
 {
    return currentWin;
 }

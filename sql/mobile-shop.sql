@@ -78,7 +78,7 @@ CREATE TABLE mobile(
     mob_price DOUBLE(10, 2) NOT NULL,
     mob_desc VARCHAR(255),
     cart_id BIGINT,
-    image_url VARCHAR(255) NOT NULL,
+    image_url VARCHAR(255),
     rating_id BIGINT,
     wishlist_id BIGINT,
     create_at DATETIME(6), 

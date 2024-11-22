@@ -25,7 +25,7 @@ public class PaymentServiceImpl implements PaymentService {
             put("paymentID", paymentEntity.getPaymentId());
             put("paymentMethod", paymentEntity.getPaymentMethod());
             put("paymentDescription", paymentEntity.getPaymentDescription());
-            put("imageUrl", paymentEntity.getImageUrl());
+            put("imageUrl", paymentEntity.getImageUrl() != null ? paymentEntity.getImageUrl() : "");
         }};
     }
     @Override

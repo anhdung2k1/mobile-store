@@ -2,7 +2,7 @@
 #pragma once
 #include "../model/UserClient.h"
 #include "../model/Mobile.h"
-#include "../view/ChatView.h"
+#include "../view/ClientView.h"
 #include "../view/StatusBar.h"
 #include <vector>
 #include <sys/socket.h>
@@ -23,7 +23,7 @@
 #include <cstdlib>
 
 using namespace std;
-class ChatService
+class ClientService
 {
 private:
     static const int buffer_size = 8124;

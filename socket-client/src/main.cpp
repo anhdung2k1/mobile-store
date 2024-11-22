@@ -1,9 +1,9 @@
 #include <bits/stdc++.h>
-#include "controller/ChatController.h"
+#include "controller/ClientController.h"
 
 using namespace std;
 int main(int argument, char const *argv[])
 {
-    ChatController::connectToServer();
+    ClientController::connectToServer();
     return 0;
 }

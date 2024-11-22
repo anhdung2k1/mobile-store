@@ -40,14 +40,14 @@ void StatusBar::setAttributes(attr_t attributes) {
 }
 
 void StatusBar::draw() {
-    int output_row = _parent->_maxy - 1;
+    int output_row = getmaxy(_parent) - 1;
     attron(_attributes);
     mvwaddstr(_parent, output_row, 0, getText().c_str());
     attroff(_attributes);
 }
 
 void StatusBar::clear() {
-    int output_row = _parent->_maxy - 1;
+    int output_row = getmaxy(_parent) - 1;
     move(output_row, 0);
     clrtoeol();
 }

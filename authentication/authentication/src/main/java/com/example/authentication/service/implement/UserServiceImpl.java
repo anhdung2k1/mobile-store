@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService{
             put("address", userEntity.getAddress());
             put("birthDay", userEntity.getBirthDay());
             put("gender", userEntity.getGender());
-            put("imageUrl", userEntity.getImageUrl());
+            put("imageUrl", userEntity.getImageUrl() != null ? userEntity.getImageUrl() : "");
         }};
     }
 
@@ -50,10 +50,12 @@ public class UserServiceImpl implements UserService{
             UserEntity userEntity = new UserEntity();
             user.setCreateAt(LocalDateTime.now());
             user.setUpdateAt(LocalDateTime.now());
-            if (!user.getImageUrl().isEmpty()) {
-                // Save to S3 Bucket
-                URL objectURL = s3Utils.getS3URL(user.getImageUrl());
-                user.setImageUrl(objectURL.toString());
+            if (user.getImageUrl() != null) {
+                if (!user.getImageUrl().isEmpty() ) {
+                    // Save to S3 Bucket
+                    URL objectURL = s3Utils.getS3URL(user.getImageUrl());
+                    user.setImageUrl(objectURL.toString());
+                }
             }
             BeanUtils.copyProperties(user, userEntity);
             userRepository.save(userEntity);
@@ -68,19 +70,23 @@ public class UserServiceImpl implements UserService{
     public boolean deleteUser(Long id) throws Exception {
        try{
             if(userRepository.findById(id).isPresent()) {
-                String fileURI = userRepository.findById(id).get().getImageUrl();
-                String [] fileURISplitted = fileURI.split("/");
-                log.info("fileURISplitted: {}", (Object) fileURISplitted);
-                String fileName = fileURISplitted[fileURISplitted.length-1];
-                log.info("FileName: {}", fileName);
-                s3Client.deleteObject(bucketName, fileName);
-                log.info("FileName: {} removed", fileName);
+                if (userRepository.findById(id).get().getImageUrl() != null) {
+                    if (!userRepository.findById(id).get().getImageUrl().isEmpty()) {
+                        String fileURI = userRepository.findById(id).get().getImageUrl();
+                        String [] fileURISplitted = fileURI.split("/");
+                        log.info("fileURISplitted: {}", (Object) fileURISplitted);
+                        String fileName = fileURISplitted[fileURISplitted.length-1];
+                        log.info("FileName: {}", fileName);
+                        s3Client.deleteObject(bucketName, fileName);
+                        log.info("FileName: {} removed", fileName);
+                    }
+                }
 
                userRepository.delete(userRepository.findById(id).get());
                return true;
             }
             return false;
-       }catch(NoSuchElementException e){
+       } catch(NoSuchElementException e){
             throw new Exception("User is not found :" + id.toString());
        }
     }
@@ -100,8 +106,7 @@ public class UserServiceImpl implements UserService{
             // Assign all the properties USER Properties to users
             assert userEntity != null;
             return userMap(userEntity);
-        }
-        catch (NoSuchElementException e){
+        } catch (NoSuchElementException e){
             throw new Exception("User is not found :" + id.toString());
         }
     }
@@ -143,8 +148,10 @@ public class UserServiceImpl implements UserService{
             userEntity.setGender(user.getGender());
             userEntity.setUpdateAt(LocalDateTime.now());
             if (user.getImageUrl() != null) {
-                URL objectURL = s3Utils.getS3URL(user.getImageUrl());
-                userEntity.setImageUrl(objectURL.toString());
+                if (!user.getImageUrl().isEmpty()) {
+                    URL objectURL = s3Utils.getS3URL(user.getImageUrl());
+                    userEntity.setImageUrl(objectURL.toString());
+                }
             }
             userRepository.save(userEntity);
             BeanUtils.copyProperties(userEntity, user);

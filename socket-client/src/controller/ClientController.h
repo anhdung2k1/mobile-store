@@ -1,8 +1,8 @@
 // Copyright [2024] <Anh Dung>
 #pragma once
-#include "../view/ChatView.h"
+#include "../view/ClientView.h"
 
-class ChatController{
+class ClientController{
  public:
         static void connectToServer();
 };

@@ -1,8 +1,5 @@
 // Copyright [2024] <Anh Dung>
-#define PORT 8000
-#define ADDRESS "172.17.0.5"
-
-#include "ChatService.h"
+#include "ClientService.h"
 
 bool exitApp = false;
 bool reconnect = false;
@@ -10,31 +7,31 @@ queue<string> pendingMsg;
 stack<string> hiddenMsgUp;
 stack<string> hiddenMsgDown;
 
-void ChatService::pushStackUp(string message)
+void ClientService::pushStackUp(string message)
 {
     hiddenMsgUp.push(message);
 }
 
-void ChatService::pushStackDown(string message)
+void ClientService::pushStackDown(string message)
 {
     hiddenMsgDown.push(message);
 }
 
-struct ChatService::Response
+struct ClientService::Response
 {
     string pattern;
     string value;
 };
 
-ChatService::Response response;
+ClientService::Response response;
 
-void ChatService::clearStack()
+void ClientService::clearStack()
 {
     stack<string>().swap(hiddenMsgUp);
     stack<string>().swap(hiddenMsgDown);
 }
 
-void ChatService::HandleInput()
+void ClientService::HandleInput()
 {
     if (cin.fail())
     {
@@ -44,17 +41,27 @@ void ChatService::HandleInput()
     }
 }
 
-int ChatService::GetPort()
+// Get SERVER_PORT by getting env
+int ClientService::GetPort()
 {
-    return PORT;
+    const char* port = getenv("SERVER_PORT");
+    if (port != nullptr && *port != '\0') {
+        return stoi(string(port)); // Convert to int
+    }
+    return 8000;  // Default port if SERVER_PORT is not set
 }
 
-string ChatService::GetAddress()
+// GET SERVER_ADDRESS by getting env
+string ClientService::GetAddress()
 {
-    return ADDRESS;
+    const char* address = getenv("SERVER_ADDRESS");
+    if (address != nullptr && *address != '\0') {
+        return string(address); // Return as string
+    }
+    return "127.0.0.1";  // Default address if SERVER_ADDRESS is not set
 }
 
-bool ChatService::RequestSend(string request, int sock)
+bool ClientService::RequestSend(string request, int sock)
 {
     if (send(sock, request.c_str(), request.size(), 0))
     {
@@ -63,7 +70,7 @@ bool ChatService::RequestSend(string request, int sock)
     return false;
 }
 
-void ChatService::processPattern(char *buffer, string &pattern, string &value)
+void ClientService::processPattern(char *buffer, string &pattern, string &value)
 {
     string convertedBuffer = (string)buffer;
     int pos = convertedBuffer.find("|");
@@ -71,17 +78,17 @@ void ChatService::processPattern(char *buffer, string &pattern, string &value)
     value = convertedBuffer.substr(pos + 1);
 }
 
-string ChatService::processString(string msg)
+string ClientService::processString(string msg)
 {
     msg.erase(remove_if(msg.begin(), msg.end(), [](char c) { return c == '"'; }), msg.end());
     return msg;
 }
 
-bool ChatService::HandlePattern(char *buffer, int sock)
+bool ClientService::HandlePattern(char *buffer, int sock)
 {
     string pattern, value;
     processPattern(buffer, pattern, value);
-    WINDOW *win = ChatView::getCurrentWin();
+    WINDOW *win = ClientView::getCurrentWin();
     int y, x;
     getyx(win, y, x);
 
@@ -103,7 +110,7 @@ bool ChatService::HandlePattern(char *buffer, int sock)
     return true;
 }
 
-string ChatService::GetValueFromServer(int sock, string pattern)
+string ClientService::GetValueFromServer(int sock, string pattern)
 {
     if (!reconnect)
     {
@@ -121,7 +128,7 @@ string ChatService::GetValueFromServer(int sock, string pattern)
     return "";
 }
 
-bool ChatService::ResponseReceive(int sock, char *buffer)
+bool ClientService::ResponseReceive(int sock, char *buffer)
 {
     bzero(buffer, buffer_size);
     int valread = recv(sock, buffer, buffer_size, 0);
@@ -136,7 +143,7 @@ bool ChatService::ResponseReceive(int sock, char *buffer)
     return true;
 }
 
-void ChatService::HandleReceive(int sock, char *buffer)
+void ClientService::HandleReceive(int sock, char *buffer)
 {
     while (!exitApp)
     {
@@ -146,9 +153,9 @@ void ChatService::HandleReceive(int sock, char *buffer)
             close(sock);
             if (!exitApp)
             {
-                sock = handleConnect(ADDRESS, PORT);
+                sock = handleConnect(ClientService::GetAddress().c_str(), ClientService::GetPort());
                 nlohmann::json backupJson = nlohmann::json::object();
-                UserClient backupUser = ChatView::getUser();
+                UserClient backupUser = ClientView::getUser();
                 backupJson.push_back({"userName", backupUser.getName()});
                 backupJson.push_back({"userPassword", backupUser.getPassword()});
                 string backupString = backupJson.dump();
@@ -162,7 +169,7 @@ void ChatService::HandleReceive(int sock, char *buffer)
     }
 }
 
-bool ChatService::ConvertToBool(string s) {
+bool ClientService::ConvertToBool(string s) {
     if (s == "true" || s == "1" || s == "yes" || s == "y" || s == "True" || s == "YES" || s == "Y") {
         return true;
     } else if (s == "false" || s == "0" || s == "no" || s == "n" || s == "False" || s == "NO" || s == "N") {
@@ -175,7 +182,7 @@ bool ChatService::ConvertToBool(string s) {
     }
 }
 
-map<int, UserClient> ChatService::GetFoundUser(int sock, UserClient user, int &count, WINDOW *finduserWin)
+map<int, UserClient> ClientService::GetFoundUser(int sock, UserClient user, int &count, WINDOW *finduserWin)
 {
     map<int, UserClient> foundUser;
     string response = GetValueFromServer(sock, "FIND_USER");
@@ -213,12 +220,12 @@ map<int, UserClient> ChatService::GetFoundUser(int sock, UserClient user, int &c
         // cout << "No result matches your search!\n";
         mvwprintw(finduserWin, row, 2, "No result matches your search!");
         wrefresh(finduserWin);
-        ChatView::handleMenu(sock, 102);
+        ClientView::handleMenu(sock, 102);
     }
     return foundUser;
 }
 
-void ChatService::GetCurrentProfile(int sock, UserClient &user)
+void ClientService::GetCurrentProfile(int sock, UserClient &user)
 {
     string response = GetValueFromServer(sock, "UPDATE_PROFILE");
     nlohmann::json j = nlohmann::json::parse(response);
@@ -237,7 +244,7 @@ void ChatService::GetCurrentProfile(int sock, UserClient &user)
 void ReconnectStatus()
 {
     string notification;
-    WINDOW *win = ChatView::getCurrentWin();
+    WINDOW *win = ClientView::getCurrentWin();
     int y, x;
     getyx(win, y, x);
     int count = 0;
@@ -262,7 +269,7 @@ void ReconnectStatus()
     }
 }
 
-int ChatService::handleConnect(const char *address, int port)
+int ClientService::handleConnect(const char *address, int port)
 {
     int sock = 0;
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -300,18 +307,18 @@ int ChatService::handleConnect(const char *address, int port)
     return sock;
 }
 
-void ChatService::exitAppChat(int sock)
+void ClientService::exitAppChat(int sock)
 {
     RequestSend("USER_EXIT_APP|", sock);
     exitApp = true;
 }
 
-void ChatService::GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserProfileWin)
+void ClientService::GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserProfileWin)
 {
     stringstream ss;
     ss << user.getId();
     string str = ss.str();
-    ChatService::RequestSend("USER_PROFILE|" + str, sock);
+    ClientService::RequestSend("USER_PROFILE|" + str, sock);
     string response = GetValueFromServer(sock, "USER_PROFILE");
     nlohmann::json j = nlohmann::json::parse(response);
     user.setName(j.at("userName").get<string>());
@@ -324,11 +331,11 @@ void ChatService::GetUserProfile(int sock, UserClient &user, WINDOW *OrtherUserP
     wrefresh(OrtherUserProfileWin);
 }
 
-Mobile ChatService::GetMobileInformation(int sock, int mobileId)
+Mobile ClientService::GetMobileInformation(int sock, int mobileId)
 {
     string str = to_string(mobileId);
-    ChatService::RequestSend("MOBILE_INFORMATION|" + str, sock);
-    string response = ChatService::GetValueFromServer(sock, "MOBILE_INFORMATION");
+    ClientService::RequestSend("MOBILE_INFORMATION|" + str, sock);
+    string response = ClientService::GetValueFromServer(sock, "MOBILE_INFORMATION");
     nlohmann::json j = nlohmann::json::parse(response);
     Mobile mb(
         j.at("mobileID").get<int>(),
@@ -343,13 +350,13 @@ Mobile ChatService::GetMobileInformation(int sock, int mobileId)
 }
 
 // Return two values [map<int, int> idMapping, vector<Mobile>mobile]
-map<int, int> ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern)
+map<int, int> ClientService::FindInventoryName(int sock, vector<Mobile> &mobile, string input, string pattern)
 {
     mobile.clear();
     int idx = 1;
     map<int, int> idMapping; // key: mobileID, value: index
-    ChatService::RequestSend(pattern + "|" + input, sock);
-    string response = ChatService::GetValueFromServer(sock, pattern);
+    ClientService::RequestSend(pattern + "|" + input, sock);
+    string response = ClientService::GetValueFromServer(sock, pattern);
     if (response.length() > 0) {
         nlohmann::json j = nlohmann::json::parse(response);
         mvprintw(5, 5, "%s", "Mobile Name");
@@ -378,12 +385,12 @@ map<int, int> ChatService::FindInventoryName(int sock, vector<Mobile> &mobile, s
     return idMapping;
 }
 
-map<int, int> ChatService::FindTransactionHistory(int sock, vector<Transaction> &transaction, string input) {
+map<int, int> ClientService::FindTransactionHistory(int sock, vector<Transaction> &transaction, string input) {
     transaction.clear();
     int idx = 1;
     map<int, int> idTransMapping;
-    ChatService::RequestSend("FIND_TRANSACTION_HISTORY|" + input, sock);
-    string response = ChatService::GetValueFromServer(sock, "FIND_TRANSACTION_HISTORY");
+    ClientService::RequestSend("FIND_TRANSACTION_HISTORY|" + input, sock);
+    string response = ClientService::GetValueFromServer(sock, "FIND_TRANSACTION_HISTORY");
     if(response.length() > 0) {
         nlohmann::json j = nlohmann::json::parse(response);
         mvprintw(5, 5, "%s", "Transaction Name");
@@ -407,12 +414,12 @@ map<int, int> ChatService::FindTransactionHistory(int sock, vector<Transaction> 
     return idTransMapping; 
 }
 
-map<int, int> ChatService::GetTransactionHistoryWithCustomerId(int sock, vector<Transaction> &transaction, int customerId) {
+map<int, int> ClientService::GetTransactionHistoryWithCustomerId(int sock, vector<Transaction> &transaction, int customerId) {
     transaction.clear();
     int idx = 1;
     map<int, int> idTransMapping;
-    ChatService::RequestSend("GET_TRANSACTION_HISTORY_WITH_CUSTOMER_ID|" + to_string(customerId), sock);
-    string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY_WITH_CUSTOMER_ID");
+    ClientService::RequestSend("GET_TRANSACTION_HISTORY_WITH_CUSTOMER_ID|" + to_string(customerId), sock);
+    string response = ClientService::GetValueFromServer(sock, "GET_TRANSACTION_HISTORY_WITH_CUSTOMER_ID");
     if (response.length() > 0) {
         nlohmann::json j = nlohmann::json::parse(response);
         for(auto tr : j) {
@@ -432,9 +439,9 @@ map<int, int> ChatService::GetTransactionHistoryWithCustomerId(int sock, vector<
     return idTransMapping;
 }
 
-Transaction ChatService::GetTransactionInformation(int sock, int transactionId) {
-    ChatService::RequestSend("GET_TRANSACTION_INFORMATION|" + to_string(transactionId), sock);
-    string response = ChatService::GetValueFromServer(sock, "GET_TRANSACTION_INFORMATION");
+Transaction ClientService::GetTransactionInformation(int sock, int transactionId) {
+    ClientService::RequestSend("GET_TRANSACTION_INFORMATION|" + to_string(transactionId), sock);
+    string response = ClientService::GetValueFromServer(sock, "GET_TRANSACTION_INFORMATION");
     nlohmann::json j = nlohmann::json::parse(response);
     Transaction transaction(
         j.at("transactionID").get<int>(),
@@ -445,7 +452,7 @@ Transaction ChatService::GetTransactionInformation(int sock, int transactionId) 
     return transaction;
 }
 
-void ChatService::CreateTransaction(int sock, Transaction& transaction, int customerId) {
+void ClientService::CreateTransaction(int sock, Transaction& transaction, int customerId) {
     stringstream formData;
     formData << "{\"transactionName\": "
              << "\"" + transaction.getTransactionName() + "\", "
@@ -455,8 +462,8 @@ void ChatService::CreateTransaction(int sock, Transaction& transaction, int cust
              << "\"" + transaction.getPaymentMethod() + "\", "
              << "\"customerId\": "
              << "\"" + to_string(customerId) + "\"}";
-    ChatService::RequestSend("CREATE_TRANSACTION|" + formData.str(), sock);
-    string response = ChatService::GetValueFromServer(sock, "CREATE_TRANSACTION");
+    ClientService::RequestSend("CREATE_TRANSACTION|" + formData.str(), sock);
+    string response = ClientService::GetValueFromServer(sock, "CREATE_TRANSACTION");
     if (ConvertToBool(response)) {
         mvprintw(24, 3, "%s", "Transaction has been created successfully!!");
     }
@@ -465,7 +472,7 @@ void ChatService::CreateTransaction(int sock, Transaction& transaction, int cust
     }
 }
 
-void ChatService::UpdateTransaction(int sock, Transaction& transaction) {
+void ClientService::UpdateTransaction(int sock, Transaction& transaction) {
     stringstream formData;
     formData << "{\"transactionName\": "
              << "\"" + transaction.getTransactionName() + "\", "
@@ -473,24 +480,24 @@ void ChatService::UpdateTransaction(int sock, Transaction& transaction) {
              << "\"" + transaction.getTransactionType() + "\", "
              << "\"paymentMethod\": "
              << "\"" + transaction.getPaymentMethod() + "\"}";
-    ChatService::RequestSend("UPDATE_TRANSACTION|" + formData.str(), sock);
-    string response = ChatService::GetValueFromServer(sock, "UPDATE_TRANSACTION");
-    if(ChatService::ConvertToBool(response)) {
+    ClientService::RequestSend("UPDATE_TRANSACTION|" + formData.str(), sock);
+    string response = ClientService::GetValueFromServer(sock, "UPDATE_TRANSACTION");
+    if(ClientService::ConvertToBool(response)) {
         mvprintw(24, 3, "%s", "Transaction has been updated successfully!!");
     } else {
         mvprintw(24, 3, "%s", "Failed to updated Transaction !!");
     }
 }
 
-bool ChatService::DeleteTransaction(int sock, int transactionId) {
-    ChatService::RequestSend("DELETE_TRANSACTION|" + to_string(transactionId), sock);
-    string response = ChatService::GetValueFromServer(sock, "DELETE_TRANSACTION");
-    bool isDeleted = ChatService::ConvertToBool(response) ? true : false;
+bool ClientService::DeleteTransaction(int sock, int transactionId) {
+    ClientService::RequestSend("DELETE_TRANSACTION|" + to_string(transactionId), sock);
+    string response = ClientService::GetValueFromServer(sock, "DELETE_TRANSACTION");
+    bool isDeleted = ClientService::ConvertToBool(response) ? true : false;
     return isDeleted;
 }
 
 //Create new Mobile Device
-void ChatService::CreateMobileDevice(int sock, Mobile& mobile) {
+void ClientService::CreateMobileDevice(int sock, Mobile& mobile) {
     stringstream formData;
     formData << "{\"mobileName\": "
              << "\"" + mobile.getMobileName() + "\", " 
@@ -505,16 +512,16 @@ void ChatService::CreateMobileDevice(int sock, Mobile& mobile) {
              << "\"mobileDescription\": "
              << "\"" + mobile.getMobileDescription() + "\"}";
 
-    ChatService::RequestSend("CREATE_MOBILE_DEVICE|" + formData.str(), sock);
-    string response = ChatService::GetValueFromServer(sock, "CREATE_MOBILE_DEVICE");
-    if(ChatService::ConvertToBool(response)) {
+    ClientService::RequestSend("CREATE_MOBILE_DEVICE|" + formData.str(), sock);
+    string response = ClientService::GetValueFromServer(sock, "CREATE_MOBILE_DEVICE");
+    if(ClientService::ConvertToBool(response)) {
         mvprintw(24, 3, "%s", "Mobile has been created successfully!!");
     } else {
         mvprintw(24, 3, "%s", "Failed to created mobile device !!");
     }
 }
 
-void ChatService::UpdateMobileDevice(int sock, Mobile& mobile) {
+void ClientService::UpdateMobileDevice(int sock, Mobile& mobile) {
     stringstream formData;
     formData << "{\"mobileName\": "
              << "\"" + mobile.getMobileName() + "\", " 
@@ -529,28 +536,28 @@ void ChatService::UpdateMobileDevice(int sock, Mobile& mobile) {
              << "\"mobileDescription\": "
              << "\"" + mobile.getMobileDescription() + "\"}";
 
-    ChatService::RequestSend("UPDATE_MOBILE_DEVICE|" + formData.str(), sock);
-    string response = ChatService::GetValueFromServer(sock, "UPDATE_MOBILE_DEVICE");
-    if(ChatService::ConvertToBool(response)) {
+    ClientService::RequestSend("UPDATE_MOBILE_DEVICE|" + formData.str(), sock);
+    string response = ClientService::GetValueFromServer(sock, "UPDATE_MOBILE_DEVICE");
+    if(ClientService::ConvertToBool(response)) {
         mvprintw(24, 3, "%s", "Mobile has been updated successfully!!");
     } else {
         mvprintw(24, 3, "%s", "Failed to updated mobile device !!");
     }
 }
 
-bool ChatService::DeleteMobileDevice(int sock, int mobileId) {
-    ChatService::RequestSend("DELETE_MOBILE_DEVICE|" + to_string(mobileId), sock);
-    string response = ChatService::GetValueFromServer(sock, "DELETE_MOBILE_DEVICE");
-    bool isDeleted = ChatService::ConvertToBool(response) ? true : false;
+bool ClientService::DeleteMobileDevice(int sock, int mobileId) {
+    ClientService::RequestSend("DELETE_MOBILE_DEVICE|" + to_string(mobileId), sock);
+    string response = ClientService::GetValueFromServer(sock, "DELETE_MOBILE_DEVICE");
+    bool isDeleted = ClientService::ConvertToBool(response) ? true : false;
     return isDeleted;
 }
 
-map<int, int> ChatService::FindCustomerName(int sock, vector<Customer>& customers, string input) {
+map<int, int> ClientService::FindCustomerName(int sock, vector<Customer>& customers, string input) {
     customers.clear();
     int idx = 1;
     map<int, int> idMapping;
-    ChatService::RequestSend("FIND_CUSTOMER_NAME|" + input, sock);
-    string response = ChatService::GetValueFromServer(sock, "FIND_CUSTOMER_NAME");
+    ClientService::RequestSend("FIND_CUSTOMER_NAME|" + input, sock);
+    string response = ClientService::GetValueFromServer(sock, "FIND_CUSTOMER_NAME");
     if(response.length() > 0) {
         nlohmann::json j = nlohmann::json::parse(response);
         mvprintw(5, 5, "%s", "Customer Name");
@@ -578,9 +585,9 @@ map<int, int> ChatService::FindCustomerName(int sock, vector<Customer>& customer
     return idMapping;
 }
 
-Customer ChatService::GetCustomerInformation(int sock, int customerId) {
-    ChatService::RequestSend("GET_CUSTOMER_INFORMATION|" + to_string(customerId), sock);
-    string response = ChatService::GetValueFromServer(sock, "GET_CUSTOMER_INFORMATION");
+Customer ClientService::GetCustomerInformation(int sock, int customerId) {
+    ClientService::RequestSend("GET_CUSTOMER_INFORMATION|" + to_string(customerId), sock);
+    string response = ClientService::GetValueFromServer(sock, "GET_CUSTOMER_INFORMATION");
     nlohmann::json j = nlohmann::json::parse(response);
     Customer customer(
         j.at("customerID").get<int>(),
@@ -593,7 +600,7 @@ Customer ChatService::GetCustomerInformation(int sock, int customerId) {
     return customer;
 }
 
-void ChatService::CreateCustomer(int sock, Customer& customer) {
+void ClientService::CreateCustomer(int sock, Customer& customer) {
     stringstream formData;
     formData << "{\"customerName\": "
              << "\"" + customer.getCustomerName() + "\", " 
@@ -606,15 +613,15 @@ void ChatService::CreateCustomer(int sock, Customer& customer) {
              << "\"customerEmail\": "
              << "\"" + customer.getCustomerEmail() + "\"}";
 
-    ChatService::RequestSend("CREATE_CUSTOMER|" + formData.str(), sock);
-    string response = ChatService::GetValueFromServer(sock, "CREATE_CUSTOMER");
-    if(ChatService::ConvertToBool(response)) {
+    ClientService::RequestSend("CREATE_CUSTOMER|" + formData.str(), sock);
+    string response = ClientService::GetValueFromServer(sock, "CREATE_CUSTOMER");
+    if(ClientService::ConvertToBool(response)) {
         mvprintw(24, 3, "%s", "Customer has been created successfully!!");
     } else {
         mvprintw(24, 3, "%s", "Failed to created customer!!");
     }
 }
-void ChatService::UpdateCustomer(int sock, Customer& customer) {
+void ClientService::UpdateCustomer(int sock, Customer& customer) {
     stringstream formData;
     formData << "{\"customerName\": "
              << "\"" + customer.getCustomerName() + "\", " 
@@ -627,23 +634,23 @@ void ChatService::UpdateCustomer(int sock, Customer& customer) {
              << "\"customerEmail\": "
              << "\"" + customer.getCustomerEmail() + "\"}";
 
-    ChatService::RequestSend("UPDATE_CUSTOMER|" + formData.str(), sock);
-    string response = ChatService::GetValueFromServer(sock, "UPDATE_CUSTOMER");
-    if(ChatService::ConvertToBool(response)) {
+    ClientService::RequestSend("UPDATE_CUSTOMER|" + formData.str(), sock);
+    string response = ClientService::GetValueFromServer(sock, "UPDATE_CUSTOMER");
+    if(ClientService::ConvertToBool(response)) {
         mvprintw(24, 3, "%s", "Customer has been updated successfully!!");
     } else {
         mvprintw(24, 3, "%s", "Failed to created customer!!");
     }
 }
 
-bool ChatService::DeleteCustomer(int sock, int customerId) {
-    ChatService::RequestSend("DELETE_CUSTOMER|" + to_string(customerId), sock);
-    string response = ChatService::GetValueFromServer(sock, "DELETE_CUSTOMER");
-    bool isDeleted = ChatService::ConvertToBool(response) ? true : false;
+bool ClientService::DeleteCustomer(int sock, int customerId) {
+    ClientService::RequestSend("DELETE_CUSTOMER|" + to_string(customerId), sock);
+    string response = ClientService::GetValueFromServer(sock, "DELETE_CUSTOMER");
+    bool isDeleted = ClientService::ConvertToBool(response) ? true : false;
     return isDeleted;
 }
 
-bool ChatService::HandleName(string username)
+bool ClientService::HandleName(string username)
 {
     if (username.length() < 2)
     {
@@ -670,7 +677,7 @@ bool ChatService::HandleName(string username)
     return true;
 }
 
-bool ChatService::HandlePassword(string password)
+bool ClientService::HandlePassword(string password)
 {
     bool isNumber = FALSE;
     bool isAlphabet = FALSE;
@@ -700,14 +707,14 @@ bool ChatService::HandlePassword(string password)
 }
 
 // Check the account logged in is administrator
-bool ChatService::IsAdminAuthenticated(int sock) {
-    ChatService::RequestSend("ADMIN_ACCOUNT|", sock);
-    string response = ChatService::GetValueFromServer(sock, "ADMIN_ACCOUNT");
+bool ClientService::IsAdminAuthenticated(int sock) {
+    ClientService::RequestSend("ADMIN_ACCOUNT|", sock);
+    string response = ClientService::GetValueFromServer(sock, "ADMIN_ACCOUNT");
     return ConvertToBool(response);
 }
 
-bool ChatService::DeleteAccountUser(int sock, int userId) {
-    ChatService::RequestSend("DELETE_ACCOUNT|" + to_string(userId), sock);
-    string response = ChatService::GetValueFromServer(sock, "DELETE_ACCOUNT");
-    return ChatService::ConvertToBool(response);
+bool ClientService::DeleteAccountUser(int sock, int userId) {
+    ClientService::RequestSend("DELETE_ACCOUNT|" + to_string(userId), sock);
+    string response = ClientService::GetValueFromServer(sock, "DELETE_ACCOUNT");
+    return ClientService::ConvertToBool(response);
 }
