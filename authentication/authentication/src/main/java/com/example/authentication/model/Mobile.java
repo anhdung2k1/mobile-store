@@ -17,7 +17,7 @@ public class Mobile {
     private String mobileType;
     private String mobileDescription;
     private Integer mobileQuantity;
-    private String mobilePrice;
+    private Double mobilePrice;
     private String imageUrl;
     private RatingEntity rate;
     private LocalDateTime createAt;

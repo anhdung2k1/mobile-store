@@ -49,7 +49,7 @@ public class MobileEntity {
 
     @Column(name = "MOB_PRICE", nullable = false) // Price of the mobile
     @NotBlank(message = "Must specify price")
-    private String mobilePrice;
+    private Double mobilePrice;
 
     @Column(name = "MOB_DESC")
     private String mobileDescription; // The description for individual mobile

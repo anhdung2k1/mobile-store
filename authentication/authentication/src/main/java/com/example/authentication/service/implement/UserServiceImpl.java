@@ -50,10 +50,12 @@ public class UserServiceImpl implements UserService{
             UserEntity userEntity = new UserEntity();
             user.setCreateAt(LocalDateTime.now());
             user.setUpdateAt(LocalDateTime.now());
-            if (!user.getImageUrl().isEmpty() || user.getImageUrl() != null) {
-                // Save to S3 Bucket
-                URL objectURL = s3Utils.getS3URL(user.getImageUrl());
-                user.setImageUrl(objectURL.toString());
+            if (user.getImageUrl() != null) {
+                if (!user.getImageUrl().isEmpty() ) {
+                    // Save to S3 Bucket
+                    URL objectURL = s3Utils.getS3URL(user.getImageUrl());
+                    user.setImageUrl(objectURL.toString());
+                }
             }
             BeanUtils.copyProperties(user, userEntity);
             userRepository.save(userEntity);
@@ -68,14 +70,16 @@ public class UserServiceImpl implements UserService{
     public boolean deleteUser(Long id) throws Exception {
        try{
             if(userRepository.findById(id).isPresent()) {
-                if (userRepository.findById(id).get().getImageUrl() != null || !userRepository.findById(id).get().getImageUrl().isEmpty()) {
-                    String fileURI = userRepository.findById(id).get().getImageUrl();
-                    String [] fileURISplitted = fileURI.split("/");
-                    log.info("fileURISplitted: {}", (Object) fileURISplitted);
-                    String fileName = fileURISplitted[fileURISplitted.length-1];
-                    log.info("FileName: {}", fileName);
-                    s3Client.deleteObject(bucketName, fileName);
-                    log.info("FileName: {} removed", fileName);
+                if (userRepository.findById(id).get().getImageUrl() != null) {
+                    if (!userRepository.findById(id).get().getImageUrl().isEmpty()) {
+                        String fileURI = userRepository.findById(id).get().getImageUrl();
+                        String [] fileURISplitted = fileURI.split("/");
+                        log.info("fileURISplitted: {}", (Object) fileURISplitted);
+                        String fileName = fileURISplitted[fileURISplitted.length-1];
+                        log.info("FileName: {}", fileName);
+                        s3Client.deleteObject(bucketName, fileName);
+                        log.info("FileName: {} removed", fileName);
+                    }
                 }
 
                userRepository.delete(userRepository.findById(id).get());
@@ -143,9 +147,11 @@ public class UserServiceImpl implements UserService{
             userEntity.setBirthDay(user.getBirthDay());
             userEntity.setGender(user.getGender());
             userEntity.setUpdateAt(LocalDateTime.now());
-            if (user.getImageUrl() != null || !user.getImageUrl().isEmpty()) {
-                URL objectURL = s3Utils.getS3URL(user.getImageUrl());
-                userEntity.setImageUrl(objectURL.toString());
+            if (user.getImageUrl() != null) {
+                if (!user.getImageUrl().isEmpty()) {
+                    URL objectURL = s3Utils.getS3URL(user.getImageUrl());
+                    userEntity.setImageUrl(objectURL.toString());
+                }
             }
             userRepository.save(userEntity);
             BeanUtils.copyProperties(userEntity, user);
